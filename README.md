@@ -20,7 +20,10 @@ All of the parts are unbundled and can be extended to meet any standard (or non-
 
 ### Developer Installation
 
-In the root directory:
-- `docker-compose up`
-- `cd portal`
-- `npm run dev`
+- In the root directory:
+    ```bash 
+    docker-compose up -d --build \
+    cd portal \
+    npm run dev
+    ```
+- Navigate to **`localhost:3000`** to view the admin console running
