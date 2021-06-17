@@ -4,8 +4,10 @@ This project is an open-source, low-code framework to create internal admin tool
 
 ---
 
+### Features
+
 The following features are present out of the box:
-- Authentication and Authorization using FusionAuth
+- Authentication and Authorization using Next-Auth and FusionAuth
 - Data collection through ODK *(WIP)*
 - REST API on collected data through Loopback
 - GraphQL API on collected data through Hasura
@@ -15,3 +17,10 @@ The following features are present out of the box:
 - Metabase to visualise collected data inside Postgres *(WIP)*
 
 All of the parts are unbundled and can be extended to meet any standard (or non-standard) requirements.
+
+### Developer Installation
+
+In the root directory:
+- `docker-compose up`
+- `cd portal`
+- `npm run dev`

@@ -1,0 +1,26 @@
+{
+  "name": "portal",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "next": "11.0.0",
+    "next-auth": "^3.26.1",
+    "prop-types": "^15.7.2",
+    "ra-data-lb4": "^0.3.0",
+    "react": "17.0.2",
+    "react-admin": "^3.16.2",
+    "react-dom": "17.0.2",
+    "react-toast-notifications": "^2.4.4"
+  },
+  "devDependencies": {
+    "eslint": "7.28.0",
+    "eslint-config-next": "11.0.0"
+  }
+}

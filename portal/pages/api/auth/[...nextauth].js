@@ -1,0 +1,54 @@
+import NextAuth from 'next-auth'
+import Providers from 'next-auth/providers'
+import axios from 'axios'
+import { session } from 'next-auth/client'
+
+const fusionAuthLogin = async (path, credentials) => { 
+  const options = {
+    headers: { 'Authorization': process.env.FUSIONAUTH_API_KEY }
+  }      
+  
+  const response = await axios.post(
+      `${path}/api/login`, 
+      { loginId: credentials.loginId, password: credentials.password, applicationId: credentials.applicationId },
+      options
+      );
+  return response;
+}
+
+export default NextAuth({
+  // Configure one or more authentication providers
+  providers: [
+    Providers.Credentials({
+      id: 'fusionauth',
+      name: 'FusionAuth Credentials Login',         
+      async authorize(credentials, req) {   
+        
+        const response = await fusionAuthLogin(process.env.FUSIONAUTH_DOMAIN, credentials);
+        if(response) {          
+          return response.data;
+        }
+        return null;
+      }
+      
+    })
+  ],
+  session: {
+    jwt: true
+  },
+  callbacks: {
+    async jwt(token, user, account, profile, isNewUser) {
+      // Add access_token to the token right after signin
+      if (account){                      
+        token.username = profile.user.username;
+        token.jwt = profile.token;        
+      }
+      return token
+    },
+    async session(session, token) {
+      session.jwt = token.jwt;
+      session.username = token.username;
+      return session;
+    }
+  }
+})

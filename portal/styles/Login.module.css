@@ -1,0 +1,23 @@
+.description {
+    font-size: 2.5rem;    
+    text-align: center;
+    font-weight: 600;
+    font-variant: all-small-caps;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+  
+.form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form input:focus, .form input:active {
+    outline: 0;
+}
