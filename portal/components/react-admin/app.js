@@ -1,20 +1,34 @@
-import * as React from "react";
+import { useState, useEffect } from "react";
+import { Admin, Resource } from 'react-admin';
+import buildHasuraProvider from 'ra-data-hasura';
+import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { useSession } from "next-auth/client";
+import { StudentList, StudentEdit } from './base/resources/Student';
 
-import { Admin, Resource, ListGuesser } from 'react-admin';
-import lb4Provider from "ra-data-lb4";
-import styles from '../../styles/Home.module.css'
+const App = () => {
+    const [dataProvider, setDataProvider] = useState(null);
+    const [session] = useSession();
 
+    const authenticatedClient = new ApolloClient({
+        uri: process.env.NEXT_PUBLIC_HASURA_URL,
+        cache: new InMemoryCache(),
+        headers: {
+          'Authorization': `Bearer ${session.jwt}`,
+        },
+      });
 
-const dataProvider = lb4Provider();
-
-
-const App = () => { 
-  return (
-    <Admin dataProvider={dataProvider}>
-      <Resource name="" list={ListGuesser} />
+    useEffect(() => {
+        async function buildDataProvider() {                                  
+            const hasuraProvider = await buildHasuraProvider({ client: authenticatedClient });
+            setDataProvider(() => hasuraProvider);
+        }
+        buildDataProvider();
+    }, [])
+    if(!dataProvider) return null;
+    return (<Admin dataProvider={dataProvider}>
+        <Resource name="student" list={StudentList} edit={StudentEdit} />
     </Admin>
-);
+    );
 }
-
 
 export default App;

@@ -13,6 +13,7 @@ import {
 } from '@loopback/rest';
 import {DonateDevice} from '../models';
 import {DonateDeviceRepository} from '../repositories';
+import { graphQLHelper } from './graphQLHelper';
 
 export class DonateDeviceController {
   constructor(
@@ -38,7 +39,13 @@ export class DonateDeviceController {
     })
     donateDevice: Omit<DonateDevice, 'id'>,
   ): Promise<DonateDevice> {
-    return this.donateDeviceRepository.create(donateDevice);
+    const instanceID = donateDevice.data[0]?.instanceID;
+    const filter = {where: {'data.instanceID': instanceID}};
+    const existingRecord = await this.donateDeviceRepository.findOne(filter);
+    if (!existingRecord) {
+      return this.donateDeviceRepository.create(donateDevice);
+    } else return existingRecord;
+  }
   }
 
   @get('/donate-devices/count')

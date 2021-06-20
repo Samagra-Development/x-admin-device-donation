@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { useState, useEffect } from 'react';
-import styles from './layout.module.css'
+import styles from '../styles/layout.module.css'
 
 
 export default function layout ({ children, home })  {
@@ -40,7 +40,7 @@ export default function layout ({ children, home })  {
         <div className={styles.container}>
             <header className={styles.header}>
                 <h1 className={styles.title}>
-                    फ़ोन <span className={styles.link}>दान</span>
+            बच्चों का सहारा, <br/>फ़ोन हमारा
                 </h1>
             </header>
             <main onTransitionEnd={() => { transitionEnd(); }} className={`${styles.main} ${styles[transitionStage]}`}>{activeChildren}</main>

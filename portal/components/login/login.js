@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useToasts } from 'react-toast-notifications';
 import { signIn } from 'next-auth/client'
+import { useRouter } from 'next/router'
 import controls from './form.config';
 import styles from '../../styles/Login.module.css'
 
+
 export default function Login(props) {
-    const { applicationId } = props;
+    const { persona } = props;
     const [input, setInput] = useState({});
+    const router = useRouter();
     const [inputValidity, setInputValidity] = useState(controls.map(control => { 
         return { 
             [control.name]: false}
@@ -32,23 +35,27 @@ export default function Login(props) {
 
     const signUserIn = async (e) => {
         e.preventDefault();                            
-        const { error } = await 
+        const { error, url } = await 
             signIn('fusionauth', 
                 {
                     loginId: input.username, 
                     password: input.password,
-                    applicationId,
-                    redirect: false
-                })
+                    applicationId: persona.applicationId,
+                    redirect: false,
+                    callbackUrl: `${process.env.NEXT_PUBLIC_URL}/${persona.redirectUrl}`
+                }) 
+        if(url) {   
+            router.push(url);
+        }          
         if(error) {
             addToast(error, { appearance: 'error'})
         }
     } 
 
     return (                                    
-            <div className={styles.grid}>                
-                <h2> Log in &#47; लॉग इन &rarr;</h2>
-                <form className={`card ${styles.form}`} >
+            <div className={`${styles.grid} ${styles['grid-one']}`}>    
+                <span className={styles.description}>Log in as <span className={'text-bold'}>{persona.en}</span>&#47; <span className={'text-bold'}>{persona.hi}</span> लॉग इन</span>                            
+                <form className={styles.form} >
                     {controls.map((control) => <input 
                         key={control.name}
                         type={control.type} 
@@ -57,10 +64,10 @@ export default function Login(props) {
                         required={control.required}
                         placeholder={control.placeholder} 
                         onChange={handleInput} />)}
-                    <button disabled={!formValidity} 
+                    <button autcomplete='off' disabled={!formValidity} 
                         onClick={signUserIn}
                     >
-                          Fill request form / निवेदन
+                          Submit
                     </button>                
                 </form>   
             </div>           
