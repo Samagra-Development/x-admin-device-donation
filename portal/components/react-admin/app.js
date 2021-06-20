@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Admin, Resource } from 'react-admin';
+import { Admin, ListGuesser, Resource } from 'react-admin';
 import buildHasuraProvider from 'ra-data-hasura';
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { useSession } from "next-auth/client";
-import { StudentList, StudentEdit } from './base/resources/Student';
+import customTheme from './theme';
+import { DonateDeviceRequestList } from './base/resources/donate-device';
 
 const App = () => {
     const [dataProvider, setDataProvider] = useState(null);
@@ -14,9 +15,10 @@ const App = () => {
         cache: new InMemoryCache(),
         headers: {
           'Authorization': `Bearer ${session.jwt}`,
+          'x-hasura-role': `${session.role}`
         },
       });
-
+    console.log(customTheme);
     useEffect(() => {
         async function buildDataProvider() {                                  
             const hasuraProvider = await buildHasuraProvider({ client: authenticatedClient });
@@ -24,9 +26,10 @@ const App = () => {
         }
         buildDataProvider();
     }, [])
+
     if(!dataProvider) return null;
-    return (<Admin dataProvider={dataProvider}>
-        <Resource name="student" list={StudentList} edit={StudentEdit} />
+    return (<Admin theme={customTheme} dataProvider={dataProvider}>
+        <Resource name={process.env.NEXT_PUBLIC_DONATE_DEVICE_ADMIN_PATH} list={DonateDeviceRequestList} />
     </Admin>
     );
 }

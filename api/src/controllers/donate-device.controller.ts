@@ -13,7 +13,8 @@ import {
 } from '@loopback/rest';
 import {DonateDevice} from '../models';
 import {DonateDeviceRepository} from '../repositories';
-import { graphQLHelper } from './graphQLHelper';
+import {DonateDevice as DonateDeviceType} from './donate-device-graphQL-model'
+import { graphQLHelper } from './graphQL-helper';
 
 export class DonateDeviceController {
   constructor(
@@ -42,11 +43,19 @@ export class DonateDeviceController {
     const instanceID = donateDevice.data[0]?.instanceID;
     const filter = {where: {'data.instanceID': instanceID}};
     const existingRecord = await this.donateDeviceRepository.findOne(filter);
-    if (!existingRecord) {
+    console.log(existingRecord);
+    if (!existingRecord) {      
+      const trackingKey = instanceID.split(':')?.[1]?.split('-')?.[0].toUpperCase();      
+      const data = donateDevice?.data?.[0];
+      data.trackingKey = trackingKey;
+      const donateDeviceType = new DonateDeviceType(data);
+      const gQLHelper = new graphQLHelper();
+      const { errors, data: gqlResponse } = await gQLHelper.startExecuteInsert(donateDeviceType);
+      if(errors) { console.error(errors); } else { console.log(gqlResponse); }
       return this.donateDeviceRepository.create(donateDevice);
-    } else return existingRecord;
-  }
-  }
+    } 
+    else return existingRecord;
+  }  
 
   @get('/donate-devices/count')
   @response(200, {
@@ -57,24 +66,6 @@ export class DonateDeviceController {
     @param.where(DonateDevice) where?: Where<DonateDevice>,
   ): Promise<Count> {
     return this.donateDeviceRepository.count(where);
-  }
-
-  @get('/donate-devices')
-  @response(200, {
-    description: 'Array of DonateDevice model instances',
-    content: {
-      'application/json': {
-        schema: {
-          type: 'array',
-          items: getModelSchemaRef(DonateDevice, {includeRelations: true}),
-        },
-      },
-    },
-  })
-  async find(
-    @param.filter(DonateDevice) filter?: Filter<DonateDevice>,
-  ): Promise<DonateDevice[]> {
-    return this.donateDeviceRepository.find(filter);
   }
 
   @patch('/donate-devices')

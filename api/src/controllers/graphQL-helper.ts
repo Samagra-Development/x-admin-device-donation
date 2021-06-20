@@ -1,6 +1,6 @@
  
 import axios from 'axios';
-import { graphQLQuery } from './graphQL';
+import { graphQLQuery } from './graphQL-query';
 
 export class graphQLHelper {
 
@@ -46,7 +46,11 @@ async fetchGraphQL (
   
     if (errors) {
       console.error(errors);
-    } else console.log(data);
+      return { errors: errors, data: null }
+    } else { 
+      console.log(data);
+      return { errors: null, data: data }
+    }
   }
 
 }

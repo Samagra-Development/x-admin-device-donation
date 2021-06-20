@@ -9,8 +9,7 @@ export default async function handler(req, res) {
             const response = await axios({method: 'get',
             url: `http://enterprise.smsgupshup.com/GatewayAPI/rest?msg=${msg}&v=1.1&userid=${process.env.GUPSHUP_USERNAME}&password=${process.env.GUPSHUP_PASSWORD}&send_to=${contactNumber}&msg_type=text&method=sendMessage&format=JSON`
             });
-             
-            console.log(response);          
+                  
             const responseObject = response.data?.response;
             if(responseObject?.status === 'success') { 
                     res.status(200).json({error: null, success: 'Successfully sent!'})                 

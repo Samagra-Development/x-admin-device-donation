@@ -44,12 +44,14 @@ export default NextAuth({
       // Add access_token to the token right after signin
       if (account){          
         token.username = profile.user?.username;
+        token.role = profile.user?.registrations?.[0].roles?.[0];
         token.jwt = profile.token;                
       }
       return token
     },
     async session(session, token) {
       session.jwt = token.jwt;
+      session.role = token.role;
       session.username = token.username;
       return session;
     }
