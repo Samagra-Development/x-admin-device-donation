@@ -40,10 +40,14 @@ export default NextAuth({
     jwt: true
   },
   callbacks: {
+    redirect (url, baseUrl) {
+      return url
+    },
     async jwt(token, user, account, profile, isNewUser) {
       // Add access_token to the token right after signin
       if (account){          
         token.username = profile.user?.username;
+        token.fullName = profile.user?.fullName;
         token.role = profile.user?.registrations?.[0].roles?.[0];
         token.jwt = profile.token;                
       }
@@ -52,6 +56,7 @@ export default NextAuth({
     async session(session, token) {
       session.jwt = token.jwt;
       session.role = token.role;
+      session.fullName = token.fullName;
       session.username = token.username;
       return session;
     }

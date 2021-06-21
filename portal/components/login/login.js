@@ -19,7 +19,7 @@ export default function Login(props) {
         
     const handleInput = (e) => {   
         setInput({ ...input, [e.target.name]: e.target.value });        
-        setInputValidity({...inputValidity, [e.target.name]: e.target.validity.valid});        
+        setInputValidity({...inputValidity, [e.target.name]: e.target.validity.valid});               
     }
 
     useEffect(() => {        
@@ -42,9 +42,10 @@ export default function Login(props) {
                     password: input.password,
                     applicationId: persona.applicationId,
                     redirect: false,
-                    callbackUrl: `${process.env.NEXT_PUBLIC_URL}/${persona.redirectUrl}`
+                    callbackUrl: `${persona.redirectUrl.search('http')  < 0 ? `${process.env.NEXT_PUBLIC_URL}/${persona.redirectUrl}` : persona.redirectUrl}`
                 }) 
         if(url) {   
+            console.log(url);
             router.push(url);
         }          
         if(error) {
@@ -63,8 +64,9 @@ export default function Login(props) {
                         autoComplete={control.autocomplete}
                         required={control.required}
                         placeholder={control.placeholder} 
+                        pattern={control.pattern}
                         onChange={handleInput} />)}
-                    <button autcomplete='off' disabled={!formValidity} 
+                    <button autoComplete='off' disabled={!formValidity} 
                         onClick={signUserIn}
                     >
                           Submit

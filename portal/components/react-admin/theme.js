@@ -4,9 +4,19 @@ import indigo from '@material-ui/core/colors/indigo';
 import pink from '@material-ui/core/colors/pink';
 import red from '@material-ui/core/colors/red';
 
+const primaryColour = {
+    main: '#303765'
+}
+
+const heading = {
+    main: '#FAFAFAEE',
+    light: '#FAFAFAAA'
+}
+
 const customTheme = merge({}, defaultTheme, {
     palette: {
-        primary: indigo,
+        primary: primaryColour,
+        heading: heading,
         secondary: pink,
         error: red,
         contrastThreshold: 3,
@@ -14,7 +24,16 @@ const customTheme = merge({}, defaultTheme, {
     },
     typography: {
         // Use the system font instead of the default Roboto font.
-        fontFamily: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Arial', 'sans-serif'].join(','),
+        fontFamily: ['Martel Sans', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Arial', 'sans-serif'].join(','),
+        body1: {
+            fontSize: '1.4rem'
+        },
+        h6: {
+            fontSize: '1.45rem'
+        },
+        h5: {
+            fontSize: '1.65rem'
+        }
     },
     overrides: {
         MuiButton: { // override the styles of all instances of this component
@@ -22,11 +41,11 @@ const customTheme = merge({}, defaultTheme, {
                 color: 'white', // Some CSS
             },
         },
-        MuiTableCell: {
+        MuiTableCell: { // Replace the font of the list items
             root: {
                 fontFamily: 'Martel Sans'
             },
-            head: {
+            head: { // Add styling for the heading row in lists
                     color: '#00000058',
                     fontSize: '0.8rem',
                     fontWeight: 'bold',
@@ -35,6 +54,11 @@ const customTheme = merge({}, defaultTheme, {
                     backgroundColor: '#F8FAFC'
             }              
         },
+        MuiToolbar: {
+            regular: {
+                minHeight: '10vh',                
+            }
+        }
     },
 });
 

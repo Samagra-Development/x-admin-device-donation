@@ -1,18 +1,17 @@
 import axios from 'axios';
 
 export default async function handler(req, res) {    
-      if(req.method === 'GET') {
-          const { id } = req.query;
+      if(req.method === 'POST') {
+          const { id } = req.body;          
           const responseObject = await startFetchTrackDevice(id);                             
           if(responseObject?.errors) { 
                 res.status(500).json({error: responseObject?.errors?.[0]?.message, success: null})                                 
           }
-          else if(responseObject?.data) {
-            console.log(responseObject.data)
+          else if(responseObject?.data) {            
             if(responseObject?.data?.['device_donation_donor']?.length) {
-              res.status(200).json({error: null, data: maskPhoneNumber(responseObject.data['device_donation_donor'])})
+              res.status(200).json({error: null, success: { data: maskPhoneNumber(responseObject.data['device_donation_donor'])}})
             }
-            else res.status(404).json({error: 'No device found - please check the entered tracking ID!', success: null})
+            else res.status(200).json({error: 'No device found with this ID/ इस आईडी से कोई फ़ोन नहीं मिला!', success: null})
           }
       }                
 }
@@ -46,7 +45,7 @@ async function fetchGraphQL(operationsDoc, operationName, variables) {
   
   const operationsDoc = `
     query trackDevice($trackingKey: String) {
-      device_donation_donor(where: {device_tracking_id: {_eq: $trackingKey}}) {
+      device_donation_donor(where: {device_tracking_key: {_eq: $trackingKey}}) {
         is_device_delivered
         is_device_received
         phone_number

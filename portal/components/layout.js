@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from '../styles/layout.module.css'
 
 
-export default function layout ({ children, home })  {
+export default function Layout ({ children, home })  {
     const transitionStages = {
         FADE_OUT: 'fadeOut',
         FADE_IN: 'fadeIn'
@@ -26,11 +26,11 @@ export default function layout ({ children, home })  {
 
     useEffect(() => {
         setTransitionStage(transitionStages.FADE_IN);
-      }, []);
+      }, [transitionStages.FADE_IN]);
 
     useEffect( () => {
         if(!compareElem(children, activeChildren)) setTransitionStage(transitionStages.FADE_OUT);
-    }, [children, activeChildren])
+    }, [transitionStages.FADE_OUT, children, activeChildren])
     
     return (
         <>
