@@ -64,6 +64,7 @@ const CustomLayout = (props) => {
           <AppBar title={title} open={open} logout={logout} />
           <div>{children}</div>
         </div>
+        <Notification />
       </main>          
   );
 };

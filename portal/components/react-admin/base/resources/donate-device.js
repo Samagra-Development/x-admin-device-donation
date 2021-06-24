@@ -9,7 +9,6 @@ import {
   Edit,
   SimpleForm,  
   SelectInput,
-  NullableBooleanInput,
   Filter,
   SearchInput
 } from 'react-admin';
@@ -50,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
     margin: '0rem 2rem'
   },
   filter: {
-    paddingLeft: 0
+    paddingLeft: 0,
   },
   grid: {
     display: 'grid',
@@ -78,7 +77,22 @@ const useStyles = makeStyles((theme) => ({
     width: '30vw',
     alignSelf: 'center',
     '& > div > div': {
+      fontSize: '1.1rem',
+      transform: 'translate(12px 21px)'
+    }
+  },
+  filterSelect: {
+    width: '15vw',
+    alignSelf: 'center',
+    '& > label': {
+      opacity: '0.7',
       fontSize: '1.1rem'
+    },
+    '& > div': {
+      transform: 'translate(0 5px)' 
+    },
+    ' .MuiInputLabel-shrink': {
+        transform: 'translate(12px, 7px) scale(0.75)'
     }
   },
   warning: {
@@ -94,6 +108,8 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+const getChoice = (choices, id) => { console.log(choices, id); return choices?.find(elem => elem.id === id); }
+
 const DevicesFilter = (props) => {
   const classes = useStyles();
   const isSmall = useMediaQuery((theme) => theme.breakpoints.down('sm'));
@@ -103,6 +119,12 @@ const DevicesFilter = (props) => {
       source='device_tracking_key'     
       className={isSmall ? classes.smSearchBar : classes.searchBar}
       alwaysOn
+    />
+    <SelectInput
+      label='Delivery Type'
+      source='delivery_mode'   
+      className={classes.filterSelect}  
+      choices={config.deliveryTypeChoices.filter(elem => elem.filterable)}
     />
   </Filter>
   )
@@ -139,8 +161,10 @@ export const DonateDeviceRequestList = (props) => {
               return record.district ? record.district : record.other_district
             }
           }}/>
+          <TextField label='Block' source='block' />   
           <TextField label='Tracking ID' source='device_tracking_key' />                        
-          <FunctionField label='Delivery Mode'  render={(record) => record.delivery_mode ? record.delivery_mode : record.delivery_mode_outside_HP}/>   
+          <FunctionField label='Delivery Mode'  render={(record) => record.delivery_mode ? 
+            getChoice(config?.deliveryTypeChoices, record.delivery_mode)?.name : getChoice(config?.deliveryTypeChoices, record.delivery_mode_outside_HP)?.name}/>   
           <BooleanField label='Call Function' source='call_function' />  
           <BooleanField label='WA Function' source='wa_function' />   
           <BooleanField label='YT Function' source='yt_function' />   
@@ -166,20 +190,28 @@ export const DonateDeviceRequestEdit = (props) => {
       <div className={classes.grid}>        
         <td>Name</td>
         <td>Phone Number</td>
-        <td>State/UT</td>  
+        <td>District</td>  
         <TextField label='Name' source='name' disabled variant='outlined' />      
         <TextField label='Phone Number' source='phone_number' disabled variant='outlined'/>   
-        <TextField label='State/UT' source='state_ut' disabled variant='outlined'/> 
-        <td>District</td>
-        <td>Address</td>
-        <td>Pincode</td>  
         <FunctionField label='District' render={(record) => 
           { if(record) {
             return record.district ? record.district : record.other_district
           }
         }}
         disabled variant='outlined'/>
-        <TextField label='Address' source='address' disabled variant='outlined' />   
+        <td>Address</td>
+        <td>Pincode</td> 
+        <td>Delivery</td>     
+        <TextField label='Address' source='address' disabled variant='outlined' />
+        <TextField label='Pincode' source='pincode' disabled variant='outlined' /> 
+        <FunctionField label='Delivery' render={(record) => 
+          { if(record) {            
+            return record.district ? getChoice(config.deliveryTypeChoices, record.delivery_mode)?.name : 
+            getChoice(config.deliveryTypeChoices, record.delivery_mode_outside_HP)?.name
+          }
+        }}
+        disabled variant='outlined'/>
+         
       </div>            
       <span className={classes.heading}>Device Details</span>                  
       <div className={classes.grid}>      
@@ -210,7 +242,6 @@ export const DonateDeviceRequestEdit = (props) => {
       <span className={classes.heading}>Update Status</span>
       <div className={`${classes.grid} ${classes.fullWidthGrid} ${classes.select}`}>
         <SelectInput source='delivery_status' choices={config.statusChoices} label='Delivery Status' />
-        <NullableBooleanInput source='is_device_delivered' />
       </div>
       <p className={classes.warning}>Changing status will trigger an SMS notification to the donor upon saving.</p>
     </SimpleForm>

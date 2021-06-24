@@ -79,6 +79,14 @@
     color: red;
 }
 
+.blurrable-card {
+    transition: filter 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), color 0.15s ease, border-color 0.15s ease;
+}
+
+.blur {
+    filter: blur(2px);
+}
+
 
 @media screen and (max-width: 600px) {
     .grid {

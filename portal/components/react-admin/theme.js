@@ -67,6 +67,14 @@ const customTheme = merge({}, defaultTheme, {
         MuiFilledInput: {
             root: {
                 backgroundColor: '#F8FAFC'
+            },
+            input: {
+                fontSize: '0.9rem',
+            }
+        },
+        MuiMenuItem: {
+            root: {
+                fontSize: '0.9rem'
             }
         }
     },

@@ -1,10 +1,11 @@
-
+import pincodeToBlock from '../datasources/pincodeToBlock';
 export class DonateDevice {   
     name?: string | null;
     phone_number?: string | null;
     created_at?: string | null;
     state_ut?: string | null;
     district?: string | null;
+    block?: string | null;
     other_district?: null;
     address?: string | null;
     landmark?: string | null;
@@ -42,6 +43,7 @@ export class DonateDevice {
         this.created_at = data['*meta-submission-date*'] ?? null;
         this.state_ut = data.state_ut ?? null;
         this.district = data.district ?? null;
+        this.block = this.fetchBlock(data.pincode) ?? null;
         this.other_district = data.otherdistrict ?? null;
         this.address = data.address ?? null;
         this.landmark = data.landmark ?? null;
@@ -62,6 +64,12 @@ export class DonateDevice {
         this.final_declaration = data.finalDecalaration ?? null;
         this.device_tracking_key = data.trackingID ?? null;
         this.delivery_status = 'no-action-taken';
+    }
+
+    fetchBlock(pincode: string): string {
+      const pincodeBlockMapping = new pincodeToBlock();
+      if(!pincodeBlockMapping[pincode]) return 'OTHER'
+      return pincodeBlockMapping[pincode];
     }
 
     convertToBoolean(response: string): boolean {            

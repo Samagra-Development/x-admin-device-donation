@@ -70,7 +70,7 @@ export default function Track() {
                             <button autoComplete='off' disabled={!trackingKeyValid} onClick={handleSubmit}>Submit</button> 
                         </form>
                     </div>                     
-                    <div className={`card`}>        
+                    <div className={`card ${styles['blurrable-card']} ${trackingResponse ? '': styles.blur}`}>        
                         <h2 className='text-center'>Status &#47; स्थिति</h2>        
                         <table className={styles.table}>
                             <tbody className={styles.tableBody}>

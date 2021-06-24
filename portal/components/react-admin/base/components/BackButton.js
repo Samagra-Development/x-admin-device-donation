@@ -5,7 +5,8 @@ import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles( (theme) => ({
   button: {
-    color: theme.palette.primary.main
+    color: theme.palette.primary.main,
+    padding: '0 0 1rem 0'
   }
 }));
 

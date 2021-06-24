@@ -7,6 +7,13 @@ const resourceConfig = {
     { id: 'received-state', name: 'Received by state', icon: 'real_estate_agent' , style: 'success' },
     { id: 'delivered-child', name: 'Delivered to child', icon: 'check_circle', style: 'success'  },
     { id: 'cancelled', name: 'Cancelled', icon: 'disabled_by_default', style: 'error'  },
+  ],
+  deliveryTypeChoices: [
+    { id: 'hand', name: 'Hand Off', filterable: true},
+    { id: 'pickup', name: 'Pick Up', filterable: true},
+    { id: 'courier', name: 'Courier', filterable: true},
+    { id: 'handnonHP', name: 'Hand Off (outside HP)'},
+    { id: 'couriernonHP', name: 'Courier (outside HP)'},
   ]
 }
 
