@@ -1,9 +1,9 @@
 .grid {
     display: grid;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin: 1rem auto;
     text-align: center;
     grid-template-columns: 1fr 1fr;
+    width: 70vw;
   }
 
 .description {
@@ -20,12 +20,12 @@
     border: 0;
     border-bottom: 1px solid gray;
     margin-bottom: 1rem;    
-    font-family: 'Martel Sans', sans-serif;
+    font-family: 'Bahnschrift', 'sans-serif';
     text-transform: uppercase;
 }
 
 .form button {
-    font-family: 'Martel Sans';
+    font-family: 'Bahnschrift', 'sans-serif'; 
     border: 0;
     padding: 0.5rem 0;
     background-color: #303765;
@@ -93,6 +93,7 @@
     margin-top: 0;
     margin-bottom: 1rem;
     grid-template-columns: 1fr;
+    width: 100vw;
   }
 
   .tableHeader {

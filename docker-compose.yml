@@ -83,6 +83,20 @@ services:
         HASURA_ADMIN_SECRET: ${HASURA_ADMIN_SECRET}
     ports:
       - "3001:3000"
+    
+  portal:
+    build:
+      context: ./portal
+    ports:
+      - "3000:3000"
+    environment:      
+        HASURA_URL: ${HASURA_URL}
+        HASURA_ADMIN_SECRET: ${HASURA_ADMIN_SECRET}
+        FUSIONAUTH_DOMAIN: ${FUSIONAUTH_DOMAIN}
+        FUSIONAUTH_API_KEY: ${FUSIONAUTH_API_KEY}
+        GUPSHUP_USERNAME: ${GUPSHUP_USERNAME}
+        GUPSHUP_PASSWORD: ${GUPSHUP_PASSWORD}
+        NEXTAUTH_URL: ${NEXTAUTH_URL}
 
 # volumes:
 #   db_data:

@@ -18,6 +18,9 @@ const useStyles = makeStyles((theme) => ({
   },
   sidebarHeader: {
     backgroundColor: theme.palette.grey[700],
+    '& > div': {
+      marginTop: '1ch;'
+    }
   },
   sidebarList: {
     display: 'flex',

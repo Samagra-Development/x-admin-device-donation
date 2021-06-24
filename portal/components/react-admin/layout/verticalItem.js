@@ -9,8 +9,13 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    paddingLeft: '16px',
-    marginBottom: '2.5ch'
+    padding: '16px 0px 16px 16px',
+  },
+  '&:focus, &:active': {
+    backgroundColor: 'inherit'
+  },
+  selected: {
+      backgroundColor: theme.palette.grey.hover
   },
   listItem: {
     fontSize: '1.2rem',
@@ -18,8 +23,8 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'center',
     fontVariant: 'all-small-caps',
     marginLeft: '1rem',
-    fontWeight: '600',
-    color: theme.palette.grey[300],
+    fontWeight: '700',
+    color: theme.palette.grey.light,
   },
   sidebarIcon: {
     color: '#626D74',
@@ -46,12 +51,12 @@ const VerticalItem = (props) => {
     sidebarItemName = item.options.label;
   }
   return (
-    <div className={classes.sidebarItem}>
+    <Link to={item.url} className={`${classes.sidebarItem} ${activePath?.split('/')?.includes(item.url.replace('/', '')) ? classes.selected : ''}`}>
       <Icon className={classes.sidebarIcon} type={item.icon} />
-      <Link to={item.url} className={classes.listItem}>
+      <span className={classes.listItem}>
         {sidebarItemName}
-      </Link>
-    </div>
+      </span>
+    </Link>
   );
 };
 

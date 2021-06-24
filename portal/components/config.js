@@ -12,8 +12,8 @@ const resourceConfig = {
     { id: 'hand', name: 'Hand Off', filterable: true},
     { id: 'pickup', name: 'Pick Up', filterable: true},
     { id: 'courier', name: 'Courier', filterable: true},
-    { id: 'handnonHP', name: 'Hand Off (outside HP)'},
-    { id: 'couriernonHP', name: 'Courier (outside HP)'},
+    { id: 'handnonhp', name: 'Hand Off (outside HP)'},
+    { id: 'couriernonhp', name: 'Courier (outside HP)'},
   ]
 }
 

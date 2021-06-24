@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
   grid: {
     display: 'grid',
     width: '100%',
-    gridTemplateColumns: '1fr auto',
+    gridTemplateColumns: '1fr 1fr 1fr',
     gridRowGap: '1ch',
     gridColumnGap: '1ch',
     margin: '1rem 0',    
@@ -102,8 +102,7 @@ export const RequestDeviceList = (props) => {
       {...props}          
       bulkActionButtons={false}
       title='Demand list'
-      className={isSmall ? classes.smList : classes.list}
-      filters={false}
+      className={isSmall ? classes.smList : classes.list}      
     >
       {isSmall ? (
         <SimpleList
@@ -134,15 +133,14 @@ export const RequestDeviceEdit = (props) => {
   const classes = useStyles();
   const Title = ({ record }) => {
     return (
-      <span><span className={classes.grey}>#{record.udise}</span> details</span>)
+      <span>School <span className={classes.grey}>#{record.udise}</span> details</span>)
       ;
   }
   return (
   <div>
-  <Edit {...props} title={<Title/>}>
-    <>
-    <BackButton history={props.history} />
+  <Edit {...props} title={<Title/>}>      
     <SimpleForm toolbar={<EditNoDeleteToolbar />}>
+      <BackButton history={props.history} />
       <span className={classes.heading}>School Details</span>
       <div className={classes.grid}>        
         <td>Name</td>
@@ -171,8 +169,7 @@ export const RequestDeviceEdit = (props) => {
       <div className={`${classes.grid} ${classes.fullWidthGrid}`}>
         <TextField label='Demand Details' source='student_details'/>
       </div>
-    </SimpleForm>
-    </>
+    </SimpleForm>    
   </Edit>
 </div>)
 };

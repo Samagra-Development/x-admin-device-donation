@@ -42,25 +42,23 @@ export class DonateDeviceController {
     donateDevice: Omit<DonateDevice, 'id'>,
   ): Promise<DonateDevice> {
     const instanceID = donateDevice.data[0]?.instanceID;
-    const filter = { where: { 'data.instanceID': instanceID } };
-    const existingRecord = await this.donateDeviceRepository.findOne(filter);
-    console.log(existingRecord);
-    if (!existingRecord) {
-      const trackingKey = instanceID.split(':')?.[1]?.split('-')?.[0].toUpperCase();
-      const data = donateDevice?.data?.[0];
+ 
+    const trackingKey = instanceID.split(':')?.[1]?.split('-')?.[0].toUpperCase();
+    console.log(trackingKey);
+    const data = donateDevice?.data?.[0];
 
-      const smsBody = `You have successfully registered for donating your smartphone as part of "Baccho ka Sahara, Phone Humara" campaign. Your tracking ID is ${trackingKey}. You can use this ID to track the status of delivery for your donated device.\n\n- Samagra Shiksha, Himachal Pradesh`;
-      const contactNumber = 12345;
-      const smsDispatchResponse = await sendSMS(smsBody, contactNumber)
+    const smsBody = `You have successfully registered for donating your smartphone as part of "Baccho ka Sahara, Phone Humara" campaign. Your tracking ID is ${trackingKey}. You can use this ID to track the status of delivery for your donated device.\n\n- Samagra Shiksha, Himachal Pradesh`;
+    const contactNumber = data.contact;
+    const smsDispatchResponse = sendSMS(smsBody, contactNumber)
 
-      data.trackingKey = trackingKey;
-      const donateDeviceType = new DonateDeviceType(data);
-      const gQLHelper = new graphQLHelper();
-      const { errors, data: gqlResponse } = await gQLHelper.startExecuteInsert(donateDeviceType);
-      if (errors) { console.error(errors); } else { console.log(gqlResponse); }
-      return this.donateDeviceRepository.create(donateDevice);
-    }
-    else return existingRecord;
+    //TODO: Log SMS send event
+
+    data.trackingKey = trackingKey;
+    const donateDeviceType = new DonateDeviceType(data);
+    const gQLHelper = new graphQLHelper();
+    const { errors, data: gqlResponse } = await gQLHelper.startExecuteInsert(donateDeviceType);
+    if (errors) { console.error(errors); } else { console.log(gqlResponse); }
+    return this.donateDeviceRepository.create(donateDevice);    
   }
 
   @get('/donate-devices/count')

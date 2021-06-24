@@ -55,7 +55,7 @@ export default function Login(props) {
 
     return (                                    
             <div className={`${styles.grid} ${styles['grid-one']}`}>    
-                <span className={styles.description}>Log in as <span className={'text-bold'}>{persona.en}</span>&#47; <span className={'text-bold'}>{persona.hi}</span> लॉग इन</span>                            
+                <span className={styles.description}>Log in as <span className={'text-bold'}>{persona.en}</span>&#47; <br/><span className={'text-bold'}>{persona.hi}</span> लॉग इन</span>                            
                 <form className={styles.form} >
                     {controls.map((control) => <input 
                         key={control.name}

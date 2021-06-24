@@ -16,6 +16,16 @@ a {
   box-sizing: border-box;
 }
 
+/*
+ * FONT FACE 
+ */
+@font-face {
+  font-family: "Bahnschrift";
+  src: url("/fonts/bahnschrift.ttf");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
 
 /**
 * =============

@@ -1,19 +1,23 @@
 .container {
     min-height: 100vh;
     padding: 0 0.5rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
     height: 100vh;
   }
   
 .header{
-    padding: 0 0;
+    padding: 1rem 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
+
+  .headerLogos {
+    display: flex;
+    flex-direction: row;
+    width: 70vw;
+    justify-content: space-around;
   }
 
 .main {
@@ -26,11 +30,10 @@
   
 .footer {
     width: 100%;
-    position: fixed;
-    bottom: 0;
     height: 12vh;
     border-top: 1px solid #eaeaea;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
   }
@@ -59,7 +62,25 @@
     line-height: 1.15;
     font-size: 2.75rem;
     color: #303765;
+    margin-bottom: 0.2rem;
   }
+  .subtitle {
+    margin: 0;
+    line-height: 1.15;
+    font-size: 1.6rem;
+    color: #000;
+    font-weight: 400;
+    margin-bottom: 0.4rem;
+  }
+  .subsubtitle {
+    margin: 0rem;
+    line-height: 1.15;
+    font-size: 1rem;
+    color: #000;
+    font-weight: 400;
+    font-style: italic;
+  }
+  
   
 .title,
   .description {
@@ -68,13 +89,23 @@
   
 
 .logo {
-    width: 70%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    filter: grayscale(1);
-    margin-left: 0.5rem;
   }
+
+.credit {
+  font-weight: 700;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.address {  
+  text-align: center;
+  font-size: 0.8rem;
+  opacity: 0.65;
+  font-weight: 500;
+}
 
 /**
 * =============
@@ -97,8 +128,46 @@
   .logo img {
     transform: scale(0.625);
   }
+
+  .headerLogos {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .face {
+    transform: scale(0.8);
+  }
+
+  .address, .credit {
+    font-size: 0.7rem;
+    transform: translateX(10px);
+  }
   /* .grid {
     width: 100%;
     flex-direction: column;
   } */
+}
+
+
+@media (min-width: 768px) {
+  .footer {
+    position: fixed;
+    bottom: 3rem;
+  }
+
+  .logo {
+    width: 70vw;
+    margin-top: 3rem;
+  }
+
+  /* .grid {
+    width: 100%;
+    flex-direction: column;
+  } */
+}
+
+@media screen and (max-width: 1024px) {
+  .address {
+    width: 100vw;
+  }
 }

@@ -40,6 +40,12 @@ const useStyles= makeStyles((theme) => ({
     },
   },
   container: {
+    display: 'grid',
+    gridTemplateRows: '9vh auto',
+    gridTemplateColumns: 'auto',
+    '& > header': {
+      position: 'inherit'
+    },
     [theme.breakpoints.down('sm')]: {     
       gridColumn: '1 / 3', 
     },

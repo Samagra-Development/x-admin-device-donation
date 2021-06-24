@@ -36,20 +36,42 @@ export default function Layout ({ children, home })  {
         <>
         <Head>
             <title>समर्थ हिमाचल</title>
+            <link
+                rel="preload"
+                href="/bahnschrift.ttf"
+                as="font"
+            crossOrigin=""
+            />
         </Head>
         <div className={styles.container}>
             <header className={styles.header}>
-                <h1 className={styles.title}>
-            बच्चों का सहारा, <br/>फ़ोन हमारा
-                </h1>
+            <div className={styles.headerLogos}>
+            <Image 
+                src='/cm.png' alt='Chief Minister' className={styles.face} width={80} height={80} />  
+             <Image 
+                src='/campaign_logo.png' alt='Campaign Logo' width={80} height={80} />
+            <Image 
+                src='/em-final-square.png' alt='Education Minister' className={styles.face} width={80} height={80} />             
+            </div>
+            <h1 className={styles.title}>
+            Digital Saathi                </h1>
+                <h2 className={styles.subtitle}>
+            Bacchon ka sahara, phone humara
+                </h2>
+                <h3 className={styles.subsubtitle}>
+            An initiative of the Government of Himachal Pradesh, India
+                </h3>
             </header>
             <main onTransitionEnd={() => { transitionEnd(); }} className={`${styles.main} ${styles[transitionStage]}`}>{activeChildren}</main>
             <footer className={styles.footer}>   
-                <span className={styles.credit}></span>
-                <span className={styles.logo}>
-                    <Image src="/govt_of_hp_logo.png" alt="HP Govt Logo" width={120} height={80} />
-                    <Image src="/logo.png" alt="SSA Logo" width={200} height={80} />
-                </span>        
+                <div className={styles.logo}>
+                    <Image src="/default.png" alt="HP Govt Logo" width={180} height={80} />
+                    <span className={styles.address}>
+                        <span className={styles.credit}>For more details, contact XXX </span> <br/>
+                        State Project Office (Samagra Shiksha), Directorate Education, DPEP Bhawan, Below Old ISBT, Lalpani, Shimla - 171001
+                        </span>
+                    <Image src="/SSA_logo.png" className={styles['ssa-logo']} alt="SSA Logo" width={200} height={120} />
+                </div>        
             </footer>            
         </div>
         </>

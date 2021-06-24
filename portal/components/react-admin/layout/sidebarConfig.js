@@ -5,12 +5,14 @@ const sidebarConfig = [
     {
         "name": "Donors",
         "icon": "smartphone",
-        "url": "device_donation_donor"
+        "resource": "device_donation_donor",
+        "url": "/device_donation_donor"
     },
     {
         "name": "School Level Demand",
         "icon": "school",
-        "url": "device_demand_response"
+        "resource": "device_donation_donor",
+        "url": "/device_demand_response"
     }
 ]
 

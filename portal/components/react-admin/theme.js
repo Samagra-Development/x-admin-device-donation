@@ -9,7 +9,10 @@ const primaryColour = {
 }
 
 const darkGrey = {
-    main: '#343A40'
+    main: '#343A40',
+    light: '#AEAEAE',
+    hover: '#4C4C4C',
+    darker: '#2D2D2D'
 }
 
 const heading = {
@@ -29,7 +32,7 @@ const customTheme = merge({}, defaultTheme, {
     },
     typography: {
         // Use the system font instead of the default Roboto font.
-        fontFamily: ['Martel Sans', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Arial', 'sans-serif'].join(','),
+        fontFamily: ['Bahnschrift', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Arial', 'sans-serif'].join(','),
         body1: {
             fontSize: '1.4rem'
         },
@@ -48,7 +51,7 @@ const customTheme = merge({}, defaultTheme, {
         },
         MuiTableCell: { // Replace the font of the list items
             root: {
-                fontFamily: 'Martel Sans'
+                fontFamily: 'Bahnschrift'
             },
             head: { // Add styling for the heading row in lists
                     color: '#00000058',

@@ -8,21 +8,24 @@ export default function Home() {
     <Layout>
         <div className={styles.grid}>
           <a href={process.env.NEXT_PUBLIC_DONATE_DEVICE_FORM_URL} target="_blank" rel="noopener noreferrer" className='card'>
-            <h2>Donate &#47; दान &rarr;</h2>
-            <p>I want to donate a smart phone <br/> मुझे स्मार्ट फ़ोन दान करना है </p>
+            <h2>Donate your smartphone &#47; <br/> अपना स्मार्टफ़ोन दान करें  &#10230;</h2>            
           </a>
 
           <Link href="/track" passHref>     
             <div className='card'>            
-              <h2>Track &#47; ट्रैक &rarr;</h2>
-              <p>I want to track my donated device<br/> मुझे दान किया हुआ फ़ोन ट्रैक करना है </p>
+              <h2>Track your smartphone and get your Digi Saathi certificate &#47;<br/> अपने स्मर्टफ़ोने को ट्रैक करें और अपना Digi साथी प्रशंसा पत्र लें  &#10230;</h2>              
+            </div>
+          </Link>
+
+          <Link href="/#" passHref>
+            <div className='card'>
+              <h2>Frequently Asked Questions &#47; <br/> जानकारी &#10230;</h2>              
             </div>
           </Link>
 
           <Link href="/login" passHref>
-            <div className='card center'>
-              <h2>Login &#47; लॉग इन &rarr;</h2>
-              <p>I am a state functionary <br/> मैं राज्य में प्रभारी हूँ  </p>
+            <div className='card'>
+              <h2>Login for state officials &#47; <br/> राज्य के अधिकारियों के लिए लॉग इन &#10230;</h2>              
             </div>
           </Link>
        

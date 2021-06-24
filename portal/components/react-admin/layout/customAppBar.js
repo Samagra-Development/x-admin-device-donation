@@ -18,9 +18,6 @@ const useStyles = makeStyles((theme) => ({
     overflow: 'hidden',
     fontWeight: 500,
   },
-  divStyle: {
-    height: '10vh',
-  },
   appBarStyle: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.heading.main
@@ -50,8 +47,7 @@ const AppBarCustom = (props) => {
     else dispatch(setSidebarVisibility(true));
   };
   return (
-    <div>
-      <div className={classes.divStyle} />
+    <>      
       <AppBar
         id='toolbar'
         className={classes.appBarStyle}
@@ -77,7 +73,7 @@ const AppBarCustom = (props) => {
             <UserMenu className={classes.userMenuButton} />          
         </Toolbar>
       </AppBar>
-    </div>
+    </>
   );
 };
 

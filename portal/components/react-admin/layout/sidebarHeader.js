@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import AppBar from '@material-ui/core/AppBar';
+import Image from 'next/image';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
   sidebarHeader: {
     gridColumn: '1 / 2',
     gridRow: '1 / 2',
-    height: '8vh',
-    textAlign: 'center'
+    height: '9vh',
+    textAlign: 'center',    
+    boxSizing: 'content-box',
+    backgroundColor: theme.palette.grey.darker,
+    boxShadow: '0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)',
+    opacity: 0.7
   },
   sidebarHeaderLogo: {
-    marginTop: '1ch',
+    filter: 'grayscale(1)',    
     [theme.breakpoints.down('sm')]: {     
       width: '25%',
       height: '7vh'      
@@ -26,10 +30,13 @@ const UserNavbarHeader = () => {
   const classes = useStyles(); 
   return (    
         <div className={classes.sidebarHeader}>
-          <img
+          <Image
             className={classes.sidebarHeaderLogo}          
-            src='/govt_of_hp_logo.png'
-            alt='logo'          
+            src='/default.png'
+            alt='logo'      
+            width={75}
+            height={50}
+            layout={'intrinsic'}
           />  
         </div>        
   );

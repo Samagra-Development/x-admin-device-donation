@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const sendSMS = async (msg, contactNumber) => {
+const sendSMS = async (msg:string, contactNumber:string) => {
     const response = await axios({
         method: 'get',
         url: `http://enterprise.smsgupshup.com/GatewayAPI/rest?msg=${msg}&v=1.1&userid=${process.env.GUPSHUP_USERNAME}&password=${process.env.GUPSHUP_PASSWORD}&send_to=${contactNumber}&msg_type=text&method=sendMessage&format=JSON`

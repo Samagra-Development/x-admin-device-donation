@@ -108,7 +108,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const getChoice = (choices, id) => { console.log(choices, id); return choices?.find(elem => elem.id === id); }
+const getChoice = (choices, id) => { return choices?.find(elem => elem.id === id); }
 
 const DevicesFilter = (props) => {
   const classes = useStyles();
@@ -155,19 +155,18 @@ export const DonateDeviceRequestList = (props) => {
       ) : (
         <Datagrid rowClick='edit'>
           <TextField label='Name' source='name' />          
-          <TextField label='Phone Number' source='phone_number' />    
+          <TextField label='Phone Number' source='phone_number' />
+          <TextField label='State/UT' source='state_ut' />    
           <FunctionField label='District' render={(record) => 
             { if(record) {
-              return record.district ? record.district : record.other_district
+              return record.district !== 'OTHER' ? record.district : record.other_district
             }
           }}/>
           <TextField label='Block' source='block' />   
           <TextField label='Tracking ID' source='device_tracking_key' />                        
           <FunctionField label='Delivery Mode'  render={(record) => record.delivery_mode ? 
-            getChoice(config?.deliveryTypeChoices, record.delivery_mode)?.name : getChoice(config?.deliveryTypeChoices, record.delivery_mode_outside_HP)?.name}/>   
-          <BooleanField label='Call Function' source='call_function' />  
-          <BooleanField label='WA Function' source='wa_function' />   
-          <BooleanField label='YT Function' source='yt_function' />   
+            getChoice(config?.deliveryTypeChoices, record.delivery_mode)?.name : getChoice(config?.deliveryTypeChoices, record.delivery_mode_outside_HP)?.name}/>             
+          <BooleanField label='WA Function' source='wa_function' />             
         </Datagrid>
       )}
     </List>

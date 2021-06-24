@@ -41,9 +41,9 @@ export class DonateDevice {
         this.name = data?.name ?? null;
         this.phone_number = data.contact ?? null;
         this.created_at = data['*meta-submission-date*'] ?? null;
-        this.state_ut = data.state_ut ?? null;
+        this.state_ut = data.state ?? null;
         this.district = data.district ?? null;
-        this.block = this.fetchBlock(data.pincode) ?? null;
+        this.block = this.fetchBlock(this.convertToString(data.pincode)) ?? null;
         this.other_district = data.otherdistrict ?? null;
         this.address = data.address ?? null;
         this.landmark = data.landmark ?? null;
@@ -62,14 +62,15 @@ export class DonateDevice {
         this.yt_function = this.convertToBoolean(data.youtube) ?? null;
         this.charger_available = this.convertToBoolean(data.charger) ?? null;
         this.final_declaration = data.finalDecalaration ?? null;
-        this.device_tracking_key = data.trackingID ?? null;
+        this.device_tracking_key = data.trackingKey ?? null;
         this.delivery_status = 'no-action-taken';
     }
 
-    fetchBlock(pincode: string): string {
-      const pincodeBlockMapping = new pincodeToBlock();
-      if(!pincodeBlockMapping[pincode]) return 'OTHER'
-      return pincodeBlockMapping[pincode];
+    fetchBlock(pincode: string | null): string | null {
+      if(!pincode) return null;
+      const pincodeBlockMapping = new pincodeToBlock();      
+      if(!pincodeBlockMapping.mapping[pincode]) return 'OTHER'
+      return pincodeBlockMapping.mapping[pincode];
     }
 
     convertToBoolean(response: string): boolean {            
