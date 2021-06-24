@@ -7,7 +7,7 @@ import styles from '../styles/Login.module.css'
 export default function LoginWrapper() {    
     const [selectedPersona, setSelectedPersona] = useState(null);
     const personas = [        
-        { consonant: true, en: 'school head', hi: 'स्कूल प्रमुख', applicationId: process.env.NEXT_PUBLIC_FUSIONAUTH_SCHOOL_APP_ID, redirectUrl: process.env.NEXT_PUBLIC_REQUEST_DEVICE_FORM_URL },
+        { consonant: true, en: 'school', hi: 'स्कूल प्रमुख', applicationId: process.env.NEXT_PUBLIC_FUSIONAUTH_SCHOOL_APP_ID, redirectUrl: process.env.NEXT_PUBLIC_REQUEST_DEVICE_FORM_URL },
         { consonant: false, en: 'official', hi: 'अधिकारी', applicationId: process.env.NEXT_PUBLIC_FUSIONAUTH_STATE_APP_ID, redirectUrl: `admin#/${process.env.NEXT_PUBLIC_DONATE_DEVICE_ADMIN_PATH}`}
         // { consonant: false, en: 'operator', hi: 'संचालक', applicationId: process.env.NEXT_PUBLIC_FUSIONAUTH_OPERATOR_APP_ID, redirectUrl: `admin#/${process.env.NEXT_PUBLIC_DONATE_DEVICE_ADMIN_PATH}`}        
     ]  

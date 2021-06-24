@@ -19,6 +19,8 @@ import {
 } from '@loopback/rest';
 import {RequestDevice} from '../models';
 import {RequestDeviceRepository} from '../repositories';
+import {RequestDevice as RequestDeviceType} from './request-device-graphQL-model'
+import { graphQLHelper } from './graphQL-helper';
 
 export class RequestDeviceController {
   constructor(
@@ -44,7 +46,18 @@ export class RequestDeviceController {
     })
     requestDevice: Omit<RequestDevice, 'id'>,
   ): Promise<RequestDevice> {
-    return this.requestDeviceRepository.create(requestDevice);
+    const instanceID = requestDevice.data[0]?.instanceID;
+    const filter = {where: {'data.instanceID': instanceID}};
+    const existingRecord = await this.requestDeviceRepository.findOne(filter);    
+    if (!existingRecord) {         
+      const data = requestDevice?.data?.[0];
+      const requestDeviceType = new RequestDeviceType(data);
+      const gQLHelper = new graphQLHelper();
+      const { errors, data: gqlResponse } = await gQLHelper.startExecuteInsert(requestDeviceType);
+      if(errors) { console.error(errors); } else { console.log(gqlResponse); }
+      return this.requestDeviceRepository.create(requestDevice);
+    } 
+    else return existingRecord;
   }
 
   @get('/request-devices/count')

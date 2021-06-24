@@ -24,6 +24,7 @@ export class DonateDevice {
     charger_available?: boolean | null;
     final_declaration?: string | null;
     device_tracking_key?: string | null;
+    delivery_status?: string | null;
 
     operationsDoc = `
     mutation insertDonor($donor: device_donation_donor_insert_input!) {
@@ -60,6 +61,7 @@ export class DonateDevice {
         this.charger_available = this.convertToBoolean(data.charger) ?? null;
         this.final_declaration = data.finalDecalaration ?? null;
         this.device_tracking_key = data.trackingID ?? null;
+        this.delivery_status = 'no-action-taken';
     }
 
     convertToBoolean(response: string): boolean {            

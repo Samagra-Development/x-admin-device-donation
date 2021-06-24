@@ -46,8 +46,7 @@ async function fetchGraphQL(operationsDoc, operationName, variables) {
   const operationsDoc = `
     query trackDevice($trackingKey: String) {
       device_donation_donor(where: {device_tracking_key: {_eq: $trackingKey}}) {
-        is_device_delivered
-        is_device_received
+        delivery_status
         phone_number
       }
     }

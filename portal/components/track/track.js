@@ -5,8 +5,7 @@ import controls from './track.config'
 import axios from 'axios';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { useToasts } from 'react-toast-notifications';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import CancelIcon from '@material-ui/icons/Cancel';
+import config from '@/components/config'
 
 export default function Track() {  
     const [trackingKey, setTrackingKey] = useState(null);
@@ -14,6 +13,11 @@ export default function Track() {
     const [trackingResponse, setTrackingResponse] = useState(null);
     const [HCaptchaToken, setHCaptchaToken] = useState(null);
     const captchaRef = useRef(null);
+
+    const getStatus = (id) => {         
+        const obj = config.statusChoices.find(elem => elem.id === id);         
+        return { name: obj?.name, icon: obj?.icon, style: obj?.style }
+    }
 
     const handleInput = (e) => {
         setTrackingKey(e.target.value);
@@ -39,7 +43,7 @@ export default function Track() {
                 addToast(error, { appearance: 'error'});  
             }
             if(success) {
-                setTrackingResponse(success.data);
+                setTrackingResponse(success.data);               
             }
         } catch(err) {                             
             addToast(err.message, { appearance: 'error'});            
@@ -72,20 +76,17 @@ export default function Track() {
                             <tbody className={styles.tableBody}>
                                 <tr className={`${styles.tableRow} ${styles.tableHeader}`}>
                                     <th>Donor Mobile No.</th>
-                                    <th>Received</th>
-                                    <th>Delivered</th>
+                                    <th className={'text-center'}>Status</th>                                    
                                 </tr>
                                  
                                 <tr className={styles.tableRow}>
                                 {trackingResponse ?
                                 <>                                    
                                     <td className={styles.tableCell}>{trackingResponse.phone_number}</td>
-                                    <td className={`${styles.tableCell} ${trackingResponse.is_device_received ? styles.success : styles.error}`}>
-                                        {trackingResponse.is_device_received ? <CheckCircleIcon /> : <CancelIcon/>}
-                                    </td>
-                                        <td className={`${styles.tableCell} ${trackingResponse.is_device_delivered ? styles.success : styles.error}`}>
-                                        {trackingResponse.is_device_delivered ? <CheckCircleIcon/> : <CancelIcon/>}
-                                    </td>
+                                    <td className={`${styles.tableCell}`}>
+                                    <span className={`material-icons ${styles[getStatus(trackingResponse.delivery_status)?.style]}
+                                    ${styles.icon}`}>{getStatus(trackingResponse.delivery_status)?.icon}</span> {getStatus(trackingResponse.delivery_status)?.name}
+                                    </td>                                        
                                 </> : <></>}
                                 </tr>                                
                             </tbody>

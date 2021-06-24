@@ -37,7 +37,6 @@ const UserMenuComponent = ({ user, logout}) => {
   const [userMenu, setUserMenu] = React.useState(null);
   const isSmall = useMediaQuery((theme) => theme.breakpoints.down('sm'));
   const classes = useStyles();
-  console.log(logout);
 
   const userMenuClick = (event) => {
     setUserMenu(event.currentTarget);

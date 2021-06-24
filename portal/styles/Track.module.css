@@ -62,8 +62,17 @@
     text-align: center;
 }
 
+.icon {
+    transform: translateY(0.1rem);
+    font-size: 1.2rem;
+}
+
 .success {
     color: green;
+}
+
+.pending {
+    color: darkgoldenrod;
 }
 
 .error {

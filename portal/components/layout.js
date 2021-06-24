@@ -44,9 +44,11 @@ export default function Layout ({ children, home })  {
                 </h1>
             </header>
             <main onTransitionEnd={() => { transitionEnd(); }} className={`${styles.main} ${styles[transitionStage]}`}>{activeChildren}</main>
-            <footer className={styles.footer}>      
+            <footer className={styles.footer}>   
+                <span className={styles.credit}></span>
                 <span className={styles.logo}>
                     <Image src="/govt_of_hp_logo.png" alt="HP Govt Logo" width={120} height={80} />
+                    <Image src="/logo.png" alt="SSA Logo" width={200} height={80} />
                 </span>        
             </footer>            
         </div>

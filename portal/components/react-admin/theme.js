@@ -8,6 +8,10 @@ const primaryColour = {
     main: '#303765'
 }
 
+const darkGrey = {
+    main: '#343A40'
+}
+
 const heading = {
     main: '#FAFAFAEE',
     light: '#FAFAFAAA'
@@ -19,6 +23,7 @@ const customTheme = merge({}, defaultTheme, {
         heading: heading,
         secondary: pink,
         error: red,
+        grey: darkGrey,
         contrastThreshold: 3,
         tonalOffset: 0.2,
     },
@@ -57,6 +62,11 @@ const customTheme = merge({}, defaultTheme, {
         MuiToolbar: {
             regular: {
                 minHeight: '10vh',                
+            }                       
+        },
+        MuiFilledInput: {
+            root: {
+                backgroundColor: '#F8FAFC'
             }
         }
     },
