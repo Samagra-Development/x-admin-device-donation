@@ -10,7 +10,7 @@ const resourceConfig = {
       },
       { 
         title: {
-          en: 'Track your smartphone and get your Digi Saathi certificate', hi: 'अपने स्मार्टफ़ोन को ट्रैक करें और अपना Digi साथी प्रशंसा पत्र लें;'
+          en: 'Track your smartphone and get your Digi Saathi certificate', hi: 'अपने स्मार्टफ़ोन को ट्रैक करें और अपना Digi साथी प्रशंसा पत्र लें'
         },
         target: '/track',
         icon: 'grading',
@@ -18,7 +18,7 @@ const resourceConfig = {
       },
       { 
         title: {
-          en: 'Frequently Asked Questions', hi: 'जानकारी;'
+          en: 'Frequently Asked Questions', hi: 'जानकारी'
         },
         target: '/#',
         icon: 'quiz',
