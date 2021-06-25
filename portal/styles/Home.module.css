@@ -4,6 +4,16 @@
   margin-top: 0;
 }
 
+
+.primary {
+  color: #303765;
+}
+
+.secondary {
+  color: #055E4E;
+}
+
+
 @media screen and (min-width: 768px) {
   .grid {
     width: 70vw;

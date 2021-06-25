@@ -38,7 +38,7 @@ export default function Layout ({ children, home })  {
             <title>समर्थ हिमाचल</title>
             <link
                 rel="preload"
-                href="/bahnschrift.ttf"
+                href="/Bahnschrift.otf"
                 as="font"
             crossOrigin=""
             />
@@ -63,14 +63,14 @@ export default function Layout ({ children, home })  {
                 </h3>
             </header>
             <main onTransitionEnd={() => { transitionEnd(); }} className={`${styles.main} ${styles[transitionStage]}`}>{activeChildren}</main>
+            <span className={styles.credit}>For more details, contact XXX </span>
             <footer className={styles.footer}>   
                 <div className={styles.logo}>
-                    <Image src="/default.png" alt="HP Govt Logo" width={180} height={80} />
-                    <span className={styles.address}>
-                        <span className={styles.credit}>For more details, contact XXX </span> <br/>
+                    <Image src="/default.png" alt="HP Govt Logo" width={120} height={60} />
+                    <span className={styles.address}>                        
                         State Project Office (Samagra Shiksha), Directorate Education, DPEP Bhawan, Below Old ISBT, Lalpani, Shimla - 171001
                         </span>
-                    <Image src="/SSA_logo.png" className={styles['ssa-logo']} alt="SSA Logo" width={200} height={120} />
+                    <Image src="/SSA_logo.png" className={styles['ssa-logo']} alt="SSA Logo" width={200} height={80} />
                 </div>        
             </footer>            
         </div>

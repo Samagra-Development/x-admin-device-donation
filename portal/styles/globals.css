@@ -21,7 +21,7 @@ a {
  */
 @font-face {
   font-family: "Bahnschrift";
-  src: url("/fonts/bahnschrift.ttf");
+  src: url("/Bahnschrift.otf");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -34,6 +34,8 @@ a {
 
 
 .card {
+  display: grid;
+  grid-template-columns: 10% 90%;
   margin: 1rem;
   padding: 1.5rem;
   text-align: left;
@@ -42,7 +44,6 @@ a {
   border: 1px solid #eaeaea;
   border-radius: 10px;
   transition: color 0.15s ease, border-color 0.15s ease;
-  /* width: 45%; */
 }
 
 .card:hover,
