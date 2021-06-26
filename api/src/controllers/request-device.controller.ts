@@ -19,13 +19,13 @@ import {
 } from '@loopback/rest';
 import {RequestDevice} from '../models';
 import {RequestDeviceRepository} from '../repositories';
-import {RequestDevice as RequestDeviceType} from './request-device-graphQL-model'
-import { graphQLHelper } from './graphQL-helper';
+import {RequestDevice as RequestDeviceType} from './request-device-graphQL-model';
+import {graphQLHelper} from './graphQL-helper';
 
 export class RequestDeviceController {
   constructor(
     @repository(RequestDeviceRepository)
-    public requestDeviceRepository : RequestDeviceRepository,
+    public requestDeviceRepository: RequestDeviceRepository,
   ) {}
 
   @post('/request-devices')
@@ -48,16 +48,21 @@ export class RequestDeviceController {
   ): Promise<RequestDevice> {
     const instanceID = requestDevice.data[0]?.instanceID;
     const filter = {where: {'data.instanceID': instanceID}};
-    const existingRecord = await this.requestDeviceRepository.findOne(filter);    
-    if (!existingRecord) {         
+    const existingRecord = await this.requestDeviceRepository.findOne(filter);
+    if (!existingRecord) {
       const data = requestDevice?.data?.[0];
       const requestDeviceType = new RequestDeviceType(data);
       const gQLHelper = new graphQLHelper();
-      const { errors, data: gqlResponse } = await gQLHelper.startExecuteInsert(requestDeviceType);
-      if(errors) { console.error(errors); } else { console.log(gqlResponse); }
+      const {errors, data: gqlResponse} = await gQLHelper.startExecuteInsert(
+        requestDeviceType,
+      );
+      if (errors) {
+        console.error(errors);
+      } else {
+        console.log(gqlResponse);
+      }
       return this.requestDeviceRepository.create(requestDevice);
-    } 
-    else return existingRecord;
+    } else return existingRecord;
   }
 
   @get('/request-devices/count')
@@ -119,7 +124,8 @@ export class RequestDeviceController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(RequestDevice, {exclude: 'where'}) filter?: FilterExcludingWhere<RequestDevice>
+    @param.filter(RequestDevice, {exclude: 'where'})
+    filter?: FilterExcludingWhere<RequestDevice>,
   ): Promise<RequestDevice> {
     return this.requestDeviceRepository.findById(id, filter);
   }

@@ -8,9 +8,7 @@ export class RequestDeviceRepository extends DefaultCrudRepository<
   typeof RequestDevice.prototype.id,
   RequestDeviceRelations
 > {
-  constructor(
-    @inject('datasources.mongo') dataSource: MongoDataSource,
-  ) {
+  constructor(@inject('datasources.mongo') dataSource: MongoDataSource) {
     super(RequestDevice, dataSource);
   }
 }

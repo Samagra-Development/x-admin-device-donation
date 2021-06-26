@@ -50,5 +50,4 @@ export interface RequestDeviceRelations {
   // describe navigational properties here
 }
 
-export type RequestDeviceWithRelations = RequestDevice &
-  RequestDeviceRelations;
+export type RequestDeviceWithRelations = RequestDevice & RequestDeviceRelations;

@@ -8,9 +8,7 @@ export class DonateDeviceRepository extends DefaultCrudRepository<
   typeof DonateDevice.prototype.id,
   DonateDeviceRelations
 > {
-  constructor(
-    @inject('datasources.mongo') dataSource: MongoDataSource,
-  ) {
+  constructor(@inject('datasources.mongo') dataSource: MongoDataSource) {
     super(DonateDevice, dataSource);
   }
 }

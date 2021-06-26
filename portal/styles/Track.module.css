@@ -1,95 +1,96 @@
 .grid {
-    display: grid;
-    margin: 1rem auto;
-    text-align: center;
-    grid-template-columns: 1fr 1fr;
-    width: 70vw;
-  }
+  display: grid;
+  margin: 1rem auto;
+  text-align: center;
+  grid-template-columns: 1fr 1fr;
+  width: 70vw;
+}
 
 .description {
-    font-size: 1.5rem;
-    padding: 1rem 0;
-}
-  
-.form {
-    display: flex;
-    flex-direction: column;    
+  font-size: 1.5rem;
+  padding: 1rem 0;
 }
 
-.form input[type='text'] {
-    border: 0;
-    border-bottom: 1px solid gray;
-    margin-bottom: 1rem;    
-    font-family: 'Bahnschrift', 'sans-serif';
-    text-transform: uppercase;
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form input[type="text"] {
+  border: 0;
+  border-bottom: 1px solid gray;
+  margin-bottom: 1rem;
+  font-family: "Bahnschrift", "sans-serif";
+  text-transform: uppercase;
 }
 
 .form button {
-    font-family: 'Bahnschrift', 'sans-serif'; 
-    border: 0;
-    padding: 0.5rem 0;
-    background-color: #303765;
-    color: #EEE;
-    border-radius: 5px;
-    font-weight: 600;
-    transition: 100ms ease-in all;
+  font-family: "Bahnschrift", "sans-serif";
+  border: 0;
+  padding: 0.5rem 0;
+  background-color: #303765;
+  color: #eee;
+  border-radius: 5px;
+  font-weight: 600;
+  transition: 100ms ease-in all;
 }
 
 .form button:disabled {
-    color: #888;
-    background-color: #EFEFEF;
+  color: #888;
+  background-color: #efefef;
 }
 
-.form input:focus, .form input:active {
-    outline: 0;
+.form input:focus,
+.form input:active {
+  outline: 0;
 }
 
 .table {
-    width: 100%;
+  width: 100%;
 }
 
 .tableRow {
-    display: table-row    
+  display: table-row;
 }
 
 .tableHeader {
-    font-variant: all-small-caps;
-    color: #22222299;   
+  font-variant: all-small-caps;
+  color: #22222299;
 }
 
 .tableCell {
-    display: table-cell;
-    text-align: center;
+  display: table-cell;
+  text-align: center;
 }
 
 .icon {
-    transform: translateY(0.1rem);
-    font-size: 1.2rem;
+  transform: translateY(0.1rem);
+  font-size: 1.2rem;
 }
 
 .success {
-    color: green;
+  color: green;
 }
 
 .pending {
-    color: darkgoldenrod;
+  color: darkgoldenrod;
 }
 
 .error {
-    color: red;
+  color: red;
 }
 
 .blurrable-card {
-    transition: filter 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), color 0.15s ease, border-color 0.15s ease;
+  transition: filter 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .blur {
-    filter: blur(2px);
+  filter: blur(2px);
 }
 
-
 @media screen and (max-width: 600px) {
-    .grid {
+  .grid {
     margin-top: 0;
     margin-bottom: 1rem;
     grid-template-columns: 1fr;
@@ -97,6 +98,6 @@
   }
 
   .tableHeader {
-      font-variant: normal;
+    font-variant: normal;
   }
 }

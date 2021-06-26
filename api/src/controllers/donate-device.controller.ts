@@ -4,29 +4,35 @@ import {
   Filter,
   FilterExcludingWhere,
   repository,
-  Where
+  Where,
 } from '@loopback/repository';
 import {
-  del, get,
-  getModelSchemaRef, param, patch, post, put, requestBody,
-  response
+  del,
+  get,
+  getModelSchemaRef,
+  param,
+  patch,
+  post,
+  put,
+  requestBody,
+  response,
 } from '@loopback/rest';
-import { DonateDevice } from '../models';
-import { DonateDeviceRepository } from '../repositories';
-import { DonateDevice as DonateDeviceType } from './donate-device-graphQL-model'
+import {DonateDevice} from '../models';
+import {DonateDeviceRepository} from '../repositories';
+import {DonateDevice as DonateDeviceType} from './donate-device-graphQL-model';
 import sendSMS from './../utils/sendSMS';
-import { graphQLHelper } from './graphQL-helper';
+import {graphQLHelper} from './graphQL-helper';
 
 export class DonateDeviceController {
   constructor(
     @repository(DonateDeviceRepository)
     public donateDeviceRepository: DonateDeviceRepository,
-  ) { }
+  ) {}
 
   @post('/donate-devices')
   @response(200, {
     description: 'DonateDevice model instance',
-    content: { 'application/json': { schema: getModelSchemaRef(DonateDevice) } },
+    content: {'application/json': {schema: getModelSchemaRef(DonateDevice)}},
   })
   async create(
     @requestBody({
@@ -42,18 +48,27 @@ export class DonateDeviceController {
     donateDevice: Omit<DonateDevice, 'id'>,
   ): Promise<DonateDevice> {
     const instanceID = donateDevice.data[0]?.instanceID;
-    const trackingKey = instanceID.split(':')?.[1]?.split('-')?.[0].toUpperCase();
+    const trackingKey = instanceID
+      .split(':')?.[1]
+      ?.split('-')?.[0]
+      .toUpperCase();
     const data = donateDevice?.data?.[0];
     const smsBody = `You have successfully registered for donating your smartphone as part of "Baccho ka Sahara, Phone Humara" campaign. Your tracking ID is ${trackingKey}. You can use this ID to track the status of delivery for your donated device.\n\n- Samagra Shiksha, Himachal Pradesh`;
     const contactNumber = data.contact;
-    const smsDispatchResponse = sendSMS(smsBody, trackingKey, contactNumber)    
+    const smsDispatchResponse = sendSMS(smsBody, trackingKey, contactNumber);
 
     data.trackingKey = trackingKey;
     const donateDeviceType = new DonateDeviceType(data);
     const gQLHelper = new graphQLHelper();
-    const { errors, data: gqlResponse } = await gQLHelper.startExecuteInsert(donateDeviceType);
-    if (errors) { console.error(errors); } else { console.log(gqlResponse); }
-    return this.donateDeviceRepository.create(donateDevice);    
+    const {errors, data: gqlResponse} = await gQLHelper.startExecuteInsert(
+      donateDeviceType,
+    );
+    if (errors) {
+      console.error(errors);
+    } else {
+      console.log(gqlResponse);
+    }
+    return this.donateDeviceRepository.create(donateDevice);
   }
 
   // @get('/donate-devices/count')

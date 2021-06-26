@@ -1,39 +1,36 @@
-import React, { createElement, useEffect, useState } from 'react';
+import React, { createElement, useEffect, useState } from "react";
 import {
   Collapse,
   IconButton,
   ListItem,
   ListItemText,
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import clsx from 'clsx';
-import VerticalItem from './verticalItem';
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,  
-} from '@material-ui/icons';
+} from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import clsx from "clsx";
+import VerticalItem from "./verticalItem";
+import { ArrowDownIcon, ArrowUpIcon } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     padding: 0,
-    '&.open': {
+    "&.open": {
       backgroundColor:
-        theme.palette.type === 'dark'
-          ? 'rgba(255,255,255,.015)'
-          : 'rgba(0,0,0,.05)',
+        theme.palette.type === "dark"
+          ? "rgba(255,255,255,.015)"
+          : "rgba(0,0,0,.05)",
     },
     item: (props) => ({
       height: 40,
-      width: 'calc(100% - 16px)',
-      borderRadius: '0 20px 20px 0',
+      width: "calc(100% - 16px)",
+      borderRadius: "0 20px 20px 0",
       paddingRight: 12,
       flex: 1,
       paddingLeft: props.itemPadding > 60 ? 60 : props.itemPadding,
       color: theme.palette.text.primary,
-      '&.active > .list-item-text > span': {
+      "&.active > .list-item-text > span": {
         fontWeight: 600,
       },
-      '& .list-item-icon': {
+      "& .list-item-icon": {
         marginRight: 16,
       },
     }),
@@ -67,7 +64,6 @@ const needsToBeOpened = (location, item) => {
   return location && isUrlInChildren(item, location.pathname);
 };
 
-
 function VerticalCollapse({ activePath, ...props }) {
   const [open, setOpen] = useState(() =>
     needsToBeOpened(window.location, props.item)
@@ -89,28 +85,28 @@ function VerticalCollapse({ activePath, ...props }) {
   }
 
   return (
-    <ul className={clsx(classes.root, open && 'open')}>
+    <ul className={clsx(classes.root, open && "open")}>
       <ListItem
         button
         disableRipple
-        style={{ color: 'white', paddingTop: '0px', paddingBottom: '0px' }}
-        className={clsx(classes.item, 'list-item')}
+        style={{ color: "white", paddingTop: "0px", paddingBottom: "0px" }}
+        className={clsx(classes.item, "list-item")}
         onClick={handleClick}
-        component='li'
+        component="li"
         to={item.url}
-        role='button'
+        role="button"
       >
         {/* {item.icon && createElement(CustomIcons[item.icon])}      */}
         <ListItemText
-          style={{ paddingLeft: '16px' }}
+          style={{ paddingLeft: "16px" }}
           primary={item.name}
-          classes={{ primary: 'text-14' }}
-        />        
+          classes={{ primary: "text-14" }}
+        />
 
         <IconButton
           disableRipple
-          style={{ color: 'white' }}
-          className='w-40 h-40 p-0 focus:bg-transparent hover:bg-transparent'
+          style={{ color: "white" }}
+          className="w-40 h-40 p-0 focus:bg-transparent hover:bg-transparent"
           onClick={(ev) => ev.preventDefault()}
         >
           {createElement(!open ? ArrowDownIcon : ArrowUpIcon)}
@@ -120,30 +116,30 @@ function VerticalCollapse({ activePath, ...props }) {
       {item.children && (
         <Collapse
           in={open}
-          className='collapse-children'
-          style={{ marginLeft: '16px' }}
+          className="collapse-children"
+          style={{ marginLeft: "16px" }}
         >
           {item.children.map((i, index) => {
-            if (i.children) {           
-                return (
-                  <VerticalCollapse
-                    key={index}
-                    activePath={activePath}
-                    item={i}
-                    publicity={publicity}
-                    nestedLevel={props.nestedLevel + 1}
-                    permissions={permissions}
-                  />
-                );
-            }         
+            if (i.children) {
               return (
-                <VerticalItem
-                  activePath={activePath}
+                <VerticalCollapse
                   key={index}
+                  activePath={activePath}
                   item={i}
+                  publicity={publicity}
                   nestedLevel={props.nestedLevel + 1}
+                  permissions={permissions}
                 />
               );
+            }
+            return (
+              <VerticalItem
+                activePath={activePath}
+                key={index}
+                item={i}
+                nestedLevel={props.nestedLevel + 1}
+              />
+            );
           })}
         </Collapse>
       )}

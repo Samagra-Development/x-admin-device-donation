@@ -1,10 +1,8 @@
- 
 import axios from 'axios';
-import { graphQLQuery } from './graphQL-query';
+import {graphQLQuery} from './graphQL-query';
 
 export class graphQLHelper {
-
-async fetchGraphQL (
+  async fetchGraphQL(
     operationsDoc: string,
     operationName: string,
     variables: any,
@@ -25,32 +23,31 @@ async fetchGraphQL (
       });
       return result.data;
     } catch (error) {
-        console.error(error);
-        return error;
+      console.error(error);
+      return error;
     }
   }
-  
+
   async executeInsert(obj: graphQLQuery) {
     const sanitisedObject: Partial<graphQLQuery> = {...obj};
     delete sanitisedObject.operationName;
     delete sanitisedObject.operationsDoc;
     delete sanitisedObject.variableName;
-  
+
     return this.fetchGraphQL(obj.operationsDoc, obj.operationName, {
       [obj.variableName]: sanitisedObject,
     });
   }
-  
+
   async startExecuteInsert(obj: graphQLQuery) {
     const {errors, data} = await this.executeInsert(obj);
-  
+
     if (errors) {
       console.error(errors);
-      return { errors: errors, data: null }
-    } else { 
+      return {errors: errors, data: null};
+    } else {
       console.log(data);
-      return { errors: null, data: data }
+      return {errors: null, data: data};
     }
   }
-
 }

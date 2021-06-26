@@ -50,5 +50,4 @@ export interface DonateDeviceRelations {
   // describe navigational properties here
 }
 
-export type DonateDeviceWithRelations = DonateDevice &
-  DonateDeviceRelations;
+export type DonateDeviceWithRelations = DonateDevice & DonateDeviceRelations;

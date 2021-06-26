@@ -1,32 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { withRouter } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
-import { ListSubheader } from '@material-ui/core';
-import clsx from 'clsx';
-import UserSidebarHeader from './sidebarHeader';
-import VerticalCollapse from './verticalCollapse';
-import VerticalItem from './verticalItem';
-import sidebarConfig from './sidebarConfig';
+import React, { useState, useEffect } from "react";
+import { withRouter } from "react-router-dom";
+import { makeStyles } from "@material-ui/core/styles";
+import { ListSubheader } from "@material-ui/core";
+import clsx from "clsx";
+import UserSidebarHeader from "./sidebarHeader";
+import VerticalCollapse from "./verticalCollapse";
+import VerticalItem from "./verticalItem";
+import sidebarConfig from "./sidebarConfig";
 
-const useStyles = makeStyles((theme) => ({ 
+const useStyles = makeStyles((theme) => ({
   listTitle: {
-    fontSize: '0.9rem',
-    textTransform: 'uppercase',
-    textAlign: 'center',
-    fontWeight: '700',
+    fontSize: "0.9rem",
+    textTransform: "uppercase",
+    textAlign: "center",
+    fontWeight: "700",
     color: theme.palette.grey[500],
   },
   sidebarHeader: {
     backgroundColor: theme.palette.grey[700],
-    '& > div': {
-      marginTop: '1ch;'
-    }
+    "& > div": {
+      marginTop: "1ch;",
+    },
   },
   sidebarList: {
-    display: 'flex',
-    flexDirection: 'column',
-    marginTop: '1rem'
-  }
+    display: "flex",
+    flexDirection: "column",
+    marginTop: "1rem",
+  },
 }));
 
 const CustomSidebar = (props) => {
@@ -34,7 +34,7 @@ const CustomSidebar = (props) => {
 
   const { location } = props;
   useEffect(() => {
-    const pathname = location.pathname.replace(/\//, '');
+    const pathname = location.pathname.replace(/\//, "");
     if (activePath !== pathname) {
       setActivePath(pathname);
     }
@@ -43,47 +43,40 @@ const CustomSidebar = (props) => {
   return <SidebarWrapper activePath={activePath} />;
 };
 
-const SidebarWrapper = React.memo(function SidebarWrapper({
-  activePath,
-}) {
-  
+const SidebarWrapper = React.memo(function SidebarWrapper({ activePath }) {
   const classes = useStyles();
   return (
-      <>
-            <UserSidebarHeader className={classes.sidebarHeader} />
-            <div className={classes.sidebarList}>
-            {sidebarConfig.map((item, index) => {
-              if (item.title)
-                return (
-                  <ListSubheader
-                    key={index}
-                  >
-                    <span className={classes.listTitle}>
-                      {item.title}
-                    </span>
-                  </ListSubheader>
-                );   
-                if (item.children) {                 
-                      return (
-                        <VerticalCollapse
-                          key={index}
-                          activePath={activePath}
-                          item={item}
-                          nestedLevel={0}                          
-                        />
-                      );
-                  }                           
-                  return (
-                    <VerticalItem
-                      activePath={activePath}
-                      key={index}
-                      item={item}
-                      nestedLevel={0}
-                    />
-                  );              
-            })} 
-            </div>
-      </>
+    <>
+      <UserSidebarHeader className={classes.sidebarHeader} />
+      <div className={classes.sidebarList}>
+        {sidebarConfig.map((item, index) => {
+          if (item.title)
+            return (
+              <ListSubheader key={index}>
+                <span className={classes.listTitle}>{item.title}</span>
+              </ListSubheader>
+            );
+          if (item.children) {
+            return (
+              <VerticalCollapse
+                key={index}
+                activePath={activePath}
+                item={item}
+                nestedLevel={0}
+              />
+            );
+          }
+          return (
+            <VerticalItem
+              activePath={activePath}
+              key={index}
+              item={item}
+              nestedLevel={0}
+            />
+          );
+        })}
+      </div>
+    </>
   );
 });
 
