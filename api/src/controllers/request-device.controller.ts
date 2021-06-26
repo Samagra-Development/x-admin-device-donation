@@ -64,7 +64,7 @@ export class RequestDeviceController {
       return this.requestDeviceRepository.create(requestDevice);
     } else return existingRecord;
   }
-
+  /* 
   @get('/request-devices/count')
   @response(200, {
     description: 'RequestDevice model count',
@@ -166,4 +166,5 @@ export class RequestDeviceController {
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.requestDeviceRepository.deleteById(id);
   }
+*/
 }
