@@ -14,7 +14,7 @@ const resourceConfig = {
       hi: "अधिकारी",
       credentials: "Shiksha Saathi",
       applicationId: process.env.NEXT_PUBLIC_FUSIONAUTH_STATE_APP_ID,
-      redirectUrl: `admin#/${process.env.NEXT_PUBLIC_DONATE_DEVICE_ADMIN_PATH}`,
+      redirectUrl: `admin#/device_donation_donor`,
     },
   ],
   homepageCards: [
@@ -59,20 +59,20 @@ const resourceConfig = {
     {
       title: {
         en: "Individual donor",
-        hi: "स्मार्टफ़ोन लागत अनुमान प्रपत्र भरें ",
+        hi: "व्यक्तिगत दाता ",
       },
-      target: process.env.NEXT_PUBLIC_REQUEST_DEVICE_FORM_URL,
-      icon: "smartphone",
+      target: process.env.NEXT_PUBLIC_DONATE_DEVICE_INDIV_FORM_URL,
+      icon: "volunteer_activism",
       colour: "primary",
     },
     {
       title: {
         en: "Corporate donor",
-        hi: "लाभार्थी जानकारी भरें",
+        hi: "कॉर्पोरेट दाता",
       },
-      target: process.env.NEXT_PUBLIC_REQUEST_DEVICE_FORM_URL,
-      icon: "login",
-      colour: "secondary",
+      target: process.env.NEXT_PUBLIC_DONATE_DEVICE_CORP_FORM_URL,
+      icon: "corporate_fare",
+      colour: "primary",
     },
   ],
   schoolPageCards: [

@@ -3,6 +3,7 @@ import {
   List,
   SimpleList,
   Datagrid,
+  DateField,
   TextField,
   BooleanField,
   FunctionField,
@@ -155,6 +156,25 @@ const DevicesFilter = (props) => {
         className={classes.filterSelect}
         choices={config.deliveryTypeChoices.filter((elem) => elem.filterable)}
       />
+      <SelectInput
+        label="Delivery Status"
+        source="delivery_status"
+        className={classes.filterSelect}
+        choices={config.statusChoices}
+      />
+      <ReferenceInput
+        reference="location"
+        source="block"
+        filterToQuery={(searchText) => ({ block: searchText })}
+        filter={{ distinct_on: "block" }}
+        sort={{ field: "block", order: "ASC" }}
+      >
+        <AutocompleteInput
+          optionValue="block"
+          optionText="block"
+          className={classes.filterSelect}
+        />
+      </ReferenceInput>
     </Filter>
   );
 };
@@ -172,6 +192,7 @@ export const DonateDeviceRequestList = (props) => {
       bulkActionButtons={false}
       title="Donors list"
       className={isSmall ? classes.smList : classes.list}
+      sort={{ field: "id", order: "DESC" }}
       filters={<DevicesFilter />}
     >
       {isSmall ? (
@@ -183,6 +204,7 @@ export const DonateDeviceRequestList = (props) => {
         />
       ) : (
         <Datagrid rowClick="edit">
+          <DateField label="Date" locales="en-IN" source="created_at" />
           <TextField label="Name" source="name" />
           <TextField label="Phone Number" source="phone_number" />
           <TextField label="State/UT" source="state_ut" />
@@ -210,7 +232,12 @@ export const DonateDeviceRequestList = (props) => {
                   )?.name
             }
           />
-          <BooleanField label="WA Function" source="wa_function" />
+          <FunctionField
+            label="Delivery Staus"
+            render={(record) =>
+              getChoice(config?.statusChoices, record.delivery_status)?.name
+            }
+          />
         </Datagrid>
       )}
     </List>

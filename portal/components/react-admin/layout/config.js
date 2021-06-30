@@ -9,7 +9,8 @@ import {
 
 export const resourceConfig = [
   {
-    title: "Data",
+    label: "Data",
+    title: true,
   },
   {
     name: "device_donation_donor",
@@ -21,6 +22,12 @@ export const resourceConfig = [
   },
   {
     name: "school",
+    list: null,
+    edit: null,
+    create: null,
+  },
+  {
+    name: "location",
     list: null,
     edit: null,
     create: null,

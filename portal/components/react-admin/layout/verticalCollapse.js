@@ -8,7 +8,7 @@ import {
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
 import VerticalItem from "./verticalItem";
-import { ArrowDownIcon, ArrowUpIcon } from "@material-ui/icons";
+import { KeyboardArrowDownIcon, KeyboardArrowUpIcon } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -109,7 +109,7 @@ function VerticalCollapse({ activePath, ...props }) {
           className="w-40 h-40 p-0 focus:bg-transparent hover:bg-transparent"
           onClick={(ev) => ev.preventDefault()}
         >
-          {createElement(!open ? ArrowDownIcon : ArrowUpIcon)}
+          {createElement(!open ? KeyboardArrowDownIcon : KeyboardArrowUpIcon)}
         </IconButton>
       </ListItem>
 

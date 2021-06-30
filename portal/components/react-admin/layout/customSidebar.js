@@ -35,8 +35,13 @@ const CustomSidebar = (props) => {
 
   let filteredResources = resourceConfig;
   if (props.resources) {
-    filteredResources = resourceConfig?.filter((configResource) =>
-      resources?.some((resource) => resource?.name === configResource?.name)
+    filteredResources = resourceConfig?.filter(
+      (configResource) =>
+        (resources?.some(
+          (resource) => resource?.name === configResource?.name
+        ) &&
+          configResource.label) ||
+        configResource.title
     );
   }
   useEffect(() => {
@@ -67,7 +72,7 @@ const SidebarWrapper = React.memo(function SidebarWrapper({
           if (item.title)
             return (
               <ListSubheader key={index}>
-                <span className={classes.listTitle}>{item.title}</span>
+                <span className={classes.listTitle}>{item.label}</span>
               </ListSubheader>
             );
           if (item.children) {

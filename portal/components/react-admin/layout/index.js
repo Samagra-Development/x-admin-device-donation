@@ -63,7 +63,7 @@ const CustomLayout = (props) => {
   return (
     <main className={classes.wrapper}>
       <Sidebar id="sidebar" className={classes.sidebar}>
-        <CustomSidebar />
+        <CustomSidebar resources={props.resources} />
       </Sidebar>
       <div
         onClick={() => {
