@@ -15,13 +15,15 @@ const EXTENDED_DONATION_RECORD = gql`
       id
       udise
       name
+      location {
+        district
+      }
     }
   }
 `;
 
 const customBuildFields = (type, fetchType) => {
   const resourceName = type.name;
-
   const defaultFields = buildFields(type, fetchType);
 
   if (resourceName === "device_donation_donor") {

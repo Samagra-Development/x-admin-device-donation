@@ -13,7 +13,6 @@ const handler = async (req, res) => {
       });
 
       const responseObject = response.data;
-      console.log(response, responseObject);
       if (responseObject) {
         res.status(200).json(responseObject);
       }

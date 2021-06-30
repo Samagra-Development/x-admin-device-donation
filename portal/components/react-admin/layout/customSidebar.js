@@ -6,7 +6,7 @@ import clsx from "clsx";
 import UserSidebarHeader from "./sidebarHeader";
 import VerticalCollapse from "./verticalCollapse";
 import VerticalItem from "./verticalItem";
-import sidebarConfig from "./sidebarConfig";
+import { resourceConfig } from "./config";
 
 const useStyles = makeStyles((theme) => ({
   listTitle: {
@@ -31,8 +31,14 @@ const useStyles = makeStyles((theme) => ({
 
 const CustomSidebar = (props) => {
   const [activePath, setActivePath] = useState(null);
+  const { location, resources } = props;
 
-  const { location } = props;
+  let filteredResources = resourceConfig;
+  if (props.resources) {
+    filteredResources = resourceConfig?.filter((configResource) =>
+      resources?.some((resource) => resource?.name === configResource?.name)
+    );
+  }
   useEffect(() => {
     const pathname = location.pathname.replace(/\//, "");
     if (activePath !== pathname) {
@@ -40,16 +46,24 @@ const CustomSidebar = (props) => {
     }
   }, [location, activePath]);
 
-  return <SidebarWrapper activePath={activePath} />;
+  return (
+    <SidebarWrapper
+      activePath={activePath}
+      filteredResources={filteredResources}
+    />
+  );
 };
 
-const SidebarWrapper = React.memo(function SidebarWrapper({ activePath }) {
+const SidebarWrapper = React.memo(function SidebarWrapper({
+  activePath,
+  filteredResources,
+}) {
   const classes = useStyles();
   return (
     <>
       <UserSidebarHeader className={classes.sidebarHeader} />
       <div className={classes.sidebarList}>
-        {sidebarConfig.map((item, index) => {
+        {filteredResources.map((item, index) => {
           if (item.title)
             return (
               <ListSubheader key={index}>

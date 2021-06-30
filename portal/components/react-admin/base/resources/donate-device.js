@@ -8,6 +8,7 @@ import {
   FunctionField,
   Edit,
   SimpleForm,
+  TextInput,
   SelectInput,
   Filter,
   SearchInput,
@@ -18,6 +19,7 @@ import {
   ReferenceInput,
 } from "react-admin";
 
+import { useSession } from "next-auth/client";
 import { Typography, makeStyles, useMediaQuery } from "@material-ui/core";
 import EditNoDeleteToolbar from "../components/EditNoDeleteToolbar";
 import BackButton from "../components/BackButton";
@@ -102,6 +104,20 @@ const useStyles = makeStyles((theme) => ({
       transform: "translate(12px, 7px) scale(0.75)",
     },
   },
+  textInput: {
+    "& > label": {
+      fontSize: "1.1rem",
+    },
+  },
+  selectInput: {
+    minWidth: "unset",
+    "& > label": {
+      fontSize: "1.1rem",
+    },
+    "& > div > div": {
+      maxHeight: "1.1rem",
+    },
+  },
   warning: {
     margin: "0",
     padding: "0",
@@ -109,6 +125,9 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
     width: "100%",
     fontStyle: "oblique",
+  },
+  fullWidth: {
+    width: "100%",
   },
   grey: {
     color: blueGrey[300],
@@ -202,6 +221,7 @@ export const DonateDeviceRequestEdit = (props) => {
   const classes = useStyles();
   const notify = useNotify();
   const redirect = useRedirect();
+  const [session] = useSession();
 
   const getTemplateFromDeliveryStatus = (status) => {
     const obj = config.statusChoices.find((elem) => elem.id === status);
@@ -219,7 +239,7 @@ export const DonateDeviceRequestEdit = (props) => {
       const { delivery_status } = data;
       const [template, templateId, variables] =
         getTemplateFromDeliveryStatus(delivery_status);
-      if (template && variables) {
+      if (template && variables && session.role) {
         //get each variable (which could be a path, like "ab.cd"), and replace it with
         //the appropriate value from the data object
         let replacedVariables = variables.map((keys) =>
@@ -233,7 +253,7 @@ export const DonateDeviceRequestEdit = (props) => {
         if (response?.success) notify(response.success, "info");
         else if (response?.error) notify(response.error, "warning");
         redirect("list", props.basePath, data.id, data);
-      } else notify("Failed to update.", "warning");
+      }
     }
   };
 
@@ -345,28 +365,56 @@ export const DonateDeviceRequestEdit = (props) => {
             <BooleanField source="charger_available" />
           </div>
           <span className={classes.heading}>Update Status</span>
-          <div
-            className={`${classes.grid} ${classes.fullWidthGrid} ${classes.select}`}
-          >
+          <div className={`${classes.grid} ${classes.fullWidthGrid}`}>
             <SelectInput
               source="delivery_status"
               choices={config.statusChoices}
               label="Delivery Status"
+              disabled={!session.role}
             />
             <FormDataConsumer>
               {({ formData, ...rest }) =>
-                formData?.delivery_status === "delivered-child" && (
-                  <ReferenceInput
-                    reference="school"
-                    label="Recipient School"
-                    source="recipient_school_id"
-                  >
-                    <AutocompleteInput
-                      optionValue="id"
-                      optionText="name"
-                      {...rest}
-                    />
-                  </ReferenceInput>
+                formData?.delivery_status === "delivered-child" ? (
+                  <>
+                    <h2 className={classes.heading}>Recipient</h2>
+                    <div className={!session.role ? classes.grid : null}>
+                      <ReferenceInput
+                        reference="school"
+                        label="School"
+                        source="recipient_school_id"
+                        className={classes.fullWidth}
+                        filterToQuery={(searchText) => ({
+                          "name@_ilike": searchText,
+                        })}
+                      >
+                        <AutocompleteInput
+                          optionValue="id"
+                          optionText="name"
+                          disabled={!session.role}
+                          {...rest}
+                        />
+                      </ReferenceInput>
+                      {!session.role ? (
+                        <>
+                          <TextInput
+                            label="Name"
+                            className={classes.textInput}
+                            source="recipient_name"
+                          />
+                          <SelectInput
+                            label="Grade"
+                            choices={config.gradeChoices}
+                            className={classes.selectInput}
+                            source="recipient_grade"
+                          />
+                        </>
+                      ) : (
+                        <></>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <></>
                 )
               }
             </FormDataConsumer>

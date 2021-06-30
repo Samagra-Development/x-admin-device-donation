@@ -1,9 +1,5 @@
-import Image from "next/image";
 import dynamic from "next/dynamic";
-import styles from "../styles/Home.module.css";
-import { signIn, useSession } from "next-auth/client";
-import { useToasts } from "react-toast-notifications";
-import Layout from "../components/layout";
+import { useSession } from "next-auth/client";
 import Login from "./login";
 
 const ReactAdmin = dynamic(() => import("../components/react-admin/app"), {

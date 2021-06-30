@@ -6,7 +6,7 @@ const resourceConfig = {
       hi: "स्कूल प्रमुख",
       credentials: "e-Samwad",
       applicationId: process.env.NEXT_PUBLIC_FUSIONAUTH_SCHOOL_APP_ID,
-      redirectUrl: process.env.NEXT_PUBLIC_REQUEST_DEVICE_FORM_URL,
+      redirectUrl: "school",
     },
     {
       consonant: false,
@@ -23,7 +23,7 @@ const resourceConfig = {
         en: "Donate your smartphone",
         hi: "अपना स्मार्टफ़ोन दान करें",
       },
-      target: process.env.NEXT_PUBLIC_DONATE_DEVICE_FORM_URL,
+      target: "/donate",
       icon: "volunteer_activism",
       colour: "primary",
     },
@@ -51,6 +51,46 @@ const resourceConfig = {
         hi: "राज्य के अधिकारियों के लिए लॉग इन",
       },
       target: "/login",
+      icon: "login",
+      colour: "secondary",
+    },
+  ],
+  donatePageCards: [
+    {
+      title: {
+        en: "Individual donor",
+        hi: "स्मार्टफ़ोन लागत अनुमान प्रपत्र भरें ",
+      },
+      target: process.env.NEXT_PUBLIC_REQUEST_DEVICE_FORM_URL,
+      icon: "smartphone",
+      colour: "primary",
+    },
+    {
+      title: {
+        en: "Corporate donor",
+        hi: "लाभार्थी जानकारी भरें",
+      },
+      target: process.env.NEXT_PUBLIC_REQUEST_DEVICE_FORM_URL,
+      icon: "login",
+      colour: "secondary",
+    },
+  ],
+  schoolPageCards: [
+    {
+      title: {
+        en: "Demand estimation form",
+        hi: "स्मार्टफ़ोन लागत अनुमान प्रपत्र भरें ",
+      },
+      target: process.env.NEXT_PUBLIC_REQUEST_DEVICE_FORM_URL,
+      icon: "smartphone",
+      colour: "primary",
+    },
+    {
+      title: {
+        en: "Update donee data",
+        hi: "लाभार्थी जानकारी भरें",
+      },
+      target: "/admin",
       icon: "login",
       colour: "secondary",
     },
@@ -89,10 +129,14 @@ const resourceConfig = {
       name: "Delivered to child",
       icon: "check_circle",
       style: "success",
-      templateId: "1007133539650312337",
+      templateId: "1007267945817846297",
       template:
-        "Congratulations! Your donated device with the tracking ID {#var#} has been successfully donated to a child-in-need from {#var#}. Thank you for your contribution to a student's online learning.\n\n\n- Samagra Shiksha, Himachal Pradesh",
-      variables: ["device_tracking_key", "recipient_school.name"],
+        "Congratulations! Your donated device with the tracking ID {#var#} has been successfully donated to a child-in-need from {#var#},({#var#}) . Thank you for your contribution to a student's online learning.\n\n\n- Samagra Shiksha, Himachal Pradesh",
+      variables: [
+        "device_tracking_key",
+        "recipient_school.name",
+        "recipient_school.location.district",
+      ],
     },
     {
       id: "cancelled",
@@ -107,6 +151,56 @@ const resourceConfig = {
     { id: "courier", name: "Courier", filterable: true },
     { id: "handnonhp", name: "Hand Off (outside HP)" },
     { id: "couriernonhp", name: "Courier (outside HP)" },
+  ],
+  gradeChoices: [
+    {
+      id: 1,
+      name: "1",
+    },
+    {
+      id: 2,
+      name: "2",
+    },
+    {
+      id: 3,
+      name: "3",
+    },
+    {
+      id: 4,
+      name: "4",
+    },
+    {
+      id: 5,
+      name: "5",
+    },
+    {
+      id: 6,
+      name: "6",
+    },
+    {
+      id: 7,
+      name: "7",
+    },
+    {
+      id: 8,
+      name: "8",
+    },
+    {
+      id: 9,
+      name: "9",
+    },
+    {
+      id: 10,
+      name: "10",
+    },
+    {
+      id: 11,
+      name: "11",
+    },
+    {
+      id: 12,
+      name: "12",
+    },
   ],
 };
 

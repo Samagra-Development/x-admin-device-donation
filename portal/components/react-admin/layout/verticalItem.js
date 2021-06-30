@@ -47,17 +47,15 @@ const VerticalItem = (props) => {
   });
   const { onMenuClick } = props;
 
-  let sidebarItemName = item.name;
+  let sidebarItemName = item.label;
   if (item.options !== undefined && item.options.label !== undefined) {
     sidebarItemName = item.options.label;
   }
   return (
     <Link
-      to={item.url}
+      to={`/${item.name}`}
       className={`${classes.sidebarItem} ${
-        activePath?.split("/")?.includes(item.url.replace("/", ""))
-          ? classes.selected
-          : ""
+        activePath?.split("/")?.includes(item.name) ? classes.selected : ""
       }`}
     >
       <Icon className={classes.sidebarIcon} type={item.icon} />

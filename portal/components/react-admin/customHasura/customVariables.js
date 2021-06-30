@@ -188,9 +188,15 @@ const buildUpdateVariables =
     let permitted_fields = null;
     const resource_name = resource.type.name;
     if (resource_name) {
-      permitted_fields = introspectionResults.types
-        .find((obj) => obj.name === `${resource_name}_set_input`)
-        ?.inputFields?.map((obj) => obj.name);
+      let inputType = introspectionResults.types.find(
+        (obj) => obj.name === `${resource_name}_set_input`
+      );
+      if (inputType) {
+        let inputTypeFields = inputType.inputFields;
+        if (inputTypeFields) {
+          permitted_fields = inputTypeFields.map((obj) => obj.name);
+        }
+      }
     }
     return Object.keys(params.data).reduce((acc, key) => {
       // If hasura permissions do not allow a field to be updated like (id),

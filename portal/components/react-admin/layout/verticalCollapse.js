@@ -93,7 +93,7 @@ function VerticalCollapse({ activePath, ...props }) {
         className={clsx(classes.item, "list-item")}
         onClick={handleClick}
         component="li"
-        to={item.url}
+        to={`/${item.name}`}
         role="button"
       >
         {/* {item.icon && createElement(CustomIcons[item.icon])}      */}
