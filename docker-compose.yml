@@ -103,6 +103,12 @@ services:
       GUPSHUP_PRINCIPAL_ENTITY_ID: ${GUPSHUP_PRINCIPAL_ENTITY_ID}
       NEXTAUTH_URL: ${NEXTAUTH_URL}
       SLACK_ADMIN_LOGGER_AUTH_TOKEN: ${SLACK_ADMIN_LOGGER_AUTH_TOKEN}
+
+  certificate:
+    build:
+      context: ./certificate
+    ports:
+      - "3002:3000"
 # volumes:
 #   db_data:
 #   fa_config:

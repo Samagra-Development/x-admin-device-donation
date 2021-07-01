@@ -24,7 +24,7 @@
   text-transform: uppercase;
 }
 
-.form button {
+.button {
   font-family: "Bahnschrift", "sans-serif";
   border: 0;
   padding: 0.5rem 0;
@@ -35,7 +35,7 @@
   transition: 100ms ease-in all;
 }
 
-.form button:disabled {
+.button:disabled {
   color: #888;
   background-color: #efefef;
 }
@@ -66,6 +66,19 @@
 .icon {
   transform: translateY(0.1rem);
   font-size: 1.2rem;
+}
+
+td.certificate {
+  padding: 0.5rem 0;
+}
+
+.certificate button {
+  width: 100%;
+}
+
+.certificateIcon {
+  font-size: 1.1rem;
+  transform: translateY(3px);
 }
 
 .success {
@@ -99,5 +112,9 @@
 
   .tableHeader {
     font-variant: normal;
+  }
+
+  .certificateIcon {
+    font-size: 1.5rem;
   }
 }

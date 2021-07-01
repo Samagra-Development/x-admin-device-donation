@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import styles from "../../styles/Track.module.css";
 import controls from "./track.config";
 import axios from "axios";
@@ -11,13 +11,24 @@ const Track = () => {
   const [trackingKey, setTrackingKey] = useState(null);
   const [trackingKeyValid, setTrackingKeyValid] = useState(false);
   const [trackingResponse, setTrackingResponse] = useState(null);
+  const [deliveryStatus, setDeliveryStatus] = useState(false);
+  const [displayCertificate, setDisplayCertificate] = useState(false);
   const [HCaptchaToken, setHCaptchaToken] = useState(null);
   const captchaRef = useRef(null);
 
-  const getStatus = (id) => {
-    const obj = config.statusChoices.find((elem) => elem.id === id);
-    return { name: obj?.name, icon: obj?.icon, style: obj?.style };
-  };
+  useEffect(() => {
+    const obj = config.statusChoices.find(
+      (elem) => elem.id === trackingResponse?.delivery_status
+    );
+    if (obj) {
+      setDeliveryStatus(obj);
+      if (["received-state", "delivered-child"].includes(obj.id))
+        setDisplayCertificate(true);
+      else setDisplayCertificate(false);
+    }
+  }, [trackingResponse]);
+
+  const getStatus = (id) => {};
 
   const handleInput = (e) => {
     setTrackingKey(e.target.value);
@@ -47,6 +58,38 @@ const Track = () => {
       }
       if (success) {
         setTrackingResponse(success.data);
+      }
+    } catch (err) {
+      addToast(err.message, { appearance: "error" });
+    }
+  };
+
+  const fetchCertificate = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/certificate`,
+        {
+          name: trackingResponse.name,
+          trackingKey: trackingKey,
+          udise: trackingResponse.recipient_school?.udise,
+        }
+      );
+      const { error, success } = response.data;
+      if (error) {
+        addToast(error, { appearance: "error" });
+      }
+      if (success) {
+        const pdfData = success.base64String;
+        const byteCharacters = atob(pdfData);
+        let byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const file = new Blob([byteArray], { type: "application/pdf;base64" });
+        const fileURL = URL.createObjectURL(file);
+        window.open(fileURL);
       }
     } catch (err) {
       addToast(err.message, { appearance: "error" });
@@ -84,7 +127,8 @@ const Track = () => {
             </div>
             <button
               autoComplete="off"
-              disabled={!trackingKeyValid || !HCaptchaToken}
+              className={styles.button}
+              disabled={!trackingKeyValid || HCaptchaToken}
               onClick={handleSubmit}
             >
               Submit
@@ -113,20 +157,35 @@ const Track = () => {
                     <td className={`${styles.tableCell}`}>
                       <span
                         className={`material-icons ${
-                          styles[
-                            getStatus(trackingResponse.delivery_status)?.style
-                          ]
-                        }
-                                    ${styles.icon}`}
+                          styles[deliveryStatus.style]
+                        } ${styles.icon}`}
                       >
-                        {getStatus(trackingResponse.delivery_status)?.icon}
-                      </span>{" "}
-                      {getStatus(trackingResponse.delivery_status)?.name}
+                        {deliveryStatus.icon}
+                      </span>
+                      {deliveryStatus.name}
                     </td>
                   </>
                 ) : (
                   <></>
                 )}
+              </tr>
+              <tr>
+                <td colspan="2" className={styles.certificate}>
+                  {displayCertificate && (
+                    <button
+                      className={styles.button}
+                      autoComplete="off"
+                      onClick={fetchCertificate}
+                    >
+                      <span
+                        className={`material-icons ${styles.certificateIcon}`}
+                      >
+                        military_tech
+                      </span>
+                      Certificate
+                    </button>
+                  )}
+                </td>
               </tr>
             </tbody>
           </table>

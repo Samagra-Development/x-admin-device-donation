@@ -55,6 +55,10 @@ const operationsDoc = `
       device_donation_donor(where: {device_tracking_key: {_eq: $trackingKey}}) {
         delivery_status
         phone_number
+        name
+        recipient_school {
+          udise
+        }
       }
     }
   `;

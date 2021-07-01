@@ -20,7 +20,6 @@ const Donate = () => {
                   {card.icon}
                 </span>
                 <h2>
-                  {" "}
                   {card.title.en} &#47;
                   <br /> {card.title.hi} &#10230;
                 </h2>
