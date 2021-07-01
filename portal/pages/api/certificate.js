@@ -5,7 +5,7 @@ const handler = async (req, res) => {
   if (req.method === "POST") {
     const response = await axios({
       method: "POST",
-      url: process.env.CERTIFICATE_URL,
+      url: `${process.env.CERTIFICATE_URL}/`,
       headers: req.headers,
       data: req.body,
     });
