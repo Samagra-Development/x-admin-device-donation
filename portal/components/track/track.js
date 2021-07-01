@@ -170,7 +170,7 @@ const Track = () => {
                 )}
               </tr>
               <tr>
-                <td colspan="2" className={styles.certificate}>
+                <td colSpan="2" className={styles.certificate}>
                   {displayCertificate && (
                     <button
                       className={styles.button}
