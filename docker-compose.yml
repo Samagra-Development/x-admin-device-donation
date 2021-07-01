@@ -108,8 +108,6 @@ services:
   certificate:
     build:
       context: ./certificate
-    ports:
-      - "3002:3000"
 # volumes:
 #   db_data:
 #   fa_config:
