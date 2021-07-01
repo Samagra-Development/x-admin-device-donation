@@ -128,7 +128,7 @@ const Track = () => {
             <button
               autoComplete="off"
               className={styles.button}
-              disabled={!trackingKeyValid || HCaptchaToken}
+              disabled={!trackingKeyValid || !HCaptchaToken}
               onClick={handleSubmit}
             >
               Submit
