@@ -379,13 +379,13 @@ export const DonateDeviceRequestEdit = (props) => {
             <TextField label="Device Size" source="device_size" />
             <td>Condition</td>
             <td>Age (Years)</td>
-            <td>WA Function</td>
+            <td>WhatsApp Function</td>
 
             <TextField label="Device Condition" source="device_condition" />
             <TextField label="Device Age" source="device_age" />
             <BooleanField source="wa_function" />
             <td>Call Function</td>
-            <td>YT Function</td>
+            <td>YouTube Function</td>
             <td>Charger Avbl</td>
             <BooleanField source="call_function" />
             <BooleanField source="yt_function" />

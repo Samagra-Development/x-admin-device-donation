@@ -24,7 +24,16 @@ fastify.post("/", async (request, reply) => {
 // const decoded = jwt.verify(token, publicKey);
 
 async function printPdf(name, trackingKey, udise) {
-  const template = await fs.readFile("./certificate-template.html", "utf-8");
+  const template = await fs.readFile(
+    "./certificate-template-final.html",
+    "utf-8"
+  );
+  const base64logo = await fs.readFile("./assets/cert-logo.png", "base64");
+  const base64footer = await fs.readFile("./assets/cert-footer.png", "base64");
+  const base64bahnschrift = await fs.readFile(
+    "./assets/bahnschrift.ttf",
+    "base64"
+  );
   const privateKey = await fs.readFile("./jwtRS256_digitalsaathi.key", "utf-8");
   const payload = {
     sub: `did:tracking-key:${trackingKey}`,
@@ -39,6 +48,7 @@ async function printPdf(name, trackingKey, udise) {
       credentialSubject: {
         donor: {
           trackingKey: trackingKey,
+          name: name,
           recipient: {
             udise: udise,
           },
@@ -53,7 +63,7 @@ async function printPdf(name, trackingKey, udise) {
   });
   const generateQR = async (text) => {
     try {
-      return await QRCode.toDataURL(text);
+      return await QRCode.toDataURL(text, { scale: 2 });
     } catch (err) {
       console.error(err);
     }
@@ -74,16 +84,35 @@ async function printPdf(name, trackingKey, udise) {
   const page = await browser.newPage();
   await page.setContent(template);
   await page.evaluate(
-    (name, qrcode) => {
+    (name, qrcode, base64logo, base64footer, base64bahnschrift) => {
       donor = document.querySelector("#donor");
-      image = document.querySelector("#qrcode");
+      qr = document.querySelector("#qrcode");
+      logo = document.querySelector("#logo");
+      footer = document.querySelector("#footer");
+
+      const style = document.createElement("style");
+      style.appendChild(
+        document.createTextNode(`
+      @font-face {
+          font-family: Bahnschrift;
+          src: url('data:font/ttf;base64,${base64bahnschrift}');
+      }`)
+      );
+      document.head.appendChild(style);
+
       donor.innerHTML = `${name}`;
-      image.src = qrcode;
+      qr.src = qrcode;
+      logo.src = `data:image/png;base64,${base64logo}`;
+      footer.src = `data:image/png;base64,${base64footer}`;
     },
     name,
-    qrcode
+    qrcode,
+    base64logo,
+    base64footer,
+    base64bahnschrift
   );
-  const buffer = await page.pdf({ landscape: true });
+  await page.evaluateHandle("document.fonts.ready");
+  const buffer = await page.pdf({ printBackground: true });
   const base64 = buffer.toString("base64");
   await browser.close();
   return base64;
