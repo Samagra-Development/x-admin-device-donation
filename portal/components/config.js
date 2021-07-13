@@ -28,8 +28,8 @@ const resourceConfig = {
     //   colour: "primary",
     // },{
       title: {
-        en: "Individual donor",
-        hi: "व्यक्तिगत दाता ",
+        en: "Donate a Smartphone as an Individual Donor",
+        hi: "व्यक्तिगत दाता",
       },
       target: process.env.NEXT_PUBLIC_DONATE_DEVICE_INDIV_FORM_URL,
       icon: "volunteer_activism",
@@ -37,7 +37,7 @@ const resourceConfig = {
     },
     {
       title: {
-        en: "Corporate donor",
+        en: "Donate a smartphone as a Corporate Donor",
         hi: "कॉर्पोरेट दाता",
       },
       target: process.env.NEXT_PUBLIC_DONATE_DEVICE_CORP_FORM_URL,
