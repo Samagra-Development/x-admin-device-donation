@@ -19,12 +19,29 @@ const resourceConfig = {
   ],
   homepageCards: [
     {
+    //   title: {
+    //     en: "Donate your smartphone",
+    //     hi: "अपना स्मार्टफ़ोन दान करें",
+    //   },
+    //   target: "/donate",
+    //   icon: "volunteer_activism",
+    //   colour: "primary",
+    // },{
       title: {
-        en: "Donate your smartphone",
-        hi: "अपना स्मार्टफ़ोन दान करें",
+        en: "Individual donor",
+        hi: "व्यक्तिगत दाता ",
       },
-      target: "/donate",
+      target: process.env.NEXT_PUBLIC_DONATE_DEVICE_INDIV_FORM_URL,
       icon: "volunteer_activism",
+      colour: "primary",
+    },
+    {
+      title: {
+        en: "Corporate donor",
+        hi: "कॉर्पोरेट दाता",
+      },
+      target: process.env.NEXT_PUBLIC_DONATE_DEVICE_CORP_FORM_URL,
+      icon: "corporate_fare",
       colour: "primary",
     },
     {
@@ -41,7 +58,7 @@ const resourceConfig = {
         en: "Frequently Asked Questions",
         hi: "जानकारी",
       },
-      target: "/#",
+      target: "https://drive.google.com/file/d/1uKVDD2_c94I3qU85VEJrlKx4I8VDd0lp/view",
       icon: "quiz",
       colour: "primary",
     },
@@ -98,7 +115,7 @@ const resourceConfig = {
   statusChoices: [
     {
       id: "no-action-taken",
-      name: "No Action Taken",
+      name: "Donation in Progress",//No Action Taken
       icon: "warning",
       style: "error",
     },
