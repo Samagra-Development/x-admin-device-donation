@@ -45,21 +45,13 @@ a {
 }
 
 .logo-card {
-  /* display: grid;
-  grid-template-columns: 10% 90%; */
-  -webkit-box-flex: 0;
-  -ms-flex: 0 0 50%;
-  flex: 0 0 50%;
-  max-width: 50%;
-  
+  display: grid;
+  grid-template-columns: 10% 90%;
 }
 
-@media (max-width: 768px) {
-  .logo-card {
-    -webkit-box-flex: 0;
-    -ms-flex: 0 0 100%;
-    flex: 0 0 100%;
-    max-width: 100%;
+@media screen and (min-width: 768px) {
+  .logo-card:last-child {
+    transform: translateX(50%);
   }
 }
 

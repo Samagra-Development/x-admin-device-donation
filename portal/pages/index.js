@@ -11,21 +11,19 @@ const Home = () => {
         {config.homepageCards.map((card, index) => {
           return (
             <Link key={index} href={card.target} passHref>
-              <div className="logo-card">
-                <div className="card">
-                  <span
-                    className={`material-icons ${styles.icon} ${
-                      styles[card.colour]
-                    }`}
-                  >
-                    {card.icon}
-                  </span>
-                  <h2>
-                    {" "}
-                    {card.title.en} &#47;
-                    <br /> {card.title.hi} &#10230;
-                  </h2>
-                </div>
+              <div className="card logo-card">
+                <span
+                  className={`material-icons ${styles.icon} ${
+                    styles[card.colour]
+                  }`}
+                >
+                  {card.icon}
+                </span>
+                <h2>
+                  {" "}
+                  {card.title.en} &#47;
+                  <br /> {card.title.hi} &#10230;
+                </h2>
               </div>
             </Link>
           );

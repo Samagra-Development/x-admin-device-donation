@@ -1,14 +1,7 @@
 .grid {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  margin-right: -15px;
-  margin-left: -15px;
-  -webkit-box-pack: center!important;
-  -ms-flex-pack: center!important;
-  justify-content: center!important;
+  display: grid;
+  grid-template-columns: 1fr;
+  margin-top: 0;
 }
 
 .primary {
@@ -24,13 +17,6 @@
     width: 70vw;
     margin: 0 auto;
     padding: 2rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .grid {
-    width: 100vw;
-    margin: 0 auto;
-    padding: 2rem;
+    grid-template-columns: 1fr 1fr;
   }
 }
