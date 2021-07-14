@@ -19,29 +19,37 @@ const resourceConfig = {
   ],
   homepageCards: [
     {
+    //   title: {
+    //     en: "Donate your smartphone",
+    //     hi: "अपना स्मार्टफ़ोन दान करें",
+    //   },
+    //   target: "/donate",
+    //   icon: "volunteer_activism",
+    //   colour: "primary",
+    // },{
       title: {
-        en: "Donate your smartphone",
-        hi: "अपना स्मार्टफ़ोन दान करें",
+        en: "Donate a Smartphone as an Individual Donor",
+        hi: "व्यक्तिगत दाता",
       },
-      target: "/donate",
+      target: process.env.NEXT_PUBLIC_DONATE_DEVICE_INDIV_FORM_URL,
       icon: "volunteer_activism",
       colour: "primary",
     },
     {
       title: {
-        en: "Track your smartphone and get your Digi Saathi certificate",
-        hi: "अपने स्मार्टफ़ोन को ट्रैक करें और अपना Digi साथी प्रशंसा पत्र लें",
+        en: "Donate a smartphone as a Corporate Donor",
+        hi: "कॉर्पोरेट दाता",
       },
-      target: "/track",
-      icon: "grading",
-      colour: "secondary",
+      target: process.env.NEXT_PUBLIC_DONATE_DEVICE_CORP_FORM_URL,
+      icon: "corporate_fare",
+      colour: "primary",
     },
     {
       title: {
         en: "Frequently Asked Questions",
         hi: "जानकारी",
       },
-      target: "/#",
+      target: process.env.NEXT_PUBLIC_FAQ_DOCUMENT_URL,
       icon: "quiz",
       colour: "primary",
     },
@@ -52,6 +60,15 @@ const resourceConfig = {
       },
       target: "/login",
       icon: "login",
+      colour: "secondary",
+    },
+    {
+      title: {
+        en: "Track your smartphone and get your Digi Saathi certificate",
+        hi: "अपने स्मार्टफ़ोन को ट्रैक करें और अपना Digi साथी प्रशंसा पत्र लें",
+      },
+      target: "/track",
+      icon: "grading",
       colour: "secondary",
     },
   ],
@@ -98,7 +115,7 @@ const resourceConfig = {
   statusChoices: [
     {
       id: "no-action-taken",
-      name: "No Action Taken",
+      name: "Donation in Progress",//No Action Taken
       icon: "warning",
       style: "error",
     },
