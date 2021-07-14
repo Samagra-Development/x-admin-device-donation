@@ -3,17 +3,19 @@ import { useState, useRef, useEffect } from "react";
 import styles from "../../styles/Track.module.css";
 import controls from "./track.config";
 import axios from "axios";
-import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useToasts } from "react-toast-notifications";
 import config from "@/components/config";
 
 const Track = () => {
   const [trackingKey, setTrackingKey] = useState(null);
+  const [captcha, setCaptcha] = useState(null);
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const [refreshToken, setRefreshToken] = useState(null);
+  const [captchaImg, setCaptchaImg] = useState(null);
   const [trackingKeyValid, setTrackingKeyValid] = useState(false);
   const [trackingResponse, setTrackingResponse] = useState(null);
   const [deliveryStatus, setDeliveryStatus] = useState(false);
   const [displayCertificate, setDisplayCertificate] = useState(false);
-  const [HCaptchaToken, setHCaptchaToken] = useState(null);
   const captchaRef = useRef(null);
 
   useEffect(() => {
@@ -32,14 +34,29 @@ const Track = () => {
 
   const handleInput = (e) => {
     setTrackingKey(e.target.value);
-    setTrackingKeyValid(e.target.validity.valid);
+    setTrackingKeyValid(e.target.value != "" && captcha && captcha != "");
   };
 
-  const onVerifyCaptcha = (token) => {
-    setHCaptchaToken(token);
+  const handleInputCaptcha = (e) => {
+    setCaptcha(e.target.value);
+    setTrackingKeyValid(e.target.value != "" && trackingKey && trackingKey != "");
   };
 
   const { addToast } = useToasts();
+
+  useEffect(() => {
+    try {
+      const response = axios.get(process.env.NEXT_PUBLIC_CAPTCHA_URL)
+      .then(e => {
+        const { blob } = e.data;
+        const { token } = e.headers;
+        setCaptchaImg(blob);
+        setCaptchaToken(token);
+      });
+    } catch (err) {
+      addToast(err.message, { appearance: "error" });
+    }
+  }, [refreshToken]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,19 +65,23 @@ const Track = () => {
         `${process.env.NEXT_PUBLIC_API_URL}/track`,
         {
           id: trackingKey,
+          captcha: captcha,
+          captchaToken: captchaToken
         }
       );
       const { error, success } = response.data;
-      setHCaptchaToken(null);
-      captchaRef.current.resetCaptcha();
+      
+      // captchaRef.current.resetCaptcha();
       if (error) {
         addToast(error, { appearance: "error" });
+        var rightNow = new Date();
+        setRefreshToken(rightNow.toISOString());
       }
-      if (success) {
-        setTrackingResponse(success.data);
-      }
+      // if (success) {
+      //   setTrackingResponse(success.data);
+      // }
     } catch (err) {
-      addToast(err.message, { appearance: "error" });
+      addToast(JSON.stringify(err), { appearance: "error" });
     }
   };
 
@@ -118,17 +139,23 @@ const Track = () => {
               />
             ))}
             <div className="text-center">
-              <HCaptcha
-                ref={captchaRef}
-                size="normal"
-                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY}
-                onVerify={onVerifyCaptcha}
+              <img
+                src={"data:image/png;base64, "+captchaImg}
+                alt="captcha"
+              />
+              <input 
+                type={"text"}
+                name={'captcha'}
+                autoComplete={'false'}
+                required={"required"}
+                placeholder={'captcha'}
+                onChange={handleInputCaptcha}
               />
             </div>
             <button
               autoComplete="off"
               className={styles.button}
-              disabled={!trackingKeyValid || !HCaptchaToken}
+              disabled={!trackingKeyValid}
               onClick={handleSubmit}
             >
               Submit

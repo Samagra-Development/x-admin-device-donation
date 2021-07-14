@@ -1,27 +1,39 @@
 import axios from "axios";
 
 const handler = async (req, res) => {
+  // res.status(200).json({asd:"sad"+process.env.NEXT_PUBLIC_HASURA_URL});
   if (req.method === "POST") {
-    const { id } = req.body;
-    const responseObject = await startFetchTrackDevice(id);
-    if (responseObject?.errors) {
-      res
-        .status(500)
-        .json({ error: responseObject?.errors?.[0]?.message, success: null });
-    } else if (responseObject?.data) {
-      if (responseObject?.data?.["device_donation_donor"]?.length) {
-        res.status(200).json({
-          error: null,
-          success: {
-            data: maskPhoneNumber(responseObject.data["device_donation_donor"]),
-          },
-        });
-      } else
-        res.status(200).json({
-          error: "No device found with this ID/ इस आईडी से कोई फ़ोन नहीं मिला!",
-          success: null,
-        });
-    }
+    try {
+      const { captcha, captchaToken } = req.body;
+      const responseObjectCaptcha = await captchaVerify(captcha,captchaToken);
+      
+      res.status(200).json({
+        error: null,
+        success: {},
+      });
+    } catch (e) {
+      res.status(200).json({ error: 'Incorect Captcha', success: e});
+    };
+    // const { id } = req.body;
+    // const responseObject = await startFetchTrackDevice(id);
+    // if (responseObject?.errors) {
+    //   res
+    //     .status(500)
+    //     .json({ error: responseObject?.errors?.[0]?.message, success: null });
+    // } else if (responseObject?.data) {
+    //   if (responseObject?.data?.["device_donation_donor"]?.length) {
+    //     res.status(200).json({
+    //       error: null,
+    //       success: {
+    //         data: maskPhoneNumber(responseObject.data["device_donation_donor"]),
+    //       },
+    //     });
+    //   } else
+    //     res.status(200).json({
+    //       error: "No device found with this ID/ इस आईडी से कोई फ़ोन नहीं मिला!",
+    //       success: null,
+    //     });
+    // }
   }
 };
 
@@ -33,13 +45,26 @@ function maskPhoneNumber(array) {
   return obj;
 }
 
+async function captchaVerify(captcha,captchaToken) {
+  const result = await axios({
+    method: "POST",
+    url: process.env.NEXT_PUBLIC_API_URL+'/captcha',
+    data: {
+      captcha: captcha,
+      token: captchaToken
+    },
+  });
+
+  return await result;
+}
+
 async function fetchGraphQL(operationsDoc, operationName, variables) {
   const result = await axios({
     method: "POST",
     headers: {
       "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,
     },
-    url: process.env.HASURA_URL,
+    url: process.env.NEXT_PUBLIC_HASURA_URL,
     data: {
       query: operationsDoc,
       variables: variables,
