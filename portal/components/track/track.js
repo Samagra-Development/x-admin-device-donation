@@ -30,8 +30,6 @@ const Track = () => {
     }
   }, [trackingResponse]);
 
-  const getStatus = (id) => {};
-
   const handleInput = (e) => {
     setTrackingKey(e.target.value);
     setTrackingKeyValid(e.target.value != "" && captcha && captcha != "");
@@ -39,23 +37,27 @@ const Track = () => {
 
   const handleInputCaptcha = (e) => {
     setCaptcha(e.target.value);
-    setTrackingKeyValid(e.target.value != "" && trackingKey && trackingKey != "");
+    setTrackingKeyValid(
+      e.target.value != "" && trackingKey && trackingKey != ""
+    );
   };
 
   const { addToast } = useToasts();
 
   useEffect(() => {
-    try {
-      const response = axios.get(process.env.NEXT_PUBLIC_CAPTCHA_URL)
-      .then(e => {
-        const { blob } = e.data;
-        const { token } = e.headers;
+    const response = axios
+      .get(process.env.NEXT_PUBLIC_CAPTCHA_URL)
+      .then((resp) => {
+        const { blob } = resp.data;
+        const { token } = resp.headers;
         setCaptchaImg(blob);
         setCaptchaToken(token);
+      })
+      .catch((err) => {
+        addToast(err.response?.data?.errors || err.message, {
+          appearance: "error",
+        });
       });
-    } catch (err) {
-      addToast(err.message, { appearance: "error" });
-    }
   }, [refreshToken]);
 
   const handleSubmit = async (e) => {
@@ -66,20 +68,18 @@ const Track = () => {
         {
           id: trackingKey,
           captcha: captcha,
-          captchaToken: captchaToken
+          captchaToken: captchaToken,
         }
       );
       const { error, success } = response.data;
-      
-      // captchaRef.current.resetCaptcha();
+
+      if (success) setTrackingResponse(success.data);
+
       if (error) {
         addToast(error, { appearance: "error" });
         var rightNow = new Date();
         setRefreshToken(rightNow.toISOString());
       }
-      // if (success) {
-      //   setTrackingResponse(success.data);
-      // }
     } catch (err) {
       addToast(JSON.stringify(err), { appearance: "error" });
     }
@@ -139,16 +139,18 @@ const Track = () => {
               />
             ))}
             <div className="text-center">
-              <img
-                src={"data:image/png;base64, "+captchaImg}
+              <Image
+                src={"data:image/png;base64, " + captchaImg}
+                width={100}
+                height={20}
                 alt="captcha"
               />
-              <input 
+              <input
                 type={"text"}
-                name={'captcha'}
-                autoComplete={'false'}
+                name={"captcha"}
+                autoComplete={"false"}
                 required={"required"}
-                placeholder={'captcha'}
+                placeholder={"captcha"}
                 onChange={handleInputCaptcha}
               />
             </div>

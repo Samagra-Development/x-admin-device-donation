@@ -104,19 +104,15 @@ services:
       NEXTAUTH_URL: ${NEXTAUTH_URL}
       SLACK_ADMIN_LOGGER_AUTH_TOKEN: ${SLACK_ADMIN_LOGGER_AUTH_TOKEN}
       CERTIFICATE_URL: ${CERTIFICATE_URL}
+      CAPTCHA_URL: ${CAPTCHA_URL}
 
   certificate:
     build:
       context: ./certificate
-  
+
   captcha-service:
     build:
       context: ./captcha-service
-    ports:
-      - "9000:9000"
-    environment:
-      CAPTCHA_URL: ${CAPTCHA_URL}
-
 # volumes:
 #   db_data:
 #   fa_config:
