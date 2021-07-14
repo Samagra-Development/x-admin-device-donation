@@ -49,7 +49,7 @@ const resourceConfig = {
         en: "Frequently Asked Questions",
         hi: "जानकारी",
       },
-      target: "https://drive.google.com/file/d/1uKVDD2_c94I3qU85VEJrlKx4I8VDd0lp/view",
+      target: process.env.NEXT_PUBLIC_FAQ_DOCUMENT_URL,
       icon: "quiz",
       colour: "primary",
     },
