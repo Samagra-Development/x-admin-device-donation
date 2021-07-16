@@ -74,7 +74,7 @@ export class DonateDevice {
   }
 
   convertToBoolean(response: string): boolean {
-    if (response.charAt(response.length - 1) === 'y') return true;
+    if (response?.charAt(response.length - 1) === 'y') return true;
     else return false;
   }
 
