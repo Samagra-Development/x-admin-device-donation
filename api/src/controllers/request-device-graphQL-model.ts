@@ -21,6 +21,7 @@ export class RequestDevice {
   `;
   variableName = `demand`;
   operationName = `insertDemand`;
+  databaseOperationName = `insert_device_demand_response_one`;
 
   constructor(data: any) {
     this.name = data?.name ?? null;

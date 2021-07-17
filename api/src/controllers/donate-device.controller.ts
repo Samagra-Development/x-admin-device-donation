@@ -1,26 +1,9 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  FilterExcludingWhere,
-  repository,
-  Where,
-} from '@loopback/repository';
-import {
-  del,
-  get,
-  getModelSchemaRef,
-  param,
-  patch,
-  post,
-  put,
-  requestBody,
-  response,
-} from '@loopback/rest';
+import {repository} from '@loopback/repository';
+import {getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
 import {DonateDevice} from '../models';
 import {DonateDeviceRepository} from '../repositories';
-import {DonateDevice as DonateDeviceType} from './donate-device-graphQL-model';
 import sendSMS from './../utils/sendSMS';
+import {DonateDevice as DonateDeviceType} from './donate-device-graphQL-model';
 import {graphQLHelper} from './graphQL-helper';
 
 export class DonateDeviceController {
@@ -60,13 +43,15 @@ export class DonateDeviceController {
     data.trackingKey = trackingKey;
     const donateDeviceType = new DonateDeviceType(data);
     const gQLHelper = new graphQLHelper();
-    const {errors, data: gqlResponse} = await gQLHelper.startExecuteInsert(
-      donateDeviceType,
-    );
-    if (errors) {
-      console.error(errors);
-    } else {
-      console.log(gqlResponse);
+    if (donateDeviceType.phone_number) {
+      const {errors, data: gqlResponse} = await gQLHelper.startExecuteInsert(
+        donateDeviceType,
+      );
+      if (errors) {
+        console.error(errors);
+      } else {
+        console.log(gqlResponse);
+      }
     }
     return this.donateDeviceRepository.create(donateDevice);
   }

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import sendLog from '../utils/adminLogger';
 import {graphQLQuery} from './graphQL-query';
 
 export class graphQLHelper {
@@ -33,6 +34,7 @@ export class graphQLHelper {
     delete sanitisedObject.operationName;
     delete sanitisedObject.operationsDoc;
     delete sanitisedObject.variableName;
+    delete sanitisedObject.databaseOperationName;
 
     return this.fetchGraphQL(obj.operationsDoc, obj.operationName, {
       [obj.variableName]: sanitisedObject,
@@ -41,12 +43,24 @@ export class graphQLHelper {
 
   async startExecuteInsert(obj: graphQLQuery) {
     const {errors, data} = await this.executeInsert(obj);
-
+    console.log(obj);
     if (errors) {
       console.error(errors);
+      sendLog(
+        `*⚠️ samarth-device*: *${obj.operationName}* failed with the following error: \`\`\`${errors?.[0]?.message}\`\`\``,
+        process.env.SLACK_ADMIN_LOGS_CHANNEL_ID,
+      );
       return {errors: errors, data: null};
     } else {
       console.log(data);
+      sendLog(
+        `*✅ samarth-device*: *${
+          obj.operationName
+        }* successfully done for:  \`\`\`${JSON.stringify(
+          data[obj.databaseOperationName],
+        )}\`\`\``,
+        process.env.SLACK_ADMIN_LOGS_CHANNEL_ID,
+      );
       return {errors: null, data: data};
     }
   }
