@@ -4,7 +4,7 @@ FROM node:alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --production --ignore-scripts --prefer-offline
+RUN npm ci --ignore-scripts --prefer-offline
 
 # Rebuild the source code only when needed
 FROM node:alpine AS builder
