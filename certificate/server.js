@@ -20,9 +20,6 @@ fastify.post("/", async (request, reply) => {
   reply.code(200).send({ base64String: pdf });
 });
 
-// console.log(token);
-// const decoded = jwt.verify(token, publicKey);
-
 async function printPdf(name, trackingKey, udise) {
   const template = await fs.readFile(
     "./certificate-template-final.html",

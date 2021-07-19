@@ -202,10 +202,6 @@ export const RequestDeviceEdit = (props) => {
             />
             <TextField label="" source="" />
           </div>
-          <span className={classes.heading}>Demand Overview</span>
-          <div className={`${classes.grid} ${classes.fullWidthGrid}`}>
-            <TextField label="Demand Details" source="student_details" />
-          </div>
         </SimpleForm>
       </Edit>
     </div>

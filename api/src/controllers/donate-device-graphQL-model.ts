@@ -31,11 +31,14 @@ export class DonateDevice {
     mutation insertDonor($donor: device_donation_donor_insert_input!) {
       insert_device_donation_donor_one(object: $donor) {
         id
+        phone_number
+        device_tracking_key
       }
     }
   `;
   variableName = `donor`;
   operationName = `insertDonor`;
+  databaseOperationName = `insert_device_donation_donor_one`;
 
   constructor(data: any) {
     this.name = data?.name ?? null;
@@ -74,7 +77,7 @@ export class DonateDevice {
   }
 
   convertToBoolean(response: string): boolean {
-    if (response.charAt(response.length - 1) === 'y') return true;
+    if (response?.charAt(response.length - 1) === 'y') return true;
     else return false;
   }
 
