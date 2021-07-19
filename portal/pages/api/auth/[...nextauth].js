@@ -53,6 +53,7 @@ export default NextAuth({
         token.username = profile.user?.username;
         token.fullName = profile.user?.fullName;
         token.role = profile.user?.registrations?.[0].roles?.[0];
+        token.applicationId = profile.user?.registrations?.[0].applicationId;
         token.jwt = profile.token;
       }
       return token;
@@ -62,6 +63,7 @@ export default NextAuth({
       session.role = token.role;
       session.fullName = token.fullName;
       session.username = token.username;
+      session.applicationId = token.applicationId;
       return session;
     },
   },
