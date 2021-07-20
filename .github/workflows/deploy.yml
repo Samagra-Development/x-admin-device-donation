@@ -22,8 +22,14 @@ jobs:
       - name: Deploy files with rsync
         run: rsync -avz . ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/device-donation/
 
-      - name: Move into directory
-        run: cd /home/device-donation/
+      - name: Rebuilder containers with docker
+          uses: appleboy/ssh-action@master
+          with:
+            host: ${{ secrets.HOST }}            
+            username: ${{ secrets.USERNAME }}          
+            key: ${{ secrets.SSH_PRIVATE_KEY }}        
+            script: |
+              cd /home/device-donation/
+              docker-compose up -d --build
 
-      - name: Rebuild with docker
-        run: docker-compose up -d --build
+   
