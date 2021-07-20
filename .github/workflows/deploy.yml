@@ -1,7 +1,27 @@
 name: first-github-action
-on: [push]
+on:
+  release:
+    types:
+      - created
 jobs:
-  write-to-console:
+  deploy-to-production:
+    environment: production
     runs-on: ubuntu-latest
     steps:
-      - run: echo 'Hello world!'
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ""
+
+      - name: Adding known hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy files with rsync
+        run: rsync -avz . ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/device-donation/
+
+      - name: Move into directory
+        run: cd /home/device-donation/
+
+      - name: Rebuild with docker
+        run: docker-compose up -d --build
