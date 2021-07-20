@@ -1,4 +1,4 @@
-name: first-github-action
+name: deploy-to-production
 on:
   release:
     types: [created, edited]
