@@ -2,7 +2,8 @@ name: first-github-action
 on:
   release:
     types:
-      - [created, edited]
+      - created
+      - edited
 jobs:
   deploy-to-production:
     environment: production
