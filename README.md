@@ -1,5 +1,7 @@
 ## X Admin
 
+[![deploy](https://github.com/Samagra-Development/device-donation/actions/workflows/deploy.yml/badge.svg)](https://github.com/Samagra-Development/device-donation/actions/workflows/deploy.yml)
+
 This project is an open-source, low-code framework to create internal admin tools for governance use cases. 
 
 ---
