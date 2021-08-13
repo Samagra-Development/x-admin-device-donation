@@ -17,6 +17,26 @@ const resourceConfig = {
       redirectUrl: `admin#/device_donation_donor`,
     },
   ],
+  trackCards: [
+    {
+        title: {
+          en: "Track a Smartphone as an Individual Donor",
+          hi: "व्यक्तिगत दाता",
+        },
+        type: "Individual",
+        icon: "volunteer_activism",
+        colour: "primary",
+      },
+      {
+        title: {
+          en: "Track a smartphone as a Corporate Donor",
+          hi: "कॉर्पोरेट दाता",
+        },
+        type: "Corporate",
+        icon: "corporate_fare",
+        colour: "primary",
+      },
+  ],
   homepageCards: [
     {
     //   title: {

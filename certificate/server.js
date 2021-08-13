@@ -15,12 +15,12 @@ fastify.listen(process.env.PORT, process.env.HOST, (err, address) => {
 
 fastify.post("/", async (request, reply) => {
   const { body = {} } = request;
-  const { name = "", trackingKey = "", udise = "" } = body;
-  const pdf = await printPdf(name, trackingKey, udise);
+  const { name = "", trackingKey = "", udise = "", phone_number = "" } = body;
+  const pdf = await printPdf(name, trackingKey, phone_number, udise);
   reply.code(200).send({ base64String: pdf });
 });
 
-async function printPdf(name, trackingKey, udise) {
+async function printPdf(name, trackingKey, phone_number, udise) {
   const template = await fs.readFile(
     "./certificate-template-final.html",
     "utf-8"
@@ -46,6 +46,7 @@ async function printPdf(name, trackingKey, udise) {
         donor: {
           trackingKey: trackingKey,
           name: name,
+          phone_number:phone_number,
           recipient: {
             udise: udise,
           },
