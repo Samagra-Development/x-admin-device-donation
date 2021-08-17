@@ -6,6 +6,14 @@ import {
   RequestDeviceEdit,
   RequestDeviceList,
 } from "@/resources/request-device";
+import {
+  CorporatesEdit,
+  CorporatesList,
+} from "@/resources/corporates";
+import {
+  CorporateDevicesEdit,
+  CorporateDevicesList,
+} from "@/resources/corporate-devices";
 
 export const resourceConfig = [
   {
@@ -17,6 +25,22 @@ export const resourceConfig = [
     label: "Donors",
     list: DonateDeviceRequestList,
     edit: DonateDeviceRequestEdit,
+    create: null,
+    icon: "smartphone",
+  },
+  {
+    name: "device_donation_corporates",
+    label: "Corporates",
+    list: CorporatesList,
+    edit: CorporatesEdit,
+    create: null,
+    icon: "smartphone",
+  },
+  {
+    name: "corporate_donor_devices",
+    label: "Corporate Devices",
+    list: CorporateDevicesList,
+    edit: CorporateDevicesEdit,
     create: null,
     icon: "smartphone",
   },

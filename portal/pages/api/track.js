@@ -5,8 +5,8 @@ const handler = async (req, res) => {
     try {
       const { captcha, captchaToken } = req.body;
       const responseObjectCaptcha = await captchaVerify(captcha, captchaToken);
-      const { id } = req.body;
-      const responseObject = await startFetchTrackDevice(id);
+      const { id, type } = req.body;
+      const responseObject = await startFetchTrackDevice(id,type);
       if (responseObject?.errors) {
         res
           .status(500)
@@ -16,8 +16,17 @@ const handler = async (req, res) => {
           res.status(200).json({
             error: null,
             success: {
-              data: maskPhoneNumber(
+              data: modifyData(
                 responseObject.data["device_donation_donor"]
+              ),
+            },
+          });
+        } else if (responseObject?.data?.["corporate_donor_devices"]?.length) {
+          res.status(200).json({
+            error: null,
+            success: {
+              data: modifyData(
+                responseObject.data["corporate_donor_devices"]
               ),
             },
           });
@@ -36,12 +45,22 @@ const handler = async (req, res) => {
   }
 };
 
-function maskPhoneNumber(array) {
-  const obj = array[0];
-  let { phone_number } = obj;
-  phone_number = `******${phone_number.slice(6)}`;
-  obj.phone_number = phone_number;
+function modifyData(array) {
+  let modifyData = array.map(element => element.delivery_status);
+  let obj = {allStatus:modifyData};
+  let { phone_number, device_donation_corporate, name } = array[0];
+  if(phone_number) {
+    obj.phone_number = maskPhoneNumber(phone_number);
+    obj.name = name;
+  } else if(device_donation_corporate.poc_phone_number) {
+    obj.phone_number = maskPhoneNumber(device_donation_corporate.poc_phone_number);
+    obj.name = device_donation_corporate.company_name;
+  }
   return obj;
+}
+
+function maskPhoneNumber(phone_number) {
+  return `******${phone_number.slice(6)}`;
 }
 
 async function captchaVerify(captcha, captchaToken) {
@@ -74,7 +93,7 @@ async function fetchGraphQL(operationsDoc, operationName, variables) {
   return await result;
 }
 
-const operationsDoc = `
+const operationsIndividualDoc = `
     query trackDevice($trackingKey: String) {
       device_donation_donor(where: {device_tracking_key: {_eq: $trackingKey}}) {
         delivery_status
@@ -87,14 +106,33 @@ const operationsDoc = `
     }
   `;
 
-function fetchTrackDevice(trackingKey) {
-  return fetchGraphQL(operationsDoc, "trackDevice", {
-    trackingKey: trackingKey,
-  });
+const operationsCorporateDoc = `
+  query trackDevice($trackingKey: String) {
+    corporate_donor_devices(where: {company_id: {_eq: $trackingKey}}) {
+      id
+      delivery_status
+      device_donation_corporate {
+        poc_phone_number
+        company_name
+      }
+    }
+  }
+`;
+
+function fetchTrackDevice(trackingKey,type) {
+  if(type == "Individual") {
+    return fetchGraphQL(operationsIndividualDoc, "trackDevice", {
+      trackingKey: trackingKey,
+    });
+  } else if(type == "Corporate") {
+    return fetchGraphQL(operationsCorporateDoc, "trackDevice", {
+      trackingKey: trackingKey,
+    });
+  }
 }
 
-async function startFetchTrackDevice(trackingKey) {
-  const response = await fetchTrackDevice(trackingKey);
+async function startFetchTrackDevice(trackingKey,type) {
+  const response = await fetchTrackDevice(trackingKey,type);
 
   return response.data;
 }

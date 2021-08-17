@@ -6,7 +6,7 @@ import axios from "axios";
 import { useToasts } from "react-toast-notifications";
 import config from "@/components/config";
 
-const Track = () => {
+const Track = ({type}) => {
   const [trackingKey, setTrackingKey] = useState(null);
   const [captcha, setCaptcha] = useState(null);
   const [captchaToken, setCaptchaToken] = useState(null);
@@ -14,19 +14,26 @@ const Track = () => {
   const [captchaImg, setCaptchaImg] = useState(null);
   const [trackingKeyValid, setTrackingKeyValid] = useState(false);
   const [trackingResponse, setTrackingResponse] = useState(null);
-  const [deliveryStatus, setDeliveryStatus] = useState(false);
+  const [deliveryStatus, setDeliveryStatus] = useState([]);
   const [displayCertificate, setDisplayCertificate] = useState(false);
   const captchaRef = useRef(null);
 
   useEffect(() => {
-    const obj = config.statusChoices.find(
-      (elem) => elem.id === trackingResponse?.delivery_status
-    );
-    if (obj) {
-      setDeliveryStatus(obj);
-      if (["received-state", "delivered-child"].includes(obj.id))
-        setDisplayCertificate(true);
-      else setDisplayCertificate(false);
+    let {allStatus} = trackingResponse ?? false;
+    if(allStatus) {
+      const obj = config.statusChoices.filter(
+        (elem) => allStatus.includes(elem.id)
+      );
+      if (obj) {
+        setDeliveryStatus(obj);
+        let BooleanV = true;
+        obj.forEach(e => {
+          if (!(["received-state", "delivered-child"].includes(e.id))) {
+            BooleanV = false;
+          }
+        });
+        setDisplayCertificate(BooleanV);
+      }
     }
   }, [trackingResponse]);
 
@@ -67,6 +74,7 @@ const Track = () => {
         `${process.env.NEXT_PUBLIC_API_URL}/track`,
         {
           id: trackingKey,
+          type:type,
           captcha: captcha,
           captchaToken: captchaToken,
         }
@@ -92,6 +100,7 @@ const Track = () => {
         `${process.env.NEXT_PUBLIC_API_URL}/certificate`,
         {
           name: trackingResponse.name,
+          phone_number: trackingResponse.phone_number,
           trackingKey: trackingKey,
           udise: trackingResponse.recipient_school?.udise,
         }
@@ -184,14 +193,25 @@ const Track = () => {
                       {trackingResponse.phone_number}
                     </td>
                     <td className={`${styles.tableCell}`}>
-                      <span
-                        className={`material-icons ${
-                          styles[deliveryStatus.style]
-                        } ${styles.icon}`}
-                      >
-                        {deliveryStatus.icon}
-                      </span>
-                      {deliveryStatus.name}
+                      <table className={styles.table}>
+                        {deliveryStatus.map((status,index) => { 
+                          return <tr key={index}>
+                            <td><span
+                              className={`material-icons ${
+                                styles[status.style]
+                              } ${styles.icon}`}
+                            >
+                              {status.icon}
+                            </span></td>
+                            <td className={"text-left"}>{status.name}</td>
+                            {type == "Corporate" ? <td>
+                              {(trackingResponse && trackingResponse.allStatus) ?
+                                trackingResponse.allStatus.filter((e) => e == status.id).length
+                              : ""}
+                            </td>: ""}
+                          </tr>
+                        })}
+                      </table>
                     </td>
                   </>
                 ) : (

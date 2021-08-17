@@ -18,6 +18,7 @@ import {
   FormDataConsumer,
   AutocompleteInput,
   ReferenceInput,
+  ReferenceField
 } from "react-admin";
 
 import { useSession } from "next-auth/client";
@@ -145,52 +146,27 @@ const DevicesFilter = (props) => {
   return (
     <Filter {...props} className={classes.filter}>
       <SearchInput
-        placeholder="Tracking ID"
+        placeholder="Tracking key"
         source="device_tracking_key"
         className={isSmall ? classes.smSearchBar : classes.searchBar}
         alwaysOn
       />
-      <SelectInput
-        label="Delivery Type"
-        source="delivery_mode"
-        className={classes.filterSelect}
-        choices={config.deliveryTypeChoices.filter((elem) => elem.filterable)}
-      />
-      <SelectInput
-        label="Delivery Status"
-        source="delivery_status"
-        className={classes.filterSelect}
-        choices={config.statusChoices}
-      />
-      <ReferenceInput
-        reference="location"
-        source="block"
-        filterToQuery={(searchText) => ({ block: searchText })}
-        filter={{ distinct_on: "block" }}
-        sort={{ field: "block", order: "ASC" }}
-      >
-        <AutocompleteInput
-          optionValue="block"
-          optionText="block"
-          className={classes.filterSelect}
-        />
-      </ReferenceInput>
     </Filter>
   );
 };
 
 /**
- * Donate Device Request List
+ * Corporate Devices List
  * @param {*} props
  */
-export const DonateDeviceRequestList = (props) => {
+export const CorporateDevicesList = (props) => {
   const isSmall = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const classes = useStyles();
   return (
     <List
       {...props}
       bulkActionButtons={false}
-      title="Donors list"
+      title="CorporateDevices list"
       className={isSmall ? classes.smList : classes.list}
       sort={{ field: "id", order: "DESC" }}
       filters={<DevicesFilter />}
@@ -198,53 +174,25 @@ export const DonateDeviceRequestList = (props) => {
       {isSmall ? (
         <SimpleList
           primaryText={(record) => record.name}
-          secondaryText={(record) => record.district}
           tertiaryText={(record) => record.device_tracking_key}
           linkType="edit"
         />
       ) : (
         <Datagrid rowClick="edit">
+          <TextField label="Company Name" source="device_donation_corporate.company_name" />
+          <TextField label="Name" source="device_donation_corporate.poc_name" />
+          <TextField label="Email" source="device_donation_corporate.poc_email" />
+          <TextField label="Phone Number" source="device_donation_corporate.poc_phone_number" />
+          <TextField label="Tracking key" source="device_tracking_key" />
+          <TextField label="Delivery status" source="delivery_status" />
           <DateField label="Date" locales="en-IN" source="created_at" />
-          <TextField label="Name" source="name" />
-          <TextField label="Phone Number" source="phone_number" />
-          <TextField label="State/UT" source="state_ut" />
-          <FunctionField
-            label="District"
-            render={(record) => {
-              if (record) {
-                return record.district !== "OTHER"
-                  ? record.district
-                  : record.other_district;
-              }
-            }}
-          />
-          <TextField label="Block" source="block" />
-          <TextField label="Tracking ID" source="device_tracking_key" />
-          <FunctionField
-            label="Delivery Mode"
-            render={(record) =>
-              record.delivery_mode
-                ? getChoice(config?.deliveryTypeChoices, record.delivery_mode)
-                    ?.name
-                : getChoice(
-                    config?.deliveryTypeChoices,
-                    record.delivery_mode_outside_HP
-                  )?.name
-            }
-          />
-          <FunctionField
-            label="Delivery Staus"
-            render={(record) =>
-              getChoice(config?.statusChoices, record.delivery_status)?.name
-            }
-          />
         </Datagrid>
       )}
     </List>
   );
 };
 
-export const DonateDeviceRequestEdit = (props) => {
+export const CorporateDevicesEdit = (props) => {
   const classes = useStyles();
   const notify = useNotify();
   const redirect = useRedirect();
@@ -287,7 +235,7 @@ export const DonateDeviceRequestEdit = (props) => {
   const Title = ({ record }) => {
     return (
       <span>
-        Edit donor{" "}
+        Edit Corporate Devices{" "}
         <span className={classes.grey}>#{record.device_tracking_key}</span>
       </span>
     );
@@ -302,98 +250,15 @@ export const DonateDeviceRequestEdit = (props) => {
       >
         <SimpleForm toolbar={<EditNoDeleteToolbar />}>
           <BackButton history={props.history} />
-          <span className={classes.heading}>Donor Details</span>
+          <span className={classes.heading}>Corporate Details</span>
           <div className={classes.grid}>
-            <td>Name</td>
+            <td>Company Name</td>
+            <td>Tracking key</td>
             <td>Phone Number</td>
-            <td>District</td>
-            <TextField label="Name" source="name" disabled variant="outlined" />
-            <TextField
-              label="Phone Number"
-              source="phone_number"
-              disabled
-              variant="outlined"
-            />
-            <FunctionField
-              label="District"
-              render={(record) => {
-                if (record) {
-                  return record.district
-                    ? record.district
-                    : record.other_district;
-                }
-              }}
-              disabled
-              variant="outlined"
-            />
-            <td>Address</td>
-            <td>Pincode</td>
-            <td>Delivery</td>
-            <TextField
-              label="Address"
-              source="address"
-              disabled
-              variant="outlined"
-            />
-            <TextField
-              label="Pincode"
-              source="pincode"
-              disabled
-              variant="outlined"
-            />
-            <FunctionField
-              label="Delivery"
-              render={(record) => {
-                if (record) {
-                  return record.district
-                    ? getChoice(
-                        config.deliveryTypeChoices,
-                        record.delivery_mode
-                      )?.name
-                    : getChoice(
-                        config.deliveryTypeChoices,
-                        record.delivery_mode_outside_HP
-                      )?.name;
-                }
-              }}
-              disabled
-              variant="outlined"
-            />
-          </div>
-          <span className={classes.heading}>Device Details</span>
-          <div className={classes.grid}>
-            <td>Company</td>
-            <td>Model</td>
-            <td>Screen Size</td>
-            <TextField label="Device Company" source="device_company" />
-            <FunctionField
-              label="Device Model"
-              render={(record) => {
-                if (record) {
-                  return record.device_model
-                    ? record.device_model
-                    : record.device_other_model;
-                }
-              }}
-            />
-            <TextField label="Device Size" source="device_size" />
-            <td>Condition</td>
-            <td>Age (Years)</td>
-            <td>WhatsApp Function</td>
-
-            <TextField label="Device Condition" source="device_condition" />
-            <TextField label="Device Age" source="device_age" />
-            <BooleanField source="wa_function" />
-            <td>Call Function</td>
-            <td>YouTube Function</td>
-            <td>Charger Avbl</td>
-            <BooleanField source="call_function" />
-            <BooleanField source="yt_function" />
-            <BooleanField source="charger_available" />
-          </div>
-          <span className={classes.heading}>Update Status</span>
-          <div className={`${classes.grid} ${classes.fullWidthGrid}`}>
-            {/* Enabled if session has role or user belongs to school application */}
+            <ReferenceInput source="corporate_id" reference="device_donation_corporates">
+                <SelectInput optionText="company_name" />
+            </ReferenceInput>
+            <TextField label="Tracking key" source="device_tracking_key" disabled variant="outlined" />
             <SelectInput
               source="delivery_status"
               choices={config.statusChoices}
@@ -422,7 +287,6 @@ export const DonateDeviceRequestEdit = (props) => {
                           {...rest}
                         />
                       </ReferenceInput>
-                      {/* Visible if session does not have role  */}
                       {!session.role ? (
                         <>
                           <TextInput
@@ -448,10 +312,6 @@ export const DonateDeviceRequestEdit = (props) => {
               }
             </FormDataConsumer>
           </div>
-          <p className={classes.warning}>
-            Changing status will trigger an SMS notification to the donor upon
-            saving.
-          </p>
         </SimpleForm>
       </Edit>
     </div>
