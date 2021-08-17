@@ -166,7 +166,7 @@ export const CorporateDevicesList = (props) => {
     <List
       {...props}
       bulkActionButtons={false}
-      title="CorporateDevices list"
+      title="Corporate Devices List"
       className={isSmall ? classes.smList : classes.list}
       sort={{ field: "id", order: "DESC" }}
       filters={<DevicesFilter />}
@@ -179,13 +179,18 @@ export const CorporateDevicesList = (props) => {
         />
       ) : (
         <Datagrid rowClick="edit">
+          <DateField label="Date" locales="en-IN" source="created_at" />
           <TextField label="Company Name" source="device_donation_corporate.company_name" />
           <TextField label="Name" source="device_donation_corporate.poc_name" />
           <TextField label="Email" source="device_donation_corporate.poc_email" />
           <TextField label="Phone Number" source="device_donation_corporate.poc_phone_number" />
           <TextField label="Tracking key" source="device_tracking_key" />
-          <TextField label="Delivery status" source="delivery_status" />
-          <DateField label="Date" locales="en-IN" source="created_at" />
+          <FunctionField
+            label="Delivery Staus"
+            render={(record) =>
+              getChoice(config?.statusChoices, record.delivery_status)?.name
+            }
+          />
         </Datagrid>
       )}
     </List>
@@ -222,9 +227,8 @@ export const CorporateDevicesEdit = (props) => {
           //and then reduce that to a singular value
           keys.split(".").reduce((acc, key) => acc[key], data)
         );
-
         const message = buildGupshup(template, replacedVariables);
-        const response = await sendSMS(message, templateId, data.phone_number);
+        const response = await sendSMS(message, templateId, data.device_donation_corporate?.poc_phone_number);
         if (response?.success) notify(response.success, "info");
         else if (response?.error) notify(response.error, "warning");
         redirect("list", props.basePath, data.id, data);
@@ -254,64 +258,66 @@ export const CorporateDevicesEdit = (props) => {
           <div className={classes.grid}>
             <td>Company Name</td>
             <td>Tracking key</td>
-            <td>Phone Number</td>
-            <ReferenceInput source="corporate_id" reference="device_donation_corporates">
-                <SelectInput optionText="company_name" />
-            </ReferenceInput>
+            <td>Date</td>
+            <TextField label="Company id" source="company_id" disabled variant="outlined" />
             <TextField label="Tracking key" source="device_tracking_key" disabled variant="outlined" />
-            <SelectInput
-              source="delivery_status"
-              choices={config.statusChoices}
-              label="Delivery Status"
-              disabled={!(session.role || session.applicationId === process.env.NEXT_PUBLIC_FUSIONAUTH_SCHOOL_APP_ID)}
-            />
-            <FormDataConsumer>
-              {({ formData, ...rest }) =>
-                formData?.delivery_status === "delivered-child" ? (
-                  <>
-                    <h2 className={classes.heading}>Recipient</h2>
-                    <div className={!session.role ? classes.grid : null}>
-                      <ReferenceInput
-                        reference="school"
-                        label="School"
-                        source="recipient_school_id"
-                        className={classes.fullWidth}
-                        filterToQuery={(searchText) => ({
-                          "name@_ilike": searchText,
-                        })}
-                      >
-                        <AutocompleteInput
-                          optionValue="id"
-                          optionText="name"
-                          disabled={!session.role}
-                          {...rest}
-                        />
-                      </ReferenceInput>
-                      {!session.role ? (
-                        <>
-                          <TextInput
-                            label="Name"
-                            className={classes.textInput}
-                            source="recipient_name"
-                          />
-                          <SelectInput
-                            label="Grade"
-                            choices={config.gradeChoices}
-                            className={classes.selectInput}
-                            source="recipient_grade"
-                          />
-                        </>
-                      ) : (
-                        <></>
-                      )}
-                    </div>
-                  </>
-                ) : (
-                  <></>
-                )
-              }
-            </FormDataConsumer>
+            <DateField label="Date" locales="en-IN" source="created_at" />
           </div>
+            <span className={classes.heading}>Update Status</span>
+            <div className={`${classes.grid} ${classes.fullWidthGrid}`}>
+              <SelectInput
+                source="delivery_status"
+                choices={config.statusChoices}
+                label="Delivery Status"
+                disabled={!(session.role || session.applicationId === process.env.NEXT_PUBLIC_FUSIONAUTH_SCHOOL_APP_ID)}
+              />
+              <FormDataConsumer>
+                {({ formData, ...rest }) =>
+                  formData?.delivery_status === "delivered-child" ? (
+                    <>
+                      <h2 className={classes.heading}>Recipient</h2>
+                      <div className={!session.role ? classes.grid : null}>
+                        <ReferenceInput
+                          reference="school"
+                          label="School"
+                          source="recipient_school_id"
+                          className={classes.fullWidth}
+                          filterToQuery={(searchText) => ({
+                            "name@_ilike": searchText,
+                          })}
+                        >
+                          <AutocompleteInput
+                            optionValue="id"
+                            optionText="name"
+                            disabled={!session.role}
+                            {...rest}
+                          />
+                        </ReferenceInput>
+                        {!session.role ? (
+                          <>
+                            <TextInput
+                              label="Name"
+                              className={classes.textInput}
+                              source="recipient_name"
+                            />
+                            <SelectInput
+                              label="Grade"
+                              choices={config.gradeChoices}
+                              className={classes.selectInput}
+                              source="recipient_grade"
+                            />
+                          </>
+                        ) : (
+                          <></>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <></>
+                  )
+                }
+              </FormDataConsumer>
+            </div>
         </SimpleForm>
       </Edit>
     </div>

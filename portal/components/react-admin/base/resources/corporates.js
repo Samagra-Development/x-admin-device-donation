@@ -206,14 +206,13 @@ export const CorporatesEdit = (props) => {
     return (
       <span>
         Edit Corporate{" "}
-        <span className={classes.grey}>#{record.device_tracking_key}</span>
+        <span className={classes.grey}>#{record.company_id}</span>
       </span>
     );
   };
   return (
     <div>
       <Edit
-        onSuccess={onSuccess}
         mutationMode={"pessimistic"}
         title={<Title />}
         {...props}

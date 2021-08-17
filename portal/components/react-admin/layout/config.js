@@ -34,7 +34,7 @@ export const resourceConfig = [
     list: CorporatesList,
     edit: CorporatesEdit,
     create: null,
-    icon: "smartphone",
+    icon: "corporate",
   },
   {
     name: "corporate_donor_devices",

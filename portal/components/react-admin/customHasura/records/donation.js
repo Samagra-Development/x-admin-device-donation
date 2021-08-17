@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 
-const EXTENDED_DONATION_RECORD = gql`
+export const EXTENDED_DONATION_RECORD = gql`
   {
     recipient_school {
       id
@@ -12,5 +12,3 @@ const EXTENDED_DONATION_RECORD = gql`
     }
   }
 `;
-
-export default EXTENDED_DONATION_RECORD;

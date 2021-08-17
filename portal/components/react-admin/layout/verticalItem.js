@@ -37,6 +37,9 @@ const Icon = (props) => {
     return <SmartphoneIcon className={props.className} />;
   if (props.type === "school")
     return <SchoolIcon className={props.className} />;
+  if(props.type === "corporate") {
+    return <span className={`material-icons corporate_fare`} style={{color:'#626D74',fontSize: '1.2rem'}} >corporate_fare</span>
+  }
   return <></>;
 };
 

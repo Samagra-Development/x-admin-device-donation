@@ -95,7 +95,7 @@ export class DonateDeviceController {
       } else {
         let trackingKeys: String[] = [];
         for(let i = 0; i < gqlResponse.insert_device_donation_corporates_one.quantity_of_devices; i++ ) {
-          let r = (Math.random() + 1).toString(36).substring(4).toUpperCase();
+          let r = (Math.random() + 1).toString(36).substring(4,12).toUpperCase();
           trackingKeys = [...trackingKeys,r];
           const corporateDevicesType = new CorporateDevicesType({"trackingKey":r,'companyId':gqlResponse.insert_device_donation_corporates_one.company_id});
           const {errors, data: cdGqlResponse} = await gQLHelper.startExecuteInsert(
