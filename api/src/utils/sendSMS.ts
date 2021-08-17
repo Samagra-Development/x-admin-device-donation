@@ -5,7 +5,7 @@ const sendSMS = async (
   msg: string,
   trackingKey: string,
   contactNumber: string,
-  templateId: string,
+  templateId: any,
 ) => {
   const response = await axios({
     method: 'get',
