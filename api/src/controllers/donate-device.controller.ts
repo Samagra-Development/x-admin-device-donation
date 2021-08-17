@@ -108,7 +108,7 @@ export class DonateDeviceController {
           }
         }
         
-        const smsBody = `Congratulations! You have successfully registered for donating ${gqlResponse.insert_device_donation_corporates_one.quantity_of_devices} smartphones as part of the "Digital Saathi" campaign. \nPlease note your tracking IDs: ${instanceID}. You can use these IDs to track the status of delivery for your donated smartphones. Contact 1800-180-8190 for any assistance.\n\n- Samagra Shiksha, Himachal Pradesh`;
+        const smsBody = `Congratulations! You have successfully registered for donating ${gqlResponse.insert_device_donation_corporates_one.quantity_of_devices} smartphones as part of the "Digital Saathi"campaign. \nPlease note that the tracking ID is ${instanceID}. You can use these IDs to track the status of delivery for your donated smartphones. Contact 1800-180-8190 for any assistance.\n\n- Samagra Shiksha, Himachal Pradesh\n`;
 
         const contactNumber = corporateType.poc_phone_number;
         const smsDispatchResponse = sendSMS(smsBody, instanceID, contactNumber, process.env.DONATE_DEVICES_CORPORATE_TEMPLATE_ID);
