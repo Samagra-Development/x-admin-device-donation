@@ -16,7 +16,7 @@ const handler = async (req, res) => {
           res.status(200).json({
             error: null,
             success: {
-              data: maskPhoneNumber(
+              data: modifyData(
                 responseObject.data["device_donation_donor"]
               ),
             },
@@ -25,7 +25,7 @@ const handler = async (req, res) => {
           res.status(200).json({
             error: null,
             success: {
-              data: maskPhoneNumber(
+              data: modifyData(
                 responseObject.data["corporate_donor_devices"]
               ),
             },
@@ -45,20 +45,22 @@ const handler = async (req, res) => {
   }
 };
 
-function maskPhoneNumber(array) {
-  let modifiyData = array.map(element => element.delivery_status);
-  let obj = {allStatus:modifiyData};
+function modifyData(array) {
+  let modifyData = array.map(element => element.delivery_status);
+  let obj = {allStatus:modifyData};
   let { phone_number, device_donation_corporate, name } = array[0];
   if(phone_number) {
-    phone_number = `******${phone_number.slice(6)}`;
-    obj.phone_number = phone_number;
+    obj.phone_number = maskPhoneNumber(phone_number);
     obj.name = name;
   } else if(device_donation_corporate.poc_phone_number) {
-    phone_number = `******${device_donation_corporate.poc_phone_number.slice(6)}`;
-    obj.name = device_donation_corporate.poc_name;
-    obj.phone_number = phone_number;
+    obj.phone_number = maskPhoneNumber(device_donation_corporate.poc_phone_number);
+    obj.name = device_donation_corporate.company_name;
   }
   return obj;
+}
+
+function maskPhoneNumber(phone_number) {
+  return `******${phone_number.slice(6)}`;
 }
 
 async function captchaVerify(captcha, captchaToken) {
@@ -111,7 +113,7 @@ const operationsCorporateDoc = `
       delivery_status
       device_donation_corporate {
         poc_phone_number
-        poc_name
+        company_name
       }
     }
   }

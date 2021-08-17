@@ -174,7 +174,6 @@ export const CorporateDevicesList = (props) => {
       {isSmall ? (
         <SimpleList
           primaryText={(record) => record.name}
-          secondaryText={(record) => record.district}
           tertiaryText={(record) => record.device_tracking_key}
           linkType="edit"
         />

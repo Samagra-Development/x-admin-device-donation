@@ -1,5 +1,5 @@
 import { buildFields } from "ra-data-hasura";
-import gql from "graphql-tag";
+import { EXTENDED_DONATION_RECORD, EXTENDED_CORPORATE_DEVICES_RECORD } from './records';
 /**
  * Extracts just the fields from a GraphQL AST.
  * @param {GraphQL AST} queryAst
@@ -7,35 +7,6 @@ import gql from "graphql-tag";
 const extractFieldsFromQuery = (queryAst) => {
   return queryAst.definitions[0].selectionSet.selections;
 };
-
-// Define the additional fields that we want.
-const EXTENDED_DONATION_RECORD = gql`
-  {
-    recipient_school {
-      id
-      udise
-      name
-      location {
-        district
-      }
-    }
-  }
-`;
-const EXTENDED_CORPORATE_DEVICES_RECORD = gql`
-  {
-    device_donation_corporate {
-      company_id
-      company_name
-      delivery_initiated
-      id
-      poc_designation
-      poc_email
-      poc_name
-      poc_phone_number
-      quantity_of_devices
-    }
-  }
-`;
 
 const customBuildFields = (type, fetchType) => {
   const resourceName = type.name;

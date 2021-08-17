@@ -1,7 +1,7 @@
 import {repository} from '@loopback/repository';
 import {getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
-import {DonateDevice,Corporate} from '../models';
-import {DonateDeviceRepository,CorporateRepository} from '../repositories';
+import {DonateDevice} from '../models';
+import {DonateDeviceRepository} from '../repositories';
 import sendSMS from './../utils/sendSMS';
 import {DonateDevice as DonateDeviceType} from './donate-device-graphQL-model';
 import {graphQLHelper} from './graphQL-helper';
@@ -11,9 +11,7 @@ import {CorporateDevices as CorporateDevicesType} from './corporate-devices-grap
 export class DonateDeviceController {
   constructor(
     @repository(DonateDeviceRepository)
-    public donateDeviceRepository: DonateDeviceRepository,
-    @repository(CorporateRepository)
-    public corporateRepository: CorporateRepository,
+    public donateDeviceRepository: DonateDeviceRepository
   ) {}
 
   @post('/donate-devices')
@@ -42,7 +40,7 @@ export class DonateDeviceController {
     const data = donateDevice?.data?.[0];
     const smsBody = `You have successfully registered for donating your smartphone as part of "Baccho ka Sahara, Phone Humara" campaign. Your tracking ID is ${trackingKey}. You can use this ID to track the status of delivery for your donated device.\n\n- Samagra Shiksha, Himachal Pradesh`;
     const contactNumber = data.contact;
-    const smsDispatchResponse = sendSMS(smsBody, trackingKey, contactNumber);
+    const smsDispatchResponse = sendSMS(smsBody, trackingKey, contactNumber,'1007434778563689331');
 
     data.trackingKey = trackingKey;
     const donateDeviceType = new DonateDeviceType(data);
@@ -63,21 +61,21 @@ export class DonateDeviceController {
   @post('/donate-devices-corporate')
   @response(200, {
     description: 'Corporate model instance',
-    content: {'application/json': {schema: getModelSchemaRef(Corporate)}},
+    content: {'application/json': {schema: getModelSchemaRef(DonateDevice)}},
   })
   async createCorporate(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Corporate, {
+          schema: getModelSchemaRef(DonateDevice, {
             title: 'NewSurvay',
             exclude: ['id'],
           }),
         },
       },
     })
-    corporateResponce: Omit<Corporate, 'id'>,
-  ): Promise<Corporate> {
+    corporateResponce: Omit<DonateDevice, 'id'>,
+  ): Promise<DonateDevice> {
     let instanceID = corporateResponce.data[0]?.instanceID;
     instanceID = instanceID
       .split(':')?.[1]
@@ -109,15 +107,17 @@ export class DonateDeviceController {
             console.log(cdGqlResponse);
           }
         }
-        const smsBody = `Congratulations! You have successfully registered for donating <Number of devices donated> smartphones as part of the ""Digital Saathi"" campaign.
-        \nPlease note your tracking IDs: ${trackingKeys}. You can use these IDs to track the status of delivery for your donated smartphones. Contact 1800-180-8190 for any assistance.
-        \n\n- Samagra Shiksha, Himachal Pradesh`;
+        
+        const smsBody = `Congratulations! You have successfully registered for donating ${gqlResponse.insert_device_donation_corporates_one.quantity_of_devices} smartphones as part of the "Digital Saathi" campaign. \nPlease note your tracking IDs: ${instanceID}. You can use these IDs to track the status of delivery for your donated smartphones. Contact 1800-180-8190 for any assistance.\n\n- Samagra Shiksha, Himachal Pradesh`;
+
         const contactNumber = corporateType.poc_phone_number;
-        const smsDispatchResponse = sendSMS(smsBody, instanceID, contactNumber);
-        console.log(gqlResponse,smsBody);
+        const smsDispatchResponse = sendSMS(smsBody, instanceID, contactNumber, "1007668058014878711");
+        smsDispatchResponse.then((e) => {
+          console.log(e);
+        });
       }
     }
-    return this.corporateRepository.create(corporateResponce);
+    return this.donateDeviceRepository.create(corporateResponce);
   }
   
   // @get('/donate-devices/count')

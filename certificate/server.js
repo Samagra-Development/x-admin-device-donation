@@ -15,12 +15,12 @@ fastify.listen(process.env.PORT, process.env.HOST, (err, address) => {
 
 fastify.post("/", async (request, reply) => {
   const { body = {} } = request;
-  const { name = "", trackingKey = "", udise = "", phone_number = "" } = body;
-  const pdf = await printPdf(name, trackingKey, phone_number, udise);
+  const { name = "", trackingKey = "", udise = ""} = body;
+  const pdf = await printPdf(name, trackingKey, udise);
   reply.code(200).send({ base64String: pdf });
 });
 
-async function printPdf(name, trackingKey, phone_number, udise) {
+async function printPdf(name, trackingKey, udise) {
   const template = await fs.readFile(
     "./certificate-template-final.html",
     "utf-8"
@@ -46,7 +46,6 @@ async function printPdf(name, trackingKey, phone_number, udise) {
         donor: {
           trackingKey: trackingKey,
           name: name,
-          phone_number:phone_number,
           recipient: {
             udise: udise,
           },
@@ -98,6 +97,18 @@ async function printPdf(name, trackingKey, phone_number, udise) {
       );
       document.head.appendChild(style);
 
+      let stringLength = name.length;
+      if(name.length > 60) {
+        stringLength = 60;
+        donor.style.display = `block`;
+        donor.style['white-space'] = `nowrap`;
+        donor.style['overflow'] = `hidden`;
+        donor.style['text-overflow'] = `ellipsis`;
+      }
+      //TODO values based on trial, refactor to make generic 
+      donor.style.width = `${stringLength*13}px`;
+      donor.style.left = `${400-stringLength*6.5}px`;
+      
       donor.innerHTML = `${name}`;
       qr.src = qrcode;
       logo.src = `data:image/png;base64,${base64logo}`;

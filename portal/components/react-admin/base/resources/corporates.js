@@ -202,35 +202,6 @@ export const CorporatesEdit = (props) => {
     return [obj?.template, obj?.templateId, obj?.variables];
   };
 
-  const onSuccess = async ({ data }) => {
-    if (data) {
-      notify(
-        "ra.notification.updated",
-        "info",
-        { smart_count: 1 },
-        props.mutationMode === "undoable"
-      );
-      const { delivery_status } = data;
-      const [template, templateId, variables] =
-        getTemplateFromDeliveryStatus(delivery_status);
-      if (template && variables && session.role) {
-        //get each variable (which could be a path, like "ab.cd"), and replace it with
-        //the appropriate value from the data object
-        let replacedVariables = variables.map((keys) =>
-          //turn "ef" or "ab.cd" into ["ef"] and ["ab", "cd"] respectively
-          //and then reduce that to a singular value
-          keys.split(".").reduce((acc, key) => acc[key], data)
-        );
-
-        const message = buildGupshup(template, replacedVariables);
-        const response = await sendSMS(message, templateId, data.phone_number);
-        if (response?.success) notify(response.success, "info");
-        else if (response?.error) notify(response.error, "warning");
-        redirect("list", props.basePath, data.id, data);
-      }
-    }
-  };
-
   const Title = ({ record }) => {
     return (
       <span>

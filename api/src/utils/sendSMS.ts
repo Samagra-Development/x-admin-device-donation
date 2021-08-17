@@ -5,10 +5,11 @@ const sendSMS = async (
   msg: string,
   trackingKey: string,
   contactNumber: string,
+  templateId: string,
 ) => {
   const response = await axios({
     method: 'get',
-    url: `http://enterprise.smsgupshup.com/GatewayAPI/rest?msg=${msg}&v=1.1&userid=${process.env.GUPSHUP_USERNAME}&password=${process.env.GUPSHUP_PASSWORD}&send_to=${contactNumber}&msg_type=text&method=sendMessage&format=JSON&principalEntityId=${process.env.GUPSHUP_PRINCIPAL_ENTITY_ID}&dltTemplateId=1007434778563689331`,
+    url: `http://enterprise.smsgupshup.com/GatewayAPI/rest?msg=${msg}&v=1.1&userid=${process.env.GUPSHUP_USERNAME}&password=${process.env.GUPSHUP_PASSWORD}&send_to=${contactNumber}&msg_type=text&method=sendMessage&format=JSON&principalEntityId=${process.env.GUPSHUP_PRINCIPAL_ENTITY_ID}&dltTemplateId=${templateId}`,
   });
   const responseObject = response.data?.response;
   if (responseObject?.status === 'success') {
