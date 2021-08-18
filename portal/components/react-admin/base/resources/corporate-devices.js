@@ -146,17 +146,23 @@ const DevicesFilter = (props) => {
   return (
     <Filter {...props} className={classes.filter}>
       <SearchInput
-        placeholder="Tracking key"
+        placeholder="Tracking ID"
         source="device_tracking_key"
         className={isSmall ? classes.smSearchBar : classes.searchBar}
         alwaysOn
+      />
+      <SelectInput
+        label="Delivery Status"
+        source="delivery_status"
+        className={classes.filterSelect}
+        choices={config.statusChoices}
       />
     </Filter>
   );
 };
 
 /**
- * Corporate Devices List
+ * Corporate Donors List
  * @param {*} props
  */
 export const CorporateDevicesList = (props) => {
@@ -166,7 +172,7 @@ export const CorporateDevicesList = (props) => {
     <List
       {...props}
       bulkActionButtons={false}
-      title="Corporate Devices List"
+      title="Corporate Donors List"
       className={isSmall ? classes.smList : classes.list}
       sort={{ field: "id", order: "DESC" }}
       filters={<DevicesFilter />}
@@ -184,7 +190,7 @@ export const CorporateDevicesList = (props) => {
           <TextField label="Name" source="device_donation_corporate.poc_name" />
           <TextField label="Email" source="device_donation_corporate.poc_email" />
           <TextField label="Phone Number" source="device_donation_corporate.poc_phone_number" />
-          <TextField label="Tracking key" source="device_tracking_key" />
+          <TextField label="Tracking ID" source="device_tracking_key" />
           <FunctionField
             label="Delivery Staus"
             render={(record) =>
@@ -239,7 +245,7 @@ export const CorporateDevicesEdit = (props) => {
   const Title = ({ record }) => {
     return (
       <span>
-        Edit Corporate Devices{" "}
+        Edit Corporate Donor{" "}
         <span className={classes.grey}>#{record.device_tracking_key}</span>
       </span>
     );
@@ -257,67 +263,75 @@ export const CorporateDevicesEdit = (props) => {
           <span className={classes.heading}>Corporate Details</span>
           <div className={classes.grid}>
             <td>Company Name</td>
-            <td>Tracking key</td>
+            <td>Name</td>
+            <td>Phone Number</td>
+            <TextField label="Company Name" source="device_donation_corporate.company_name" disabled variant="outlined" />
+            <TextField label="Name" source="device_donation_corporate.poc_name" disabled variant="outlined" />
+            <TextField label="Phone Number" source="device_donation_corporate.poc_phone_number" disabled variant="outlined" />
+          </div>
+          <div className={classes.grid}>
+            <td>Designation</td>
+            <td>Tracking ID</td>
             <td>Date</td>
-            <TextField label="Company id" source="company_id" disabled variant="outlined" />
-            <TextField label="Tracking key" source="device_tracking_key" disabled variant="outlined" />
+            <TextField label="Designation" source="device_donation_corporate.poc_designation" disabled variant="outlined" />
+            <TextField label="Tracking ID" source="device_tracking_key" disabled variant="outlined" />
             <DateField label="Date" locales="en-IN" source="created_at" />
           </div>
-            <span className={classes.heading}>Update Status</span>
-            <div className={`${classes.grid} ${classes.fullWidthGrid}`}>
-              <SelectInput
-                source="delivery_status"
-                choices={config.statusChoices}
-                label="Delivery Status"
-                disabled={!(session.role || session.applicationId === process.env.NEXT_PUBLIC_FUSIONAUTH_SCHOOL_APP_ID)}
-              />
-              <FormDataConsumer>
-                {({ formData, ...rest }) =>
-                  formData?.delivery_status === "delivered-child" ? (
-                    <>
-                      <h2 className={classes.heading}>Recipient</h2>
-                      <div className={!session.role ? classes.grid : null}>
-                        <ReferenceInput
-                          reference="school"
-                          label="School"
-                          source="recipient_school_id"
-                          className={classes.fullWidth}
-                          filterToQuery={(searchText) => ({
-                            "name@_ilike": searchText,
-                          })}
-                        >
-                          <AutocompleteInput
-                            optionValue="id"
-                            optionText="name"
-                            disabled={!session.role}
-                            {...rest}
+          <span className={classes.heading}>Update Status</span>
+          <div className={`${classes.grid} ${classes.fullWidthGrid}`}>
+            <SelectInput
+              source="delivery_status"
+              choices={config.statusChoices}
+              label="Delivery Status"
+              disabled={!(session.role || session.applicationId === process.env.NEXT_PUBLIC_FUSIONAUTH_SCHOOL_APP_ID)}
+            />
+            <FormDataConsumer>
+              {({ formData, ...rest }) =>
+                formData?.delivery_status === "delivered-child" ? (
+                  <>
+                    <h2 className={classes.heading}>Recipient</h2>
+                    <div className={!session.role ? classes.grid : null}>
+                      <ReferenceInput
+                        reference="school"
+                        label="School"
+                        source="recipient_school_id"
+                        className={classes.fullWidth}
+                        filterToQuery={(searchText) => ({
+                          "name@_ilike": searchText,
+                        })}
+                      >
+                        <AutocompleteInput
+                          optionValue="id"
+                          optionText="name"
+                          disabled={!session.role}
+                          {...rest}
+                        />
+                      </ReferenceInput>
+                      {!session.role ? (
+                        <>
+                          <TextInput
+                            label="Name"
+                            className={classes.textInput}
+                            source="recipient_name"
                           />
-                        </ReferenceInput>
-                        {!session.role ? (
-                          <>
-                            <TextInput
-                              label="Name"
-                              className={classes.textInput}
-                              source="recipient_name"
-                            />
-                            <SelectInput
-                              label="Grade"
-                              choices={config.gradeChoices}
-                              className={classes.selectInput}
-                              source="recipient_grade"
-                            />
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                      </div>
-                    </>
-                  ) : (
-                    <></>
-                  )
-                }
-              </FormDataConsumer>
-            </div>
+                          <SelectInput
+                            label="Grade"
+                            choices={config.gradeChoices}
+                            className={classes.selectInput}
+                            source="recipient_grade"
+                          />
+                        </>
+                      ) : (
+                        <></>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <></>
+                )
+              }
+            </FormDataConsumer>
+          </div>
         </SimpleForm>
       </Edit>
     </div>

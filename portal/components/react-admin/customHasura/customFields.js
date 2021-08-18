@@ -18,7 +18,7 @@ const customBuildFields = (type, fetchType) => {
       defaultFields.push(...relatedEntities);
     }
   } else if (resourceName === "corporate_donor_devices") {
-    if (fetchType === "GET_LIST") {
+    if (fetchType === "GET_LIST" || fetchType === "GET_ONE") {
       const relatedEntities = extractFieldsFromQuery(EXTENDED_CORPORATE_DEVICES_RECORD);
       defaultFields.push(...relatedEntities);
     } else if (fetchType === "UPDATE") {

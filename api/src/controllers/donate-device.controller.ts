@@ -7,6 +7,7 @@ import {DonateDevice as DonateDeviceType} from './donate-device-graphQL-model';
 import {graphQLHelper} from './graphQL-helper';
 import {Corporate as CorporateType} from './corporate-graphQL-model';
 import {CorporateDevices as CorporateDevicesType} from './corporate-devices-graphQL-model';
+import sendLog from '../utils/adminLogger';
 
 export class DonateDeviceController {
   constructor(
@@ -116,6 +117,11 @@ export class DonateDeviceController {
           console.log(e);
         });
       }
+    } else {
+      sendLog(
+        `*⚠️ samarth-device*: SMS notiification sending failed to _${corporateType.poc_phone_number}_. 🦺 Skipping graphQL insertion for this record.`,
+        process.env.SLACK_ADMIN_LOGS_CHANNEL_ID,
+      );
     }
     return this.donateDeviceRepository.create(corporateResponce);
   }
