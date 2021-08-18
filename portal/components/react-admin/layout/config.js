@@ -30,19 +30,17 @@ export const resourceConfig = [
   },
   {
     name: "device_donation_corporates",
-    label: "Corporates",
-    list: CorporatesList,
-    edit: CorporatesEdit,
+    list: null,
+    edit: null,
     create: null,
-    icon: "smartphone",
   },
   {
     name: "corporate_donor_devices",
-    label: "Corporate Devices",
+    label: "Corporate Donors",
     list: CorporateDevicesList,
     edit: CorporateDevicesEdit,
     create: null,
-    icon: "smartphone",
+    icon: "corporate",
   },
   {
     name: "school",

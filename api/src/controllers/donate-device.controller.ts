@@ -7,6 +7,7 @@ import {DonateDevice as DonateDeviceType} from './donate-device-graphQL-model';
 import {graphQLHelper} from './graphQL-helper';
 import {Corporate as CorporateType} from './corporate-graphQL-model';
 import {CorporateDevices as CorporateDevicesType} from './corporate-devices-graphQL-model';
+import sendLog from '../utils/adminLogger';
 
 export class DonateDeviceController {
   constructor(
@@ -95,7 +96,7 @@ export class DonateDeviceController {
       } else {
         let trackingKeys: String[] = [];
         for(let i = 0; i < gqlResponse.insert_device_donation_corporates_one.quantity_of_devices; i++ ) {
-          let r = (Math.random() + 1).toString(36).substring(4).toUpperCase();
+          let r = (Math.random() + 1).toString(36).substring(4,12).toUpperCase();
           trackingKeys = [...trackingKeys,r];
           const corporateDevicesType = new CorporateDevicesType({"trackingKey":r,'companyId':gqlResponse.insert_device_donation_corporates_one.company_id});
           const {errors, data: cdGqlResponse} = await gQLHelper.startExecuteInsert(
@@ -116,6 +117,11 @@ export class DonateDeviceController {
           console.log(e);
         });
       }
+    } else {
+      sendLog(
+        `*⚠️ samarth-device*: SMS notiification sending failed to _${corporateType.poc_phone_number}_. 🦺 Skipping graphQL insertion for this record.`,
+        process.env.SLACK_ADMIN_LOGS_CHANNEL_ID,
+      );
     }
     return this.donateDeviceRepository.create(corporateResponce);
   }
