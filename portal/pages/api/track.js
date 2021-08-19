@@ -108,7 +108,7 @@ const operationsIndividualDoc = `
 
 const operationsCorporateDoc = `
   query trackDevice($trackingKey: String) {
-    corporate_donor_devices(where: {company_id: {_eq: $trackingKey}}) {
+    corporate_donor_devices(where: {_or: [{company_id: {_eq: $trackingKey}}, {device_tracking_key: {_eq: $trackingKey}}]}) {
       id
       delivery_status
       device_donation_corporate {
