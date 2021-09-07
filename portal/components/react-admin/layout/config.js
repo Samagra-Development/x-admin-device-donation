@@ -14,6 +14,10 @@ import {
   CorporateDevicesEdit,
   CorporateDevicesList,
 } from "@/resources/corporate-devices";
+import {
+  DeviceVerificationList,
+  DeviceVerificationEdit,
+} from "@/resources/verification";
 
 export const resourceConfig = [
   {
@@ -39,6 +43,14 @@ export const resourceConfig = [
     label: "Corporate Donors",
     list: CorporateDevicesList,
     edit: CorporateDevicesEdit,
+    create: null,
+    icon: "corporate",
+  },
+  {
+    name: "device_verification_records",
+    label: "Device verification",
+    list: DeviceVerificationList,
+    edit: DeviceVerificationEdit,
     create: null,
     icon: "corporate",
   },

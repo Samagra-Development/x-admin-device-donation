@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import {
   List,
   SimpleList,
@@ -11,6 +11,9 @@ import {
   SimpleForm,
   TextInput,
   SelectInput,
+  NumberInput,
+  ImageInput,
+  BooleanInput,
   Filter,
   SearchInput,
   useRedirect,
@@ -18,16 +21,23 @@ import {
   FormDataConsumer,
   AutocompleteInput,
   ReferenceInput,
+  useMutation,
 } from "react-admin";
 
 import { useSession } from "next-auth/client";
-import { Typography, makeStyles, useMediaQuery } from "@material-ui/core";
+import {
+  Typography,
+  makeStyles,
+  useMediaQuery,
+  Button,
+} from "@material-ui/core";
 import EditNoDeleteToolbar from "../components/EditNoDeleteToolbar";
 import BackButton from "../components/BackButton";
 import blueGrey from "@material-ui/core/colors/blueGrey";
 import config from "@/components/config";
 import sendSMS from "@/utils/sendSMS";
 import buildGupshup from "@/utils/buildGupshup";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
   searchBar: {
@@ -249,13 +259,15 @@ export const DonateDeviceRequestEdit = (props) => {
   const notify = useNotify();
   const redirect = useRedirect();
   const [session] = useSession();
+  const [mutate] = useMutation();
+  const [otpGenerate, setOtpGenerate] = useState(false);
 
   const getTemplateFromDeliveryStatus = (status) => {
     const obj = config.statusChoices.find((elem) => elem.id === status);
     return [obj?.template, obj?.templateId, obj?.variables];
   };
 
-  const onSuccess = async ({ data }) => {
+  const onSuccess = async (data) => {
     if (data) {
       notify(
         "ra.notification.updated",
@@ -279,9 +291,148 @@ export const DonateDeviceRequestEdit = (props) => {
         const response = await sendSMS(message, templateId, data.phone_number);
         if (response?.success) notify(response.success, "info");
         else if (response?.error) notify(response.error, "warning");
-        redirect("list", props.basePath, data.id, data);
+      }
+      redirect("list", props.basePath, data.id, data);
+    }
+  };
+
+  const validateForm = async (values) => {
+    const errors = {};
+    if (values.delivery_status && values.delivery_status == "delivered-child") {
+      if (!values.otp) {
+        errors.otp = "The Otp is required";
       }
     }
+
+    return errors;
+  };
+
+  const uuidv4 = () => {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+      /[xy]/g,
+      function (c) {
+        var r = (Math.random() * 16) | 0,
+          v = c == "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      }
+    );
+  };
+
+  const filtered = (raw, allowed, except = "only") => {
+    return Object.keys(raw)
+      .filter((key) =>
+        except == "except" ? !allowed.includes(key) : allowed.includes(key)
+      )
+      .reduce((obj, key) => {
+        obj[key] = raw[key];
+        return obj;
+      }, {});
+  };
+
+  const save = useCallback(
+    async (values) => {
+      try {
+        if (values.otp) {
+          const responseOtp = await axios({
+            method: "POST",
+            url: `${process.env.NEXT_PUBLIC_API_URL}/sendOTP`,
+            data: {
+              phone_number: values.phone_number,
+              otp: values.otp,
+            },
+          });
+
+          const responseOtpObject = responseOtp.data;
+          if (responseOtpObject.error) {
+            return {
+              otp: "invalid otp",
+            };
+          }
+        }
+        const verificationKey = [
+          "verifier_name",
+          "number_of_students",
+          "photograph_url",
+          "declaration",
+        ];
+        const recordData = filtered(values, verificationKey, "except");
+        const verificationData = filtered(values, verificationKey, "only");
+        const response = await mutate(
+          {
+            type: "update",
+            resource: "device_donation_donor",
+            payload: { id: values.id, data: recordData },
+          },
+          { returnPromise: true }
+        );
+        const responseObject = response.data;
+        if (
+          values.otp &&
+          responseObject &&
+          responseObject.delivery_status == "delivered-child"
+        ) {
+          const record = {
+            ...verificationData,
+            udise: session.username,
+            transaction_id: uuidv4(),
+            device_tracking_key: responseObject.device_tracking_key,
+          };
+          const response = await mutate(
+            {
+              type: "create",
+              resource: "device_verification_records",
+              payload: { data: record },
+            },
+            { returnPromise: true }
+          );
+          setOtpGenerate(false);
+        }
+        onSuccess(responseObject);
+      } catch (error) {
+        if (error.body?.errors) {
+          return error.body.errors;
+        } else {
+          return error.body;
+        }
+      }
+    },
+    [mutate]
+  );
+
+  const sendOtp = async (phone_number) => {
+    const response = await axios({
+      method: "GET",
+      url: `${process.env.NEXT_PUBLIC_API_URL}/sendOTP?phone_number=${phone_number}`,
+    });
+    const responseObject = response.data;
+    if (!responseObject.error) {
+      setOtpGenerate(true);
+    }
+  };
+
+  const InputOtp = ({ phone_number }) => {
+    return (
+      <TextInput
+        label="OTP"
+        className={classes.textInput}
+        source="otp"
+        disabled={!otpGenerate}
+        InputProps={{
+          endAdornment: (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={
+                () => {
+                sendOtp(phone_number);
+              }}
+            >
+              Generate
+            </Button>
+          ),
+        }}
+      />
+    );
   };
 
   const Title = ({ record }) => {
@@ -292,15 +443,19 @@ export const DonateDeviceRequestEdit = (props) => {
       </span>
     );
   };
+
   return (
     <div>
       <Edit
-        onSuccess={onSuccess}
         mutationMode={"pessimistic"}
         title={<Title />}
         {...props}
       >
-        <SimpleForm toolbar={<EditNoDeleteToolbar />}>
+        <SimpleForm
+          toolbar={<EditNoDeleteToolbar />}
+          validate={validateForm}
+          save={save}
+        >
           <BackButton history={props.history} />
           <span className={classes.heading}>Donor Details</span>
           <div className={classes.grid}>
@@ -398,14 +553,24 @@ export const DonateDeviceRequestEdit = (props) => {
               source="delivery_status"
               choices={config.statusChoices}
               label="Delivery Status"
-              disabled={!(session.role || session.applicationId === process.env.NEXT_PUBLIC_FUSIONAUTH_SCHOOL_APP_ID)}
+              disabled={
+                !(
+                  session.role !== "school" ||
+                  session.applicationId ===
+                    process.env.NEXT_PUBLIC_FUSIONAUTH_SCHOOL_APP_ID
+                )
+              }
             />
             <FormDataConsumer>
               {({ formData, ...rest }) =>
                 formData?.delivery_status === "delivered-child" ? (
                   <>
                     <h2 className={classes.heading}>Recipient</h2>
-                    <div className={!session.role ? classes.grid : null}>
+                    <div
+                      className={
+                        session.role === "school" ? classes.grid : null
+                      }
+                    >
                       <ReferenceInput
                         reference="school"
                         label="School"
@@ -418,12 +583,12 @@ export const DonateDeviceRequestEdit = (props) => {
                         <AutocompleteInput
                           optionValue="id"
                           optionText="name"
-                          disabled={!session.role}
+                          disabled={session.role === "school"}
                           {...rest}
                         />
                       </ReferenceInput>
                       {/* Visible if session does not have role  */}
-                      {!session.role ? (
+                      {session.role === "school" ? (
                         <>
                           <TextInput
                             label="Name"
@@ -440,6 +605,30 @@ export const DonateDeviceRequestEdit = (props) => {
                       ) : (
                         <></>
                       )}
+                    </div>
+
+                    <h2 className={classes.heading}>Verification</h2>
+                    <div
+                      className={
+                        session.role === "school" ? classes.grid : null
+                      }
+                    >
+                      <TextInput
+                        label="Verifier Name"
+                        className={classes.textInput}
+                        source="verifier_name"
+                      />
+                      <ImageInput
+                        label="Upload photo"
+                        className={classes.textInput}
+                        source="photograph_url"
+                      />
+                      <InputOtp form={formData} />
+                      <BooleanInput
+                        source="declaration"
+                        label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
+                        className={classes.fullWidth}
+                      />
                     </div>
                   </>
                 ) : (
