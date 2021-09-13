@@ -13,7 +13,7 @@ const customBuildFields = (type, fetchType) => {
   const defaultFields = buildFields(type, fetchType);
 
   if (resourceName === "device_donation_donor") {
-    if (fetchType === "UPDATE") {
+    if (['GET_ONE','UPDATE'].includes(fetchType)) {
       const relatedEntities = extractFieldsFromQuery(EXTENDED_DONATION_RECORD);
       defaultFields.push(...relatedEntities);
     }

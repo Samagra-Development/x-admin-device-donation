@@ -11,7 +11,7 @@ import {
   SimpleForm,
   TextInput,
   SelectInput,
-  NumberInput,
+  ImageField,
   ImageInput,
   BooleanInput,
   Filter,
@@ -262,6 +262,23 @@ export const DonateDeviceRequestEdit = (props) => {
   const [mutate] = useMutation();
   const [otpGenerate, setOtpGenerate] = useState(false);
 
+  const fileUpload = async (file) => {
+    const newfile = await new Promise(function (resolve, reject) {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = (e) => reject(e)
+    })
+
+    const responseOtp = await axios({
+      method: "post",
+      url: `${process.env.NEXT_PUBLIC_API_URL}/fileUpload`,
+      data: {file:newfile},
+    });
+
+    return responseOtp.data;
+  }
+
   const getTemplateFromDeliveryStatus = (status) => {
     const obj = config.statusChoices.find((elem) => elem.id === status);
     return [obj?.template, obj?.templateId, obj?.variables];
@@ -371,11 +388,16 @@ export const DonateDeviceRequestEdit = (props) => {
           responseObject &&
           responseObject.delivery_status == "delivered-child"
         ) {
+          let fileUrl = null;
+          if(values.photograph_url) {
+            fileUrl = await fileUpload(values.photograph_url?.rawFile);
+          }
           const record = {
             ...verificationData,
             udise: session.username,
             transaction_id: uuidv4(),
-            device_tracking_key: responseObject.device_tracking_key,
+            device_tracking_key_individual: responseObject.device_tracking_key,
+            photograph_url: fileUrl
           };
           const response = await mutate(
             {
@@ -622,8 +644,10 @@ export const DonateDeviceRequestEdit = (props) => {
                         label="Upload photo"
                         className={classes.textInput}
                         source="photograph_url"
-                      />
-                      <InputOtp form={formData} />
+                      >
+                        <ImageField source="photograph_url" />
+                      </ImageInput>
+                      <InputOtp phone_number={formData.phone_number} />
                       <BooleanInput
                         source="declaration"
                         label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
