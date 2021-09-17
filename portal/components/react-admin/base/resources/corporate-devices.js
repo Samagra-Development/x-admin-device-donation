@@ -9,6 +9,10 @@ import {
   FunctionField,
   Edit,
   SimpleForm,
+  Show,
+  SimpleShowLayout,
+  TabbedShowLayout,
+  Tab,
   TextInput,
   SelectInput,
   ImageField,
@@ -22,6 +26,11 @@ import {
   AutocompleteInput,
   ReferenceInput,
   useMutation,
+  required,
+  maxLength,
+  Toolbar,
+  SaveButton,
+  ReferenceManyField
 } from "react-admin";
 
 import { useSession } from "next-auth/client";
@@ -31,13 +40,13 @@ import {
   useMediaQuery,
   Button,
 } from "@material-ui/core";
-import EditNoDeleteToolbar from "../components/EditNoDeleteToolbar";
 import BackButton from "../components/BackButton";
 import blueGrey from "@material-ui/core/colors/blueGrey";
 import config from "@/components/config";
 import sendSMS from "@/utils/sendSMS";
 import buildGupshup from "@/utils/buildGupshup";
 import axios from "axios";
+import CustomFormDataConsumer from "../components/CustomFormDataConsumer";
 
 const useStyles = makeStyles((theme) => ({
   searchBar: {
@@ -177,6 +186,7 @@ const DevicesFilter = (props) => {
 export const CorporateDevicesList = (props) => {
   const isSmall = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const classes = useStyles();
+  const postRowClick = (id, basePath, record) => record.device_verification_record ? 'show' : 'edit';
   return (
     <List
       {...props}
@@ -193,7 +203,7 @@ export const CorporateDevicesList = (props) => {
           linkType="edit"
         />
       ) : (
-        <Datagrid rowClick="edit">
+        <Datagrid rowClick={postRowClick}>
           <DateField label="Date" locales="en-IN" source="created_at" />
           <TextField label="Company Name" source="device_donation_corporate.company_name" />
           <TextField label="Name" source="device_donation_corporate.poc_name" />
@@ -273,8 +283,11 @@ export const CorporateDevicesEdit = (props) => {
   const validateForm = async (values) => {
     const errors = {};
     if (values.delivery_status && values.delivery_status == "delivered-child") {
-      if (!values.otp) {
-        errors.otp = "The Otp is required";
+      if (!values.device_verification_record?.otp) {
+        errors.device_verification_record = {otp:"The Otp is required"};
+      }
+      if (!values.device_verification_record?.verifier_phone_number) {
+        errors.device_verification_record = {...errors.device_verification_record,verifier_phone_number:"Verifier's phone number is required"};
       }
     }
 
@@ -306,31 +319,25 @@ export const CorporateDevicesEdit = (props) => {
   const save = useCallback(
     async (values) => {
       try {
-        if (values.otp) {
+        const recordData = filtered(values, ['device_verification_record'], "except");
+        const verificationData = values?.device_verification_record;
+        if (verificationData.otp) {
           const responseOtp = await axios({
             method: "POST",
             url: `${process.env.NEXT_PUBLIC_API_URL}/sendOTP`,
             data: {
-              phone_number: values.device_donation_corporate?.poc_phone_number,
-              otp: values.otp,
+              phone_number: verificationData.verifier_phone_number,
+              otp: verificationData.otp,
             },
           });
 
           const responseOtpObject = responseOtp.data;
           if (responseOtpObject.error) {
             return {
-              otp: "invalid otp",
+              device_verification_record: {otp: "invalid otp"},
             };
           }
         }
-        const verificationKey = [
-          "verifier_name",
-          "number_of_students",
-          "photograph_url",
-          "declaration",
-        ];
-        const recordData = filtered(values, verificationKey, "except");
-        const verificationData = filtered(values, verificationKey, "only");
         
         const response = await mutate(
           {
@@ -342,13 +349,13 @@ export const CorporateDevicesEdit = (props) => {
         );
         const responseObject = response.data;
         if (
-          values.otp &&
+          verificationData.otp &&
           responseObject &&
           responseObject.delivery_status == "delivered-child"
         ) {
-          let fileUrl = "";
-          if(values.photograph_url) {
-            fileUrl = await fileUpload(values.photograph_url?.rawFile);
+          let fileUrl = null;
+          if(verificationData.photograph_url) {
+            fileUrl = await fileUpload(verificationData.photograph_url?.rawFile);
           }
           const record = {
             ...verificationData,
@@ -369,7 +376,6 @@ export const CorporateDevicesEdit = (props) => {
         }
         onSuccess(responseObject);
       } catch (error) {
-        console.log('error',error);
         if (error.body?.errors) {
           return error.body.errors;
         } else {
@@ -391,29 +397,13 @@ export const CorporateDevicesEdit = (props) => {
     }
   };
 
-  const InputOtp = ({ phone_number }) => {
-    return (
-      <TextInput
-        label="OTP"
-        className={classes.textInput}
-        source="otp"
-        disabled={!otpGenerate}
-        InputProps={{
-          endAdornment: (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={
-                () => {
-                sendOtp(phone_number);
-              }}
-            >
-              Generate
-            </Button>
-          ),
-        }}
-      />
-    );
+  const EditNoDeleteToolbar = (props) => {
+    let { record } = props;
+    let { device_verification_record } = record ? record : {};
+    let verified = device_verification_record && device_verification_record.udise ? "none" : 'block';
+    return <Toolbar {...props}>
+      <SaveButton disabled={props.pristine} style={{display:verified}} />
+    </Toolbar>
   };
 
   const Title = ({ record }) => {
@@ -424,129 +414,125 @@ export const CorporateDevicesEdit = (props) => {
       </span>
     );
   };
-  return (
-    <div>
-      <Edit
-        mutationMode={"pessimistic"}
-        title={<Title />}
-        {...props}
+  return (<div>
+    <Edit
+      mutationMode={"pessimistic"}
+      title={<Title />}
+      {...props}
+      actions={false}
+    >
+      <SimpleForm
+        toolbar={<EditNoDeleteToolbar />}
+        validate={validateForm}
+        save={save}
       >
-        <SimpleForm
-          toolbar={<EditNoDeleteToolbar />}
-          validate={validateForm}
-          save={save}
-        >
-          <BackButton history={props.history} />
-          <span className={classes.heading}>Corporate Details</span>
-          <div className={classes.grid}>
-            <td>Company Name</td>
-            <td>Name</td>
-            <td>Phone Number</td>
-            <TextField label="Company Name" source="device_donation_corporate.company_name" disabled variant="outlined" />
-            <TextField label="Name" source="device_donation_corporate.poc_name" disabled variant="outlined" />
-            <TextField label="Phone Number" source="device_donation_corporate.poc_phone_number" disabled variant="outlined" />
-          </div>
-          <div className={classes.grid}>
-            <td>Designation</td>
-            <td>Tracking ID</td>
-            <td>Date</td>
-            <TextField label="Designation" source="device_donation_corporate.poc_designation" disabled variant="outlined" />
-            <TextField label="Tracking ID" source="device_tracking_key" disabled variant="outlined" />
-            <DateField label="Date" locales="en-IN" source="created_at" />
-          </div>
-          <span className={classes.heading}>Update Status</span>
-          <div className={`${classes.grid} ${classes.fullWidthGrid}`}>
-            <SelectInput
-              source="delivery_status"
-              choices={config.statusChoices}
-              label="Delivery Status"
-              disabled={
-                !(
-                  session.role !== "school" ||
-                  session.applicationId ===
-                    process.env.NEXT_PUBLIC_FUSIONAUTH_SCHOOL_APP_ID
-                )
-              }
-            />
-            <FormDataConsumer>
-              {({ formData, ...rest }) =>
-                formData?.delivery_status === "delivered-child" ? (
-                  <>
-                    <h2 className={classes.heading}>Recipient</h2>
-                    <div
-                      className={
-                        session.role === "school" ? classes.grid : null
-                      }
-                    >
-                      <ReferenceInput
-                        reference="school"
-                        label="School"
-                        source="recipient_school_id"
-                        className={classes.fullWidth}
-                        filterToQuery={(searchText) => ({
-                          "name@_ilike": searchText,
-                        })}
-                      >
-                        <AutocompleteInput
-                          optionValue="id"
-                          optionText="name"
-                          disabled={session.role === "school"}
-                          {...rest}
-                        />
-                      </ReferenceInput>
-                      {session.role === "school" ? (
-                        <>
-                          <TextInput
-                            label="Name"
-                            className={classes.textInput}
-                            source="recipient_name"
-                          />
-                          <SelectInput
-                            label="Grade"
-                            choices={config.gradeChoices}
-                            className={classes.selectInput}
-                            source="recipient_grade"
-                          />
-                        </>
-                      ) : (
-                        <></>
-                      )}
-                    </div>
+        <BackButton history={props.history} />
+        <span className={classes.heading}>Corporate Details</span>
+        <div className={classes.grid}>
+          <td>Company Name</td>
+          <td>Name</td>
+          <td>Phone Number</td>
+          <TextField label="Company Name" source="device_donation_corporate.company_name" disabled variant="outlined" />
+          <TextField label="Name" source="device_donation_corporate.poc_name" disabled variant="outlined" />
+          <TextField label="Phone Number" source="device_donation_corporate.poc_phone_number" disabled variant="outlined" />
+        </div>
+        <div className={classes.grid}>
+          <td>Designation</td>
+          <td>Tracking ID</td>
+          <td>Date</td>
+          <TextField label="Designation" source="device_donation_corporate.poc_designation" disabled variant="outlined" />
+          <TextField label="Tracking ID" source="device_tracking_key" disabled variant="outlined" />
+          <DateField label="Date" locales="en-IN" source="created_at" />
+        </div>
+        <CustomFormDataConsumer otpGenerate={otpGenerate}  sendOtp={sendOtp}/>
+      </SimpleForm>
+    </Edit></div>
+  );
+};
 
-                    <h2 className={classes.heading}>Verification</h2>
-                    <div
-                      className={
-                        session.role === "school" ? classes.grid : null
-                      }
-                    >
-                      <TextInput
-                        label="Verifier Name"
-                        className={classes.textInput}
-                        source="verifier_name"
-                      />
-                      <ImageInput
-                        label="Upload photo"
-                        className={classes.textInput}
-                        source="photograph_url"
-                      >
-                        <ImageField source="photograph_url" />
-                      </ImageInput>
-                      <InputOtp phone_number={formData.device_donation_corporate?.poc_phone_number} />
-                      <BooleanInput
-                        source="declaration"
-                        label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
-                        className={classes.fullWidth}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <></>
-                )
-              }
-            </FormDataConsumer>
-          </div>
-        </SimpleForm>
-      </Edit>
-    </div>
+export const CorporateDevicesShow = (props) => {
+  const classes = useStyles();
+  const [session] = useSession();
+
+  const Title = ({ record }) => {
+    return (
+      <span>
+        Show Corporate Donor{" "}
+        <span className={classes.grey}>#{record.device_tracking_key}</span>
+      </span>
+    );
+  };
+  return (<div>
+    <Show
+      title={<Title />}
+      {...props}
+      actions={false}
+    >
+      <TabbedShowLayout syncWithLocation={false}>
+        <Tab label="Corporate Details">
+          <TextField label="Company Name" source="device_donation_corporate.company_name" disabled variant="outlined" />
+          <TextField label="Name" source="device_donation_corporate.poc_name" disabled variant="outlined" />
+          <TextField label="Phone Number" source="device_donation_corporate.poc_phone_number" disabled variant="outlined" />
+          <TextField label="Designation" source="device_donation_corporate.poc_designation" disabled variant="outlined" />
+          <TextField label="Tracking ID" source="device_tracking_key" disabled variant="outlined" />
+          <DateField label="Date" locales="en-IN" source="created_at" />
+        </Tab>
+        <Tab label="Update Status">
+          <TextField
+            source="delivery_status"
+            choices={config.statusChoices}
+            label="Delivery Status"
+          />
+        </Tab>
+        <Tab label="Recipient">
+          <TextField
+            label="School"
+            className={classes.textInput}
+            source="recipient_school_id"
+          />
+          <TextField
+            label="Name"
+            className={classes.textInput}
+            source="recipient_name"
+          />
+          <TextField
+            label="Grade"
+            choices={config.gradeChoices}
+            className={classes.selectInput}
+            source="recipient_grade"
+          />
+          <TextField
+            label="Student ID"
+            className={classes.textInput}
+            source="student_id"
+            validate={[required(),maxLength(8)]}
+          />
+        </Tab>
+        <Tab label="Verification">
+          <TextField
+            label="Verifier Name"
+            className={classes.textInput}
+            source="device_verification_record.verifier_name"
+          />
+          {/* <ImageInput
+            label="Upload photo"
+            className={classes.textInput}
+            source="device_verification_record.photograph_url"
+          >
+            <ImageField source="photograph_url" />
+          </ImageInput> */}
+          <TextField
+            label="Verifier's Phone Number"
+            className={classes.textInput}
+            source="device_verification_record.verifier_phone_number"
+          />
+          <BooleanField
+            source="device_verification_record.declaration"
+            label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
+            className={classes.fullWidth}
+          />
+        </Tab>
+      </TabbedShowLayout>
+    </Show></div>
   );
 };

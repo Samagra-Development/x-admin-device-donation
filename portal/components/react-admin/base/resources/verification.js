@@ -108,7 +108,7 @@ const useStyles = makeStyles((theme) => ({
   },
   textInput: {
     "& > label": {
-      fontSize: "1.1rem",
+      fontSize: "1rem",
     },
   },
   selectInput: {
@@ -146,17 +146,18 @@ const DevicesFilter = (props) => {
   return (
     <Filter {...props} className={classes.filter}>
       <SearchInput
-        placeholder="Tracking ID"
-        source="device_tracking_key"
+        placeholder="Verifier name"
+        source="verifier_name"
         className={isSmall ? classes.smSearchBar : classes.searchBar}
         alwaysOn
       />
-      <SelectInput
+      <TextInput className={classes.textInput} label="Verifier Phone Number" source="verifier_phone_number" />
+      {/* <SelectInput
         label="Delivery Status"
         source="delivery_status"
         className={classes.filterSelect}
         choices={config.statusChoices}
-      />
+      /> */}
     </Filter>
   );
 };
@@ -180,15 +181,17 @@ export const DeviceVerificationList = (props) => {
       {isSmall ? (
         <SimpleList
           primaryText={(record) => record.name}
-          tertiaryText={(record) => record.device_tracking_key}
+          tertiaryText={(record) => record.device_tracking_key_individual ?? record.device_tracking_key_corporate}
           linkType="edit"
         />
       ) : (
         <Datagrid rowClick="edit">
           <DateField label="Date" locales="en-IN" source="created_at" />
           <TextField label="Verifier name" source="verifier_name" />
+          <TextField label="Verifier Phone Number" source="verifier_phone_number" />
           <TextField label="declaration" source="declaration" />
-          <TextField label="Tracking ID" source="device_tracking_key" />
+          <TextField label="Tracking ID individual" source="device_tracking_key_individual" />
+          <TextField label="Tracking ID corporate" source="device_tracking_key_corporate" />
         </Datagrid>
       )}
     </List>
@@ -202,7 +205,7 @@ export const DeviceVerificationEdit = (props) => {
     return (
       <span>
         Edit device verification{" "}
-        <span className={classes.grey}>#{record.device_tracking_key}</span>
+        <span className={classes.grey}>#{record.device_tracking_key_individual ?? record.device_tracking_key_corporate}</span>
       </span>
     );
   };
@@ -218,14 +221,22 @@ export const DeviceVerificationEdit = (props) => {
           <span className={classes.heading}>Details</span>
           <div className={classes.grid}>
             <td>Verifier name</td>
-            <td>declaration</td>
-            <td>Tracking ID</td>
+            <td>Verifier Phone Number</td>
+            <td>Declaration</td>
             <TextField label="Verifier name" source="verifier_name" />
-            <TextField label="declaration" source="declaration" />
-            <TextField label="Tracking ID" source="device_tracking_key" />
+            <TextField label="Verifier Phone Number" source="verifier_phone_number" />
+            <TextField label="Declaration" source="declaration" />
           </div>
-          <div className={`${classes.grid} ${classes.fullWidthGrid}`}>
+          <div className={`${classes.grid}`}>
+            <td>Tracking ID</td>
             <td>Date</td>
+            <td></td>
+            <FormDataConsumer>
+              {({ formData, ...rest }) => formData?.device_tracking_key_individual ? 
+                <TextField label="Tracking ID" source="device_tracking_key_individual" />
+                : <TextField label="Tracking ID" source="device_tracking_key_corporate" />
+              }
+            </FormDataConsumer>
             <DateField label="Date" locales="en-IN" source="created_at" />
           </div>
         </SimpleForm>

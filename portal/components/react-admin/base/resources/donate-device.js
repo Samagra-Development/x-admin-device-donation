@@ -9,19 +9,25 @@ import {
   FunctionField,
   Edit,
   SimpleForm,
+  Show,
+  SimpleShowLayout,
+  TabbedShowLayout,
+  Tab,
   TextInput,
   SelectInput,
   ImageField,
-  ImageInput,
   BooleanInput,
   Filter,
   SearchInput,
   useRedirect,
   useNotify,
-  FormDataConsumer,
   AutocompleteInput,
   ReferenceInput,
   useMutation,
+  required,
+  maxLength,
+  Toolbar,
+  SaveButton
 } from "react-admin";
 
 import { useSession } from "next-auth/client";
@@ -31,13 +37,13 @@ import {
   useMediaQuery,
   Button,
 } from "@material-ui/core";
-import EditNoDeleteToolbar from "../components/EditNoDeleteToolbar";
 import BackButton from "../components/BackButton";
 import blueGrey from "@material-ui/core/colors/blueGrey";
 import config from "@/components/config";
 import sendSMS from "@/utils/sendSMS";
 import buildGupshup from "@/utils/buildGupshup";
 import axios from "axios";
+import CustomFormDataConsumer from "../components/CustomFormDataConsumer";
 
 const useStyles = makeStyles((theme) => ({
   searchBar: {
@@ -196,6 +202,7 @@ const DevicesFilter = (props) => {
 export const DonateDeviceRequestList = (props) => {
   const isSmall = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const classes = useStyles();
+  const postRowClick = (id, basePath, record) => record.device_verification_record ? 'show' : 'edit';
   return (
     <List
       {...props}
@@ -213,7 +220,7 @@ export const DonateDeviceRequestList = (props) => {
           linkType="edit"
         />
       ) : (
-        <Datagrid rowClick="edit">
+        <Datagrid rowClick={postRowClick}>
           <DateField label="Date" locales="en-IN" source="created_at" />
           <TextField label="Name" source="name" />
           <TextField label="Phone Number" source="phone_number" />
@@ -316,8 +323,11 @@ export const DonateDeviceRequestEdit = (props) => {
   const validateForm = async (values) => {
     const errors = {};
     if (values.delivery_status && values.delivery_status == "delivered-child") {
-      if (!values.otp) {
-        errors.otp = "The Otp is required";
+      if (!values.device_verification_record?.otp) {
+        errors.device_verification_record = {otp:"The Otp is required"};
+      }
+      if (!values.device_verification_record?.verifier_phone_number) {
+        errors.device_verification_record = {...errors.device_verification_record,verifier_phone_number:"Verifier's phone number is required"};
       }
     }
 
@@ -349,31 +359,26 @@ export const DonateDeviceRequestEdit = (props) => {
   const save = useCallback(
     async (values) => {
       try {
-        if (values.otp) {
+        const recordData = filtered(values, ['device_verification_record'], "except");
+        const verificationData = values?.device_verification_record;
+        if (verificationData.otp) {
           const responseOtp = await axios({
             method: "POST",
             url: `${process.env.NEXT_PUBLIC_API_URL}/sendOTP`,
             data: {
-              phone_number: values.phone_number,
-              otp: values.otp,
+              phone_number: verificationData.verifier_phone_number,
+              otp: verificationData.otp,
             },
           });
 
           const responseOtpObject = responseOtp.data;
           if (responseOtpObject.error) {
             return {
-              otp: "invalid otp",
+              device_verification_record: {otp: "invalid otp"},
             };
           }
         }
-        const verificationKey = [
-          "verifier_name",
-          "number_of_students",
-          "photograph_url",
-          "declaration",
-        ];
-        const recordData = filtered(values, verificationKey, "except");
-        const verificationData = filtered(values, verificationKey, "only");
+        
         const response = await mutate(
           {
             type: "update",
@@ -384,13 +389,13 @@ export const DonateDeviceRequestEdit = (props) => {
         );
         const responseObject = response.data;
         if (
-          values.otp &&
+          verificationData.otp &&
           responseObject &&
           responseObject.delivery_status == "delivered-child"
         ) {
           let fileUrl = null;
-          if(values.photograph_url) {
-            fileUrl = await fileUpload(values.photograph_url?.rawFile);
+          if(verificationData.photograph_url) {
+            fileUrl = await fileUpload(verificationData.photograph_url?.rawFile);
           }
           const record = {
             ...verificationData,
@@ -432,29 +437,13 @@ export const DonateDeviceRequestEdit = (props) => {
     }
   };
 
-  const InputOtp = ({ phone_number }) => {
-    return (
-      <TextInput
-        label="OTP"
-        className={classes.textInput}
-        source="otp"
-        disabled={!otpGenerate}
-        InputProps={{
-          endAdornment: (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={
-                () => {
-                sendOtp(phone_number);
-              }}
-            >
-              Generate
-            </Button>
-          ),
-        }}
-      />
-    );
+  const EditNoDeleteToolbar = (props) => {
+    let { record } = props;
+    let { device_verification_record } = record ? record : {};
+    let verified = device_verification_record && device_verification_record.udise ? "none" : 'block';
+    return <Toolbar {...props}>
+      <SaveButton disabled={props.pristine} style={{display:verified}} />
+    </Toolbar>
   };
 
   const Title = ({ record }) => {
@@ -466,207 +455,259 @@ export const DonateDeviceRequestEdit = (props) => {
     );
   };
 
-  return (
-    <div>
-      <Edit
-        mutationMode={"pessimistic"}
-        title={<Title />}
-        {...props}
+  return (<div>
+    <Edit
+      mutationMode={"pessimistic"}
+      title={<Title />}
+      {...props}
+      actions={false}
+    >
+      <SimpleForm
+        toolbar={<EditNoDeleteToolbar />}
+        validate={validateForm}
+        save={save}
       >
-        <SimpleForm
-          toolbar={<EditNoDeleteToolbar />}
-          validate={validateForm}
-          save={save}
-        >
-          <BackButton history={props.history} />
-          <span className={classes.heading}>Donor Details</span>
-          <div className={classes.grid}>
-            <td>Name</td>
-            <td>Phone Number</td>
-            <td>District</td>
-            <TextField label="Name" source="name" disabled variant="outlined" />
-            <TextField
-              label="Phone Number"
-              source="phone_number"
-              disabled
-              variant="outlined"
-            />
-            <FunctionField
-              label="District"
-              render={(record) => {
-                if (record) {
-                  return record.district
-                    ? record.district
-                    : record.other_district;
-                }
-              }}
-              disabled
-              variant="outlined"
-            />
-            <td>Address</td>
-            <td>Pincode</td>
-            <td>Delivery</td>
-            <TextField
-              label="Address"
-              source="address"
-              disabled
-              variant="outlined"
-            />
-            <TextField
-              label="Pincode"
-              source="pincode"
-              disabled
-              variant="outlined"
-            />
-            <FunctionField
-              label="Delivery"
-              render={(record) => {
-                if (record) {
-                  return record.district
-                    ? getChoice(
-                        config.deliveryTypeChoices,
-                        record.delivery_mode
-                      )?.name
-                    : getChoice(
-                        config.deliveryTypeChoices,
-                        record.delivery_mode_outside_HP
-                      )?.name;
-                }
-              }}
-              disabled
-              variant="outlined"
-            />
-          </div>
-          <span className={classes.heading}>Device Details</span>
-          <div className={classes.grid}>
-            <td>Company</td>
-            <td>Model</td>
-            <td>Screen Size</td>
-            <TextField label="Device Company" source="device_company" />
-            <FunctionField
-              label="Device Model"
-              render={(record) => {
-                if (record) {
-                  return record.device_model
-                    ? record.device_model
-                    : record.device_other_model;
-                }
-              }}
-            />
-            <TextField label="Device Size" source="device_size" />
-            <td>Condition</td>
-            <td>Age (Years)</td>
-            <td>WhatsApp Function</td>
-
-            <TextField label="Device Condition" source="device_condition" />
-            <TextField label="Device Age" source="device_age" />
-            <BooleanField source="wa_function" />
-            <td>Call Function</td>
-            <td>YouTube Function</td>
-            <td>Charger Avbl</td>
-            <BooleanField source="call_function" />
-            <BooleanField source="yt_function" />
-            <BooleanField source="charger_available" />
-          </div>
-          <span className={classes.heading}>Update Status</span>
-          <div className={`${classes.grid} ${classes.fullWidthGrid}`}>
-            {/* Enabled if session has role or user belongs to school application */}
-            <SelectInput
-              source="delivery_status"
-              choices={config.statusChoices}
-              label="Delivery Status"
-              disabled={
-                !(
-                  session.role !== "school" ||
-                  session.applicationId ===
-                    process.env.NEXT_PUBLIC_FUSIONAUTH_SCHOOL_APP_ID
-                )
+        <BackButton history={props.history} />
+        <span className={classes.heading}>Donor Details</span>
+        <div className={classes.grid}>
+          <td>Name</td>
+          <td>Phone Number</td>
+          <td>District</td>
+          <TextField label="Name" source="name" disabled variant="outlined" />
+          <TextField
+            label="Phone Number"
+            source="phone_number"
+            disabled
+            variant="outlined"
+          />
+          <FunctionField
+            label="District"
+            render={(record) => {
+              if (record) {
+                return record.district
+                  ? record.district
+                  : record.other_district;
               }
-            />
-            <FormDataConsumer>
-              {({ formData, ...rest }) =>
-                formData?.delivery_status === "delivered-child" ? (
-                  <>
-                    <h2 className={classes.heading}>Recipient</h2>
-                    <div
-                      className={
-                        session.role === "school" ? classes.grid : null
-                      }
-                    >
-                      <ReferenceInput
-                        reference="school"
-                        label="School"
-                        source="recipient_school_id"
-                        className={classes.fullWidth}
-                        filterToQuery={(searchText) => ({
-                          "name@_ilike": searchText,
-                        })}
-                      >
-                        <AutocompleteInput
-                          optionValue="id"
-                          optionText="name"
-                          disabled={session.role === "school"}
-                          {...rest}
-                        />
-                      </ReferenceInput>
-                      {/* Visible if session does not have role  */}
-                      {session.role === "school" ? (
-                        <>
-                          <TextInput
-                            label="Name"
-                            className={classes.textInput}
-                            source="recipient_name"
-                          />
-                          <SelectInput
-                            label="Grade"
-                            choices={config.gradeChoices}
-                            className={classes.selectInput}
-                            source="recipient_grade"
-                          />
-                        </>
-                      ) : (
-                        <></>
-                      )}
-                    </div>
-
-                    <h2 className={classes.heading}>Verification</h2>
-                    <div
-                      className={
-                        session.role === "school" ? classes.grid : null
-                      }
-                    >
-                      <TextInput
-                        label="Verifier Name"
-                        className={classes.textInput}
-                        source="verifier_name"
-                      />
-                      <ImageInput
-                        label="Upload photo"
-                        className={classes.textInput}
-                        source="photograph_url"
-                      >
-                        <ImageField source="photograph_url" />
-                      </ImageInput>
-                      <InputOtp phone_number={formData.phone_number} />
-                      <BooleanInput
-                        source="declaration"
-                        label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
-                        className={classes.fullWidth}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <></>
-                )
+            }}
+            disabled
+            variant="outlined"
+          />
+          <td>Address</td>
+          <td>Pincode</td>
+          <td>Delivery</td>
+          <TextField
+            label="Address"
+            source="address"
+            disabled
+            variant="outlined"
+          />
+          <TextField
+            label="Pincode"
+            source="pincode"
+            disabled
+            variant="outlined"
+          />
+          <FunctionField
+            label="Delivery"
+            render={(record) => {
+              if (record) {
+                return record.district
+                  ? getChoice(
+                      config.deliveryTypeChoices,
+                      record.delivery_mode
+                    )?.name
+                  : getChoice(
+                      config.deliveryTypeChoices,
+                      record.delivery_mode_outside_HP
+                    )?.name;
               }
-            </FormDataConsumer>
-          </div>
-          <p className={classes.warning}>
-            Changing status will trigger an SMS notification to the donor upon
-            saving.
-          </p>
-        </SimpleForm>
-      </Edit>
-    </div>
+            }}
+            disabled
+            variant="outlined"
+          />
+        </div>
+        <span className={classes.heading}>Device Details</span>
+        <div className={classes.grid}>
+          <td>Company</td>
+          <td>Model</td>
+          <td>Screen Size</td>
+          <TextField label="Device Company" source="device_company" />
+          <FunctionField
+            label="Device Model"
+            render={(record) => {
+              if (record) {
+                return record.device_model
+                  ? record.device_model
+                  : record.device_other_model;
+              }
+            }}
+          />
+          <TextField label="Device Size" source="device_size" />
+          <td>Condition</td>
+          <td>Age (Years)</td>
+          <td>WhatsApp Function</td>
+
+          <TextField label="Device Condition" source="device_condition" />
+          <TextField label="Device Age" source="device_age" />
+          <BooleanField source="wa_function" />
+          <td>Call Function</td>
+          <td>YouTube Function</td>
+          <td>Charger Avbl</td>
+          <BooleanField source="call_function" />
+          <BooleanField source="yt_function" />
+          <BooleanField source="charger_available" />
+        </div>
+        <CustomFormDataConsumer otpGenerate={otpGenerate} sendOtp={sendOtp}/>
+      </SimpleForm>
+    </Edit></div>
+  );
+};
+
+export const DonateDeviceRequestShow = (props) => {
+  const classes = useStyles();
+  const [session] = useSession();
+
+  const Title = ({ record }) => {
+    return (
+      <span>
+        Show donor{" "}
+        <span className={classes.grey}>#{record.device_tracking_key}</span>
+      </span>
+    );
+  };
+
+  return (<div>
+    <Show
+      title={<Title />}
+      {...props}
+      actions={false}
+    >
+      <TabbedShowLayout syncWithLocation={false}>
+        <Tab label="Donor Details">
+          <TextField label="Name" source="name" variant="outlined" />
+          <TextField
+            label="Phone Number"
+            source="phone_number"
+            variant="outlined"
+          />
+          <FunctionField
+            label="District"
+            render={(record) => {
+              if (record) {
+                return record.district
+                  ? record.district
+                  : record.other_district;
+              }
+            }}
+            variant="outlined"
+          />
+          <TextField
+            label="Address"
+            source="address"
+            disabled
+            variant="outlined"
+          />
+          <TextField
+            label="Pincode"
+            source="pincode"
+            disabled
+            variant="outlined"
+          />
+          <FunctionField
+            label="Delivery"
+            render={(record) => {
+              if (record) {
+                return record.district
+                  ? getChoice(
+                      config.deliveryTypeChoices,
+                      record.delivery_mode
+                    )?.name
+                  : getChoice(
+                      config.deliveryTypeChoices,
+                      record.delivery_mode_outside_HP
+                    )?.name;
+              }
+            }}
+            disabled
+            variant="outlined"
+          />
+        </Tab>
+        <Tab label="Device Details">
+          <TextField label="Device Company" source="device_company" />
+          <FunctionField
+            label="Device Model"
+            render={(record) => {
+              if (record) {
+                return record.device_model
+                  ? record.device_model
+                  : record.device_other_model;
+              }
+            }}
+          />
+          <TextField label="Device Size" source="device_size" />
+          <TextField label="Device Condition" source="device_condition" />
+          <TextField label="Device Age" source="device_age" />
+          <BooleanField source="wa_function" />
+          <BooleanField source="call_function" />
+          <BooleanField source="yt_function" />
+          <BooleanField source="charger_available" />
+        </Tab>
+        <Tab label="Update Status">
+          <TextField
+            source="delivery_status"
+            choices={config.statusChoices}
+            label="Delivery Status"
+          />
+        </Tab>
+        <Tab label="Recipient">
+          <TextField
+            label="School"
+            className={classes.textInput}
+            source="recipient_school_id"
+          />
+          <TextField
+            label="Name"
+            className={classes.textInput}
+            source="recipient_name"
+          />
+          <TextField
+            label="Grade"
+            choices={config.gradeChoices}
+            className={classes.selectInput}
+            source="recipient_grade"
+          />
+          <TextField
+            label="Student ID"
+            className={classes.textInput}
+            source="student_id"
+            validate={[required(),maxLength(8)]}
+          />
+        </Tab>
+        <Tab label="Verification">
+          <TextField
+            label="Verifier Name"
+            className={classes.textInput}
+            source="device_verification_record.verifier_name"
+          />
+          {/* <ImageInput
+            label="Upload photo"
+            className={classes.textInput}
+            source="device_verification_record.photograph_url"
+          >
+            <ImageField source="photograph_url" />
+          </ImageInput> */}
+          <TextField
+            label="Verifier's Phone Number"
+            className={classes.textInput}
+            source="device_verification_record.verifier_phone_number"
+          />
+          <BooleanField
+            source="device_verification_record.declaration"
+            label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
+            className={classes.fullWidth}
+          />
+        </Tab>
+      </TabbedShowLayout>
+    </Show></div>
   );
 };

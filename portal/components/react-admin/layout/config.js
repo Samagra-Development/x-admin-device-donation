@@ -1,6 +1,7 @@
 import {
   DonateDeviceRequestEdit,
   DonateDeviceRequestList,
+  DonateDeviceRequestShow
 } from "@/resources/donate-device";
 import {
   RequestDeviceEdit,
@@ -13,6 +14,7 @@ import {
 import {
   CorporateDevicesEdit,
   CorporateDevicesList,
+  CorporateDevicesShow,
 } from "@/resources/corporate-devices";
 import {
   DeviceVerificationList,
@@ -29,6 +31,7 @@ export const resourceConfig = [
     label: "Donors",
     list: DonateDeviceRequestList,
     edit: DonateDeviceRequestEdit,
+    show: DonateDeviceRequestShow,
     create: null,
     icon: "smartphone",
   },
@@ -43,6 +46,7 @@ export const resourceConfig = [
     label: "Corporate Donors",
     list: CorporateDevicesList,
     edit: CorporateDevicesEdit,
+    show: CorporateDevicesShow,
     create: null,
     icon: "corporate",
   },

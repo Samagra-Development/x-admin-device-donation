@@ -13,6 +13,13 @@ export const EXTENDED_CORPORATE_DEVICES_RECORD = gql`
     poc_phone_number
     quantity_of_devices
   }
+  device_verification_record {
+    udise
+    verifier_name
+    verifier_phone_number
+    declaration
+    photograph_url
+  }
 }
 `;
 

@@ -69,6 +69,7 @@ function AsyncResources({ client }) {
             list={resource.list}
             edit={resource.edit}
             create={resource.create}
+            show={resource.show}
           />
         ))}
       </AdminUI>

@@ -13,12 +13,12 @@ const customBuildFields = (type, fetchType) => {
   const defaultFields = buildFields(type, fetchType);
 
   if (resourceName === "device_donation_donor") {
-    if (['GET_ONE','UPDATE'].includes(fetchType)) {
+    if (['GET_ONE','UPDATE','GET_LIST'].includes(fetchType)) {
       const relatedEntities = extractFieldsFromQuery(EXTENDED_DONATION_RECORD);
       defaultFields.push(...relatedEntities);
     }
   } else if (resourceName === "corporate_donor_devices") {
-    if (fetchType === "GET_LIST" || fetchType === "GET_ONE") {
+    if (['GET_ONE','GET_LIST'].includes(fetchType)) {
       const relatedEntities = extractFieldsFromQuery(EXTENDED_CORPORATE_DEVICES_RECORD);
       defaultFields.push(...relatedEntities);
     } else if (fetchType === "UPDATE") {
