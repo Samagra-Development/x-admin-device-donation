@@ -110,11 +110,11 @@ a {
 * REACT-ADMIN OVERRIDES
 */
 
-.edit-page {
+.edit-page, .show-page {
   margin: 1rem 2rem;
 }
 
-.edit-page > div {
+.edit-page > div, .show-page > div {
   margin-top: 0;
 }
 
@@ -141,7 +141,7 @@ a {
   }
 
   /* React Admin Override */
-  .edit-page {
+  .edit-page, .show-page {
     height: 100vh;
     overflow: scroll;
   }
