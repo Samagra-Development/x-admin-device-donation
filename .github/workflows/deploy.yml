@@ -29,7 +29,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /home/device-donation/
+            cd /home/device-donation/ &&
             export POSTGRES_USER=${{secrets.POSTGRES_USER}} &&
             export POSTGRES_PASSWORD=${{secrets.POSTGRES_PASSWORD}} &&
             export DATABASE_USERNAME=${{secrets.DATABASE_USERNAME}} &&
@@ -54,5 +54,5 @@ jobs:
             export SLACK_ADMIN_LOGS_CHANNEL_ID=${{secrets.SLACK_ADMIN_LOGS_CHANNEL_ID}} &&
             export CERTIFICATE_URL=${{secrets.CERTIFICATE_URL}} &&
             export CAPTCHA_URL=${{secrets.CAPTCHA_URL}} &&
-            export USER_SERVICE_URL=${{secrets.USER_SERVICE_URL}}
+            export USER_SERVICE_URL=${{secrets.USER_SERVICE_URL}} &&
             docker-compose up -d --build

@@ -37,5 +37,5 @@ jobs:
       export SLACK_ADMIN_LOGS_CHANNEL_ID=${{secrets.SLACK_ADMIN_LOGS_CHANNEL_ID}} &&
       export CERTIFICATE_URL=${{secrets.CERTIFICATE_URL}} &&
       export CAPTCHA_URL=${{secrets.CAPTCHA_URL}} &&
-      export USER_SERVICE_URL=${{secrets.USER_SERVICE_URL}}
+      export USER_SERVICE_URL=${{secrets.USER_SERVICE_URL}} &&
       docker-compose up -d --build .
