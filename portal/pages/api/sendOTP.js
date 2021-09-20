@@ -9,7 +9,7 @@ const handler = async (req, res) => {
       
       const response = await axios({
         method: "get",
-        url: `http://139.59.46.189:3005/user/sendOTP?phone=${phone_number}`,
+        url: `${process.env.USER_SERVICE_URL}/user/sendOTP?phone=${phone_number}`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session.jwt}`,

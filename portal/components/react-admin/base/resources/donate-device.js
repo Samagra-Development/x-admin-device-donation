@@ -45,6 +45,7 @@ import sendSMS from "@/utils/sendSMS";
 import buildGupshup from "@/utils/buildGupshup";
 import axios from "axios";
 import CustomFormDataConsumer from "../components/CustomFormDataConsumer";
+import { sendOTP, verifyOTP } from "@/utils/sendOTP";
 
 const useStyles = makeStyles((theme) => ({
   searchBar: {
@@ -369,16 +370,7 @@ export const DonateDeviceRequestEdit = (props) => {
         const recordData = filtered(values, ['device_verification_record'], "except");
         const verificationData = values?.device_verification_record;
         if (verificationData.otp) {
-          const responseOtp = await axios({
-            method: "POST",
-            url: `${process.env.NEXT_PUBLIC_API_URL}/sendOTP`,
-            data: {
-              phone_number: verificationData.verifier_phone_number,
-              otp: verificationData.otp,
-            },
-          });
-
-          const responseOtpObject = responseOtp.data;
+          const responseOtpObject = await verifyOTP(verificationData.verifier_phone_number,verificationData.otp);
           if (responseOtpObject.error) {
             return {
               device_verification_record: {otp: "invalid otp"},
@@ -433,13 +425,9 @@ export const DonateDeviceRequestEdit = (props) => {
     [mutate]
   );
 
-  const sendOtp = async (phone_number) => {
+  const generateOtp = async (phone_number) => {
     if(phone_number && phone_number.length >= 10) {
-      const response = await axios({
-        method: "GET",
-        url: `${process.env.NEXT_PUBLIC_API_URL}/sendOTP?phone_number=${phone_number}`,
-      });
-      const responseObject = response.data;
+      const responseObject = await sendOTP(phone_number);
       if (!responseObject.error) {
         setOtpGenerate(true);
       }
@@ -534,7 +522,7 @@ export const DonateDeviceRequestEdit = (props) => {
           <Labeled label="YouTube Function"><BooleanField source="yt_function" /></Labeled>
           <Labeled label="Charger Avbl"><BooleanField source="charger_available" /></Labeled>
         </div>
-        <CustomFormDataConsumer otpGenerate={otpGenerate} sendOtp={sendOtp}/>
+        <CustomFormDataConsumer otpGenerate={otpGenerate} sendOtp={generateOtp}/>
       </SimpleForm>
     </Edit></div>
   );
