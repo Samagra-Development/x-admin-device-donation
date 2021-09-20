@@ -30,7 +30,8 @@ import {
   maxLength,
   Toolbar,
   SaveButton,
-  ReferenceManyField
+  ReferenceManyField,
+  Labeled
 } from "react-admin";
 
 import { useSession } from "next-auth/client";
@@ -47,6 +48,7 @@ import sendSMS from "@/utils/sendSMS";
 import buildGupshup from "@/utils/buildGupshup";
 import axios from "axios";
 import CustomFormDataConsumer from "../components/CustomFormDataConsumer";
+import purple from '@material-ui/core/colors/purple';
 
 const useStyles = makeStyles((theme) => ({
   searchBar: {
@@ -83,7 +85,12 @@ const useStyles = makeStyles((theme) => ({
   grid: {
     display: "grid",
     width: "100%",
-    gridTemplateColumns: "1fr 1fr 1fr",
+    [theme.breakpoints.up('xs')]: {
+      gridTemplateColumns: "1fr",
+    },
+    [theme.breakpoints.up('sm')]: {
+      gridTemplateColumns: "1fr 1fr 1fr",
+    },
     gridRowGap: "1ch",
     gridColumnGap: "1ch",
     margin: "1rem 0",
@@ -288,6 +295,8 @@ export const CorporateDevicesEdit = (props) => {
       }
       if (!values.device_verification_record?.verifier_phone_number) {
         errors.device_verification_record = {...errors.device_verification_record,verifier_phone_number:"Verifier's phone number is required"};
+      } else if(!values.device_verification_record.verifier_phone_number.match('[0-9]{10}')) {
+        errors.device_verification_record = {...errors.device_verification_record,verifier_phone_number:"Enter a valid 10 digit mobile number."};
       }
     }
 
@@ -387,13 +396,15 @@ export const CorporateDevicesEdit = (props) => {
   );
 
   const sendOtp = async (phone_number) => {
-    const response = await axios({
-      method: "GET",
-      url: `${process.env.NEXT_PUBLIC_API_URL}/sendOTP?phone_number=${phone_number}`,
-    });
-    const responseObject = response.data;
-    if (!responseObject.error) {
-      setOtpGenerate(true);
+    if(phone_number && phone_number.length >= 10) {
+      const response = await axios({
+        method: "GET",
+        url: `${process.env.NEXT_PUBLIC_API_URL}/sendOTP?phone_number=${phone_number}`,
+      });
+      const responseObject = response.data;
+      if (!responseObject.error) {
+        setOtpGenerate(true);
+      }
     }
   };
 
@@ -429,20 +440,14 @@ export const CorporateDevicesEdit = (props) => {
         <BackButton history={props.history} />
         <span className={classes.heading}>Corporate Details</span>
         <div className={classes.grid}>
-          <td>Company Name</td>
-          <td>Name</td>
-          <td>Phone Number</td>
-          <TextField label="Company Name" source="device_donation_corporate.company_name" disabled variant="outlined" />
-          <TextField label="Name" source="device_donation_corporate.poc_name" disabled variant="outlined" />
-          <TextField label="Phone Number" source="device_donation_corporate.poc_phone_number" disabled variant="outlined" />
+          <Labeled label="Company Name"><TextField source="device_donation_corporate.company_name"/></Labeled>
+          <Labeled label="Name"><TextField source="device_donation_corporate.poc_name"/></Labeled>
+          <Labeled label="Phone Number"><TextField source="device_donation_corporate.poc_phone_number"/></Labeled>
         </div>
         <div className={classes.grid}>
-          <td>Designation</td>
-          <td>Tracking ID</td>
-          <td>Date</td>
-          <TextField label="Designation" source="device_donation_corporate.poc_designation" disabled variant="outlined" />
-          <TextField label="Tracking ID" source="device_tracking_key" disabled variant="outlined" />
-          <DateField label="Date" locales="en-IN" source="created_at" />
+          <Labeled label="Designation"><TextField source="device_donation_corporate.poc_designation"/></Labeled>
+          <Labeled label="Tracking ID"><TextField source="device_tracking_key"/></Labeled>
+          <Labeled label="Date"><DateField locales="en-IN" source="created_at" /></Labeled>
         </div>
         <CustomFormDataConsumer otpGenerate={otpGenerate}  sendOtp={sendOtp}/>
       </SimpleForm>

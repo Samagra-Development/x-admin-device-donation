@@ -18,7 +18,8 @@ import {
   FormDataConsumer,
   AutocompleteInput,
   ReferenceInput,
-  ReferenceField
+  ReferenceField,
+  Labeled
 } from "react-admin";
 
 import { useSession } from "next-auth/client";
@@ -65,7 +66,12 @@ const useStyles = makeStyles((theme) => ({
   grid: {
     display: "grid",
     width: "100%",
-    gridTemplateColumns: "1fr 1fr 1fr",
+    [theme.breakpoints.up('xs')]: {
+      gridTemplateColumns: "1fr",
+    },
+    [theme.breakpoints.up('sm')]: {
+      gridTemplateColumns: "1fr 1fr 1fr",
+    },
     gridRowGap: "1ch",
     gridColumnGap: "1ch",
     margin: "1rem 0",
@@ -220,24 +226,20 @@ export const DeviceVerificationEdit = (props) => {
           <BackButton history={props.history} />
           <span className={classes.heading}>Details</span>
           <div className={classes.grid}>
-            <td>Verifier name</td>
-            <td>Verifier Phone Number</td>
-            <td>Declaration</td>
-            <TextField label="Verifier name" source="verifier_name" />
-            <TextField label="Verifier Phone Number" source="verifier_phone_number" />
-            <TextField label="Declaration" source="declaration" />
+            <Labeled label="Verifier name"><TextField source="verifier_name" /></Labeled>
+            <Labeled label="Verifier Phone Number"><TextField source="verifier_phone_number" /></Labeled>
+            <Labeled label="Declaration"><TextField source="declaration" /></Labeled>
           </div>
           <div className={`${classes.grid}`}>
-            <td>Tracking ID</td>
-            <td>Date</td>
-            <td></td>
-            <FormDataConsumer>
-              {({ formData, ...rest }) => formData?.device_tracking_key_individual ? 
-                <TextField label="Tracking ID" source="device_tracking_key_individual" />
-                : <TextField label="Tracking ID" source="device_tracking_key_corporate" />
-              }
-            </FormDataConsumer>
-            <DateField label="Date" locales="en-IN" source="created_at" />
+            <Labeled label="Tracking ID">
+              <FormDataConsumer>
+                {({ formData, ...rest }) => formData?.device_tracking_key_individual ? 
+                  <TextField source="device_tracking_key_individual" />
+                  : <TextField source="device_tracking_key_corporate" />
+                }
+              </FormDataConsumer>
+            </Labeled>
+            <Labeled label="Date"><DateField locales="en-IN" source="created_at" /></Labeled>
           </div>
         </SimpleForm>
       </Edit>
