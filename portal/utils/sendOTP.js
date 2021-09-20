@@ -9,12 +9,12 @@ export const sendOTP = async (phoneNumber) => {
     });
     if (response.data?.error) {
       sendLog(
-        `⚠️ *samarth-device*\n :round_pushpin: \`${process.env.NEXT_PUBLIC_URL}\` \n :pager: SMS status update notification sending to *${phoneNumber}* failed`
+        `⚠️ *samarth-device*\n :round_pushpin: \`${process.env.NEXT_PUBLIC_URL}\` \n :pager: OTP sending to *${phoneNumber}* failed`
       );
       return { error: response.data?.error, success: null };
     } else if (response.data?.success) {
       sendLog(
-        `:white_check_mark: *samarth-device*\n :round_pushpin: \`${process.env.NEXT_PUBLIC_URL}\` \n :pager: SMS status update notification successfully sent to *${phoneNumber}*`
+        `:white_check_mark: *samarth-device*\n :round_pushpin: \`${process.env.NEXT_PUBLIC_URL}\` \n :pager: OTP successfully sent to *${phoneNumber}*`
       );
       return { success: response.data?.success, error: null };
     }
@@ -23,7 +23,7 @@ export const sendOTP = async (phoneNumber) => {
   }
 };
 
-export const verifyOTP = async (phoneNumber,otp) => {
+export const verifyOTP = async (phoneNumber, otp) => {
   try {
     const response = await axios({
       method: "POST",

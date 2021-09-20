@@ -31,7 +31,7 @@ import {
   Toolbar,
   SaveButton,
   ReferenceManyField,
-  Labeled
+  Labeled,
 } from "react-admin";
 
 import { useSession } from "next-auth/client";
@@ -48,7 +48,7 @@ import sendSMS from "@/utils/sendSMS";
 import buildGupshup from "@/utils/buildGupshup";
 import axios from "axios";
 import CustomFormDataConsumer from "../components/CustomFormDataConsumer";
-import purple from '@material-ui/core/colors/purple';
+import purple from "@material-ui/core/colors/purple";
 import { sendOTP, verifyOTP } from "@/utils/sendOTP";
 
 const useStyles = makeStyles((theme) => ({
@@ -86,10 +86,10 @@ const useStyles = makeStyles((theme) => ({
   grid: {
     display: "grid",
     width: "100%",
-    [theme.breakpoints.up('xs')]: {
+    [theme.breakpoints.up("xs")]: {
       gridTemplateColumns: "1fr",
     },
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up("sm")]: {
       gridTemplateColumns: "1fr 1fr 1fr",
     },
     gridRowGap: "1ch",
@@ -194,7 +194,8 @@ const DevicesFilter = (props) => {
 export const CorporateDevicesList = (props) => {
   const isSmall = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const classes = useStyles();
-  const postRowClick = (id, basePath, record) => record.device_verification_record ? 'show' : 'edit';
+  const postRowClick = (id, basePath, record) =>
+    record.device_verification_record ? "show" : "edit";
   return (
     <List
       {...props}
@@ -213,10 +214,19 @@ export const CorporateDevicesList = (props) => {
       ) : (
         <Datagrid rowClick={postRowClick}>
           <DateField label="Date" locales="en-IN" source="created_at" />
-          <TextField label="Company Name" source="device_donation_corporate.company_name" />
+          <TextField
+            label="Company Name"
+            source="device_donation_corporate.company_name"
+          />
           <TextField label="Name" source="device_donation_corporate.poc_name" />
-          <TextField label="Email" source="device_donation_corporate.poc_email" />
-          <TextField label="Phone Number" source="device_donation_corporate.poc_phone_number" />
+          <TextField
+            label="Email"
+            source="device_donation_corporate.poc_email"
+          />
+          <TextField
+            label="Phone Number"
+            source="device_donation_corporate.poc_phone_number"
+          />
           <TextField label="Tracking ID" source="device_tracking_key" />
           <FunctionField
             label="Delivery Staus"
@@ -236,24 +246,24 @@ export const CorporateDevicesEdit = (props) => {
   const redirect = useRedirect();
   const [session] = useSession();
   const [mutate] = useMutation();
-  const [otpGenerate, setOtpGenerate] = useState(false);
+  const [otpGenerated, setOtpGenerated] = useState(false);
 
   const fileUpload = async (file) => {
     const newfile = await new Promise(function (resolve, reject) {
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = () => resolve(reader.result)
-      reader.onerror = (e) => reject(e)
-    })
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (e) => reject(e);
+    });
 
     const responseOtp = await axios({
       method: "post",
       url: `${process.env.NEXT_PUBLIC_API_URL}/fileUpload`,
-      data: {file:newfile},
+      data: { file: newfile },
     });
 
     return responseOtp.data;
-  }
+  };
 
   const getTemplateFromDeliveryStatus = (status) => {
     const obj = config.statusChoices.find((elem) => elem.id === status);
@@ -280,7 +290,11 @@ export const CorporateDevicesEdit = (props) => {
           keys.split(".").reduce((acc, key) => acc[key], data)
         );
         const message = buildGupshup(template, replacedVariables);
-        const response = await sendSMS(message, templateId, data.device_donation_corporate?.poc_phone_number);
+        const response = await sendSMS(
+          message,
+          templateId,
+          data.device_donation_corporate?.poc_phone_number
+        );
         if (response?.success) notify(response.success, "info");
         else if (response?.error) notify(response.error, "warning");
       }
@@ -292,12 +306,22 @@ export const CorporateDevicesEdit = (props) => {
     const errors = {};
     if (values.delivery_status && values.delivery_status == "delivered-child") {
       if (!values.device_verification_record?.otp) {
-        errors.device_verification_record = {otp:"The Otp is required"};
+        errors.device_verification_record = { otp: "The Otp is required" };
       }
       if (!values.device_verification_record?.verifier_phone_number) {
-        errors.device_verification_record = {...errors.device_verification_record,verifier_phone_number:"Verifier's phone number is required"};
-      } else if(!values.device_verification_record.verifier_phone_number.match('[0-9]{10}')) {
-        errors.device_verification_record = {...errors.device_verification_record,verifier_phone_number:"Enter a valid 10 digit mobile number."};
+        errors.device_verification_record = {
+          ...errors.device_verification_record,
+          verifier_phone_number: "Verifier's phone number is required",
+        };
+      } else if (
+        !values.device_verification_record.verifier_phone_number.match(
+          "[0-9]{10}"
+        )
+      ) {
+        errors.device_verification_record = {
+          ...errors.device_verification_record,
+          verifier_phone_number: "Enter a valid 10 digit mobile number.",
+        };
       }
     }
 
@@ -329,17 +353,24 @@ export const CorporateDevicesEdit = (props) => {
   const save = useCallback(
     async (values) => {
       try {
-        const recordData = filtered(values, ['device_verification_record'], "except");
+        const recordData = filtered(
+          values,
+          ["device_verification_record"],
+          "except"
+        );
         const verificationData = values?.device_verification_record;
         if (verificationData.otp) {
-          const responseOtpObject = await verifyOTP(verificationData.verifier_phone_number,verificationData.otp);
+          const responseOtpObject = await verifyOTP(
+            verificationData.verifier_phone_number,
+            verificationData.otp
+          );
           if (responseOtpObject.error) {
             return {
-              device_verification_record: {otp: "invalid otp"},
+              device_verification_record: { otp: "invalid otp" },
             };
           }
         }
-        
+
         const response = await mutate(
           {
             type: "update",
@@ -355,15 +386,17 @@ export const CorporateDevicesEdit = (props) => {
           responseObject.delivery_status == "delivered-child"
         ) {
           let fileUrl = null;
-          if(verificationData.photograph_url) {
-            fileUrl = await fileUpload(verificationData.photograph_url?.rawFile);
+          if (verificationData.photograph_url) {
+            fileUrl = await fileUpload(
+              verificationData.photograph_url?.rawFile
+            );
           }
           const record = {
             ...verificationData,
             udise: session.username,
             transaction_id: uuidv4(),
             device_tracking_key_corporate: responseObject.device_tracking_key,
-            photograph_url: fileUrl
+            photograph_url: fileUrl,
           };
           const response = await mutate(
             {
@@ -373,7 +406,7 @@ export const CorporateDevicesEdit = (props) => {
             },
             { returnPromise: true }
           );
-          setOtpGenerate(false);
+          setOtpGenerated(false);
         }
         onSuccess(responseObject);
       } catch (error) {
@@ -388,10 +421,10 @@ export const CorporateDevicesEdit = (props) => {
   );
 
   const generateOtp = async (phone_number) => {
-    if(phone_number && phone_number.length >= 10) {
+    if (phone_number && phone_number.length >= 10) {
       const responseObject = await sendOTP(phone_number);
       if (!responseObject.error) {
-        setOtpGenerate(true);
+        setOtpGenerated(true);
       }
     }
   };
@@ -399,10 +432,15 @@ export const CorporateDevicesEdit = (props) => {
   const EditNoDeleteToolbar = (props) => {
     let { record } = props;
     let { device_verification_record } = record ? record : {};
-    let verified = device_verification_record && device_verification_record.udise ? "none" : 'block';
-    return <Toolbar {...props}>
-      <SaveButton disabled={props.pristine} style={{display:verified}} />
-    </Toolbar>
+    let verified =
+      device_verification_record && device_verification_record.udise
+        ? "none"
+        : "block";
+    return (
+      <Toolbar {...props}>
+        <SaveButton disabled={props.pristine} style={{ display: verified }} />
+      </Toolbar>
+    );
   };
 
   const Title = ({ record }) => {
@@ -413,33 +451,50 @@ export const CorporateDevicesEdit = (props) => {
       </span>
     );
   };
-  return (<div>
-    <Edit
-      mutationMode={"pessimistic"}
-      title={<Title />}
-      {...props}
-      actions={false}
-    >
-      <SimpleForm
-        toolbar={<EditNoDeleteToolbar />}
-        validate={validateForm}
-        save={save}
+  return (
+    <div>
+      <Edit
+        mutationMode={"pessimistic"}
+        title={<Title />}
+        {...props}
+        actions={false}
       >
-        <BackButton history={props.history} />
-        <span className={classes.heading}>Corporate Details</span>
-        <div className={classes.grid}>
-          <Labeled label="Company Name"><TextField source="device_donation_corporate.company_name"/></Labeled>
-          <Labeled label="Name"><TextField source="device_donation_corporate.poc_name"/></Labeled>
-          <Labeled label="Phone Number"><TextField source="device_donation_corporate.poc_phone_number"/></Labeled>
-        </div>
-        <div className={classes.grid}>
-          <Labeled label="Designation"><TextField source="device_donation_corporate.poc_designation"/></Labeled>
-          <Labeled label="Tracking ID"><TextField source="device_tracking_key"/></Labeled>
-          <Labeled label="Date"><DateField locales="en-IN" source="created_at" /></Labeled>
-        </div>
-        <CustomFormDataConsumer otpGenerate={otpGenerate}  sendOtp={generateOtp}/>
-      </SimpleForm>
-    </Edit></div>
+        <SimpleForm
+          toolbar={<EditNoDeleteToolbar />}
+          validate={validateForm}
+          save={save}
+        >
+          <BackButton history={props.history} />
+          <span className={classes.heading}>Corporate Details</span>
+          <div className={classes.grid}>
+            <Labeled label="Company Name">
+              <TextField source="device_donation_corporate.company_name" />
+            </Labeled>
+            <Labeled label="Name">
+              <TextField source="device_donation_corporate.poc_name" />
+            </Labeled>
+            <Labeled label="Phone Number">
+              <TextField source="device_donation_corporate.poc_phone_number" />
+            </Labeled>
+          </div>
+          <div className={classes.grid}>
+            <Labeled label="Designation">
+              <TextField source="device_donation_corporate.poc_designation" />
+            </Labeled>
+            <Labeled label="Tracking ID">
+              <TextField source="device_tracking_key" />
+            </Labeled>
+            <Labeled label="Date">
+              <DateField locales="en-IN" source="created_at" />
+            </Labeled>
+          </div>
+          <CustomFormDataConsumer
+            otpGenerated={otpGenerated}
+            sendOtp={generateOtp}
+          />
+        </SimpleForm>
+      </Edit>
+    </div>
   );
 };
 
@@ -455,77 +510,100 @@ export const CorporateDevicesShow = (props) => {
       </span>
     );
   };
-  return (<div>
-    <Show
-      title={<Title />}
-      {...props}
-      actions={false}
-    >
-      <TabbedShowLayout syncWithLocation={false}>
-        <Tab label="Corporate Details">
-          <TextField label="Company Name" source="device_donation_corporate.company_name" disabled variant="outlined" />
-          <TextField label="Name" source="device_donation_corporate.poc_name" disabled variant="outlined" />
-          <TextField label="Phone Number" source="device_donation_corporate.poc_phone_number" disabled variant="outlined" />
-          <TextField label="Designation" source="device_donation_corporate.poc_designation" disabled variant="outlined" />
-          <TextField label="Tracking ID" source="device_tracking_key" disabled variant="outlined" />
-          <DateField label="Date" locales="en-IN" source="created_at" />
-        </Tab>
-        <Tab label="Update Status">
-          <TextField
-            source="delivery_status"
-            choices={config.statusChoices}
-            label="Delivery Status"
-          />
-        </Tab>
-        <Tab label="Recipient">
-          <TextField
-            label="School"
-            className={classes.textInput}
-            source="recipient_school_id"
-          />
-          <TextField
-            label="Name"
-            className={classes.textInput}
-            source="recipient_name"
-          />
-          <TextField
-            label="Grade"
-            choices={config.gradeChoices}
-            className={classes.selectInput}
-            source="recipient_grade"
-          />
-          <TextField
-            label="Student ID"
-            className={classes.textInput}
-            source="student_id"
-            validate={[required(),maxLength(8)]}
-          />
-        </Tab>
-        <Tab label="Verification">
-          <TextField
-            label="Verifier Name"
-            className={classes.textInput}
-            source="device_verification_record.verifier_name"
-          />
-          {/* <ImageInput
+  return (
+    <div>
+      <Show title={<Title />} {...props} actions={false}>
+        <TabbedShowLayout syncWithLocation={false}>
+          <Tab label="Corporate Details">
+            <TextField
+              label="Company Name"
+              source="device_donation_corporate.company_name"
+              disabled
+              variant="outlined"
+            />
+            <TextField
+              label="Name"
+              source="device_donation_corporate.poc_name"
+              disabled
+              variant="outlined"
+            />
+            <TextField
+              label="Phone Number"
+              source="device_donation_corporate.poc_phone_number"
+              disabled
+              variant="outlined"
+            />
+            <TextField
+              label="Designation"
+              source="device_donation_corporate.poc_designation"
+              disabled
+              variant="outlined"
+            />
+            <TextField
+              label="Tracking ID"
+              source="device_tracking_key"
+              disabled
+              variant="outlined"
+            />
+            <DateField label="Date" locales="en-IN" source="created_at" />
+          </Tab>
+          <Tab label="Update Status">
+            <TextField
+              source="delivery_status"
+              choices={config.statusChoices}
+              label="Delivery Status"
+            />
+          </Tab>
+          <Tab label="Recipient">
+            <TextField
+              label="School"
+              className={classes.textInput}
+              source="recipient_school_id"
+            />
+            <TextField
+              label="Name"
+              className={classes.textInput}
+              source="recipient_name"
+            />
+            <TextField
+              label="Grade"
+              choices={config.gradeChoices}
+              className={classes.selectInput}
+              source="recipient_grade"
+            />
+            <TextField
+              label="Student ID"
+              className={classes.textInput}
+              source="student_id"
+              validate={[required(), maxLength(8)]}
+            />
+          </Tab>
+          <Tab label="Verification">
+            <TextField
+              label="Verifier Name"
+              className={classes.textInput}
+              source="device_verification_record.verifier_name"
+            />
+            {/* <ImageInput
             label="Upload photo"
             className={classes.textInput}
             source="device_verification_record.photograph_url"
           >
             <ImageField source="photograph_url" />
           </ImageInput> */}
-          <TextField
-            label="Verifier's Phone Number"
-            className={classes.textInput}
-            source="device_verification_record.verifier_phone_number"
-          />
-          <BooleanField
-            source="device_verification_record.declaration"
-            label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
-            className={classes.fullWidth}
-          />
-        </Tab>
-      </TabbedShowLayout>
-    </Show></div>
+            <TextField
+              label="Verifier's Phone Number"
+              className={classes.textInput}
+              source="device_verification_record.verifier_phone_number"
+            />
+            <BooleanField
+              source="device_verification_record.declaration"
+              label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
+              className={classes.fullWidth}
+            />
+          </Tab>
+        </TabbedShowLayout>
+      </Show>
+    </div>
   );
 };

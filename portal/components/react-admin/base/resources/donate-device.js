@@ -28,7 +28,7 @@ import {
   maxLength,
   Toolbar,
   SaveButton,
-  Labeled
+  Labeled,
 } from "react-admin";
 
 import { useSession } from "next-auth/client";
@@ -83,7 +83,7 @@ const useStyles = makeStyles((theme) => ({
     display: "grid",
     width: "100%",
     gridTemplateColumns: "1fr 1fr 1fr",
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down("md")]: {
       gridTemplateColumns: "1fr",
     },
     gridRowGap: "1ch",
@@ -207,7 +207,8 @@ const DevicesFilter = (props) => {
 export const DonateDeviceRequestList = (props) => {
   const isSmall = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const classes = useStyles();
-  const postRowClick = (id, basePath, record) => record.device_verification_record ? 'show' : 'edit';
+  const postRowClick = (id, basePath, record) =>
+    record.device_verification_record ? "show" : "edit";
   return (
     <List
       {...props}
@@ -272,24 +273,24 @@ export const DonateDeviceRequestEdit = (props) => {
   const redirect = useRedirect();
   const [session] = useSession();
   const [mutate] = useMutation();
-  const [otpGenerate, setOtpGenerate] = useState(false);
+  const [otpGenerated, setOtpGenerated] = useState(false);
 
   const fileUpload = async (file) => {
     const newfile = await new Promise(function (resolve, reject) {
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = () => resolve(reader.result)
-      reader.onerror = (e) => reject(e)
-    })
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (e) => reject(e);
+    });
 
     const responseOtp = await axios({
       method: "post",
       url: `${process.env.NEXT_PUBLIC_API_URL}/fileUpload`,
-      data: {file:newfile},
+      data: { file: newfile },
     });
 
     return responseOtp.data;
-  }
+  };
 
   const getTemplateFromDeliveryStatus = (status) => {
     const obj = config.statusChoices.find((elem) => elem.id === status);
@@ -327,15 +328,25 @@ export const DonateDeviceRequestEdit = (props) => {
 
   const validateForm = async (values) => {
     const errors = {};
-    
+
     if (values.delivery_status && values.delivery_status == "delivered-child") {
       if (!values.device_verification_record?.otp) {
-        errors.device_verification_record = {otp:"The Otp is required"};
+        errors.device_verification_record = { otp: "The Otp is required" };
       }
       if (!values.device_verification_record?.verifier_phone_number) {
-        errors.device_verification_record = {...errors.device_verification_record,verifier_phone_number:"Verifier's phone number is required"};
-      } else if(!values.device_verification_record.verifier_phone_number.match('[0-9]{10}')) {
-        errors.device_verification_record = {...errors.device_verification_record,verifier_phone_number:"Enter a valid 10 digit mobile number."};
+        errors.device_verification_record = {
+          ...errors.device_verification_record,
+          verifier_phone_number: "Verifier's phone number is required",
+        };
+      } else if (
+        !values.device_verification_record.verifier_phone_number.match(
+          "[0-9]{10}"
+        )
+      ) {
+        errors.device_verification_record = {
+          ...errors.device_verification_record,
+          verifier_phone_number: "Enter a valid 10 digit mobile number.",
+        };
       }
     }
 
@@ -367,17 +378,24 @@ export const DonateDeviceRequestEdit = (props) => {
   const save = useCallback(
     async (values) => {
       try {
-        const recordData = filtered(values, ['device_verification_record'], "except");
+        const recordData = filtered(
+          values,
+          ["device_verification_record"],
+          "except"
+        );
         const verificationData = values?.device_verification_record;
         if (verificationData.otp) {
-          const responseOtpObject = await verifyOTP(verificationData.verifier_phone_number,verificationData.otp);
+          const responseOtpObject = await verifyOTP(
+            verificationData.verifier_phone_number,
+            verificationData.otp
+          );
           if (responseOtpObject.error) {
             return {
-              device_verification_record: {otp: "invalid otp"},
+              device_verification_record: { otp: "invalid otp" },
             };
           }
         }
-        
+
         const response = await mutate(
           {
             type: "update",
@@ -393,15 +411,17 @@ export const DonateDeviceRequestEdit = (props) => {
           responseObject.delivery_status == "delivered-child"
         ) {
           let fileUrl = null;
-          if(verificationData.photograph_url) {
-            fileUrl = await fileUpload(verificationData.photograph_url?.rawFile);
+          if (verificationData.photograph_url) {
+            fileUrl = await fileUpload(
+              verificationData.photograph_url?.rawFile
+            );
           }
           const record = {
             ...verificationData,
             udise: session.username,
             transaction_id: uuidv4(),
             device_tracking_key_individual: responseObject.device_tracking_key,
-            photograph_url: fileUrl
+            photograph_url: fileUrl,
           };
           const response = await mutate(
             {
@@ -411,7 +431,7 @@ export const DonateDeviceRequestEdit = (props) => {
             },
             { returnPromise: true }
           );
-          setOtpGenerate(false);
+          setOtpGenerated(false);
         }
         onSuccess(responseObject);
       } catch (error) {
@@ -426,10 +446,10 @@ export const DonateDeviceRequestEdit = (props) => {
   );
 
   const generateOtp = async (phone_number) => {
-    if(phone_number && phone_number.length >= 10) {
+    if (phone_number && phone_number.length >= 10) {
       const responseObject = await sendOTP(phone_number);
       if (!responseObject.error) {
-        setOtpGenerate(true);
+        setOtpGenerated(true);
       }
     }
   };
@@ -437,10 +457,15 @@ export const DonateDeviceRequestEdit = (props) => {
   const EditNoDeleteToolbar = (props) => {
     let { record } = props;
     let { device_verification_record } = record ? record : {};
-    let verified = device_verification_record && device_verification_record.udise ? "none" : 'block';
-    return <Toolbar {...props}>
-      <SaveButton disabled={props.pristine} style={{display:verified}} />
-    </Toolbar>
+    let verified =
+      device_verification_record && device_verification_record.udise
+        ? "none"
+        : "block";
+    return (
+      <Toolbar {...props}>
+        <SaveButton disabled={props.pristine} style={{ display: verified }} />
+      </Toolbar>
+    );
   };
 
   const Title = ({ record }) => {
@@ -452,79 +477,108 @@ export const DonateDeviceRequestEdit = (props) => {
     );
   };
 
-  return (<div>
-    <Edit
-      mutationMode={"pessimistic"}
-      title={<Title />}
-      {...props}
-      actions={false}
-    >
-      <SimpleForm
-        toolbar={<EditNoDeleteToolbar />}
-        validate={validateForm}
-        save={save}
+  return (
+    <div>
+      <Edit
+        mutationMode={"pessimistic"}
+        title={<Title />}
+        {...props}
+        actions={false}
       >
-        <BackButton history={props.history} />
-        <span className={classes.heading}>Donor Details</span>
-        <div className={classes.grid}>
-          <Labeled label="Name"><TextField source="name" /></Labeled>
-          <Labeled label="Phone Number"><TextField source="phone_number" /></Labeled>
-          <Labeled label="District">
-            <FunctionField
-              render={(record) => {
-                if (record) {
-                  return record.district
-                    ? record.district
-                    : record.other_district;
-                }
-              }}
-            />
-          </Labeled>
-          <Labeled label="Address"><TextField source="address" /></Labeled>
-          <Labeled label="Pincode"><TextField source="pincode" /></Labeled>
-          <Labeled label="Delivery">
-            <FunctionField
-              render={(record) => {
-                if (record) {
-                  return record.district
-                    ? getChoice(
-                        config.deliveryTypeChoices,
-                        record.delivery_mode
-                      )?.name
-                    : getChoice(
-                        config.deliveryTypeChoices,
-                        record.delivery_mode_outside_HP
-                      )?.name;
-                }
-              }}
-            />
-          </Labeled>
-        </div>
-        <span className={classes.heading}>Device Details</span>
-        <div className={classes.grid}>
-          <Labeled label="Company"><TextField source="device_company" /></Labeled>
-          <Labeled label="Model">
-            <FunctionField
-              render={(record) => {
-                if (record) {
-                  return record.device_model
-                    ? record.device_model
-                    : record.device_other_model;
-                }
-              }}
-            />
-          </Labeled>
-          <Labeled label="Screen Size"><TextField  source="device_size" /></Labeled>
-          <Labeled label="Condition"><TextField  source="device_condition" /></Labeled>
-          <Labeled label="Age (Years)" ><TextField source="device_age" /></Labeled>
-          <Labeled label="WhatsApp Function"><BooleanField source="wa_function" /></Labeled>
-          <Labeled label="Call Function"><BooleanField source="call_function" /></Labeled>
-          <Labeled label="YouTube Function"><BooleanField source="yt_function" /></Labeled>
-          <Labeled label="Charger Avbl"><BooleanField source="charger_available" /></Labeled>
-        </div>
-        <CustomFormDataConsumer otpGenerate={otpGenerate} sendOtp={generateOtp}/>
-      </SimpleForm>
-    </Edit></div>
+        <SimpleForm
+          toolbar={<EditNoDeleteToolbar />}
+          validate={validateForm}
+          save={save}
+        >
+          <BackButton history={props.history} />
+          <span className={classes.heading}>Donor Details</span>
+          <div className={classes.grid}>
+            <Labeled label="Name">
+              <TextField source="name" />
+            </Labeled>
+            <Labeled label="Phone Number">
+              <TextField source="phone_number" />
+            </Labeled>
+            <Labeled label="District">
+              <FunctionField
+                render={(record) => {
+                  if (record) {
+                    return record.district
+                      ? record.district
+                      : record.other_district;
+                  }
+                }}
+              />
+            </Labeled>
+            <Labeled label="Address">
+              <TextField source="address" />
+            </Labeled>
+            <Labeled label="Pincode">
+              <TextField source="pincode" />
+            </Labeled>
+            <Labeled label="Delivery">
+              <FunctionField
+                render={(record) => {
+                  if (record) {
+                    return record.district
+                      ? getChoice(
+                          config.deliveryTypeChoices,
+                          record.delivery_mode
+                        )?.name
+                      : getChoice(
+                          config.deliveryTypeChoices,
+                          record.delivery_mode_outside_HP
+                        )?.name;
+                  }
+                }}
+              />
+            </Labeled>
+          </div>
+          <span className={classes.heading}>Device Details</span>
+          <div className={classes.grid}>
+            <Labeled label="Company">
+              <TextField source="device_company" />
+            </Labeled>
+            <Labeled label="Model">
+              <FunctionField
+                render={(record) => {
+                  if (record) {
+                    return record.device_model
+                      ? record.device_model
+                      : record.device_other_model;
+                  }
+                }}
+              />
+            </Labeled>
+            <Labeled label="Screen Size">
+              <TextField source="device_size" />
+            </Labeled>
+            <Labeled label="Condition">
+              <TextField source="device_condition" />
+            </Labeled>
+            <Labeled label="Age (Years)">
+              <TextField source="device_age" />
+            </Labeled>
+            <Labeled label="WhatsApp Function">
+              <BooleanField source="wa_function" />
+            </Labeled>
+            <Labeled label="Call Function">
+              <BooleanField source="call_function" />
+            </Labeled>
+            <Labeled label="YouTube Function">
+              <BooleanField source="yt_function" />
+            </Labeled>
+            <Labeled label="Charger Avbl">
+              <BooleanField source="charger_available" />
+            </Labeled>
+          </div>
+          <CustomFormDataConsumer
+            otpGenerated={otpGenerated}
+            sendOtp={generateOtp}
+          />
+        </SimpleForm>
+      </Edit>
+    </div>
   );
 };
 
@@ -541,138 +595,136 @@ export const DonateDeviceRequestShow = (props) => {
     );
   };
 
-  return (<div>
-    <Show
-      title={<Title />}
-      {...props}
-      actions={false}
-    >
-      <TabbedShowLayout syncWithLocation={false}>
-        <Tab label="Donor Details">
-          <TextField label="Name" source="name" variant="outlined" />
-          <TextField
-            label="Phone Number"
-            source="phone_number"
-            variant="outlined"
-          />
-          <FunctionField
-            label="District"
-            render={(record) => {
-              if (record) {
-                return record.district
-                  ? record.district
-                  : record.other_district;
-              }
-            }}
-            variant="outlined"
-          />
-          <TextField
-            label="Address"
-            source="address"
-            disabled
-            variant="outlined"
-          />
-          <TextField
-            label="Pincode"
-            source="pincode"
-            disabled
-            variant="outlined"
-          />
-          <FunctionField
-            label="Delivery"
-            render={(record) => {
-              if (record) {
-                return record.district
-                  ? getChoice(
-                      config.deliveryTypeChoices,
-                      record.delivery_mode
-                    )?.name
-                  : getChoice(
-                      config.deliveryTypeChoices,
-                      record.delivery_mode_outside_HP
-                    )?.name;
-              }
-            }}
-            disabled
-            variant="outlined"
-          />
-        </Tab>
-        <Tab label="Device Details">
-          <TextField label="Device Company" source="device_company" />
-          <FunctionField
-            label="Device Model"
-            render={(record) => {
-              if (record) {
-                return record.device_model
-                  ? record.device_model
-                  : record.device_other_model;
-              }
-            }}
-          />
-          <TextField label="Device Size" source="device_size" />
-          <TextField label="Device Condition" source="device_condition" />
-          <TextField label="Device Age" source="device_age" />
-          <BooleanField source="wa_function" />
-          <BooleanField source="call_function" />
-          <BooleanField source="yt_function" />
-          <BooleanField source="charger_available" />
-        </Tab>
-        <Tab label="Update Status">
-          <TextField
-            source="delivery_status"
-            choices={config.statusChoices}
-            label="Delivery Status"
-          />
-        </Tab>
-        <Tab label="Recipient">
-          <TextField
-            label="School"
-            className={classes.textInput}
-            source="recipient_school_id"
-          />
-          <TextField
-            label="Name"
-            className={classes.textInput}
-            source="recipient_name"
-          />
-          <TextField
-            label="Grade"
-            choices={config.gradeChoices}
-            className={classes.selectInput}
-            source="recipient_grade"
-          />
-          <TextField
-            label="Student ID"
-            className={classes.textInput}
-            source="student_id"
-            validate={[required(),maxLength(8)]}
-          />
-        </Tab>
-        <Tab label="Verification">
-          <TextField
-            label="Verifier Name"
-            className={classes.textInput}
-            source="device_verification_record.verifier_name"
-          />
-          {/* <ImageInput
+  return (
+    <div>
+      <Show title={<Title />} {...props} actions={false}>
+        <TabbedShowLayout syncWithLocation={false}>
+          <Tab label="Donor Details">
+            <TextField label="Name" source="name" variant="outlined" />
+            <TextField
+              label="Phone Number"
+              source="phone_number"
+              variant="outlined"
+            />
+            <FunctionField
+              label="District"
+              render={(record) => {
+                if (record) {
+                  return record.district
+                    ? record.district
+                    : record.other_district;
+                }
+              }}
+              variant="outlined"
+            />
+            <TextField
+              label="Address"
+              source="address"
+              disabled
+              variant="outlined"
+            />
+            <TextField
+              label="Pincode"
+              source="pincode"
+              disabled
+              variant="outlined"
+            />
+            <FunctionField
+              label="Delivery"
+              render={(record) => {
+                if (record) {
+                  return record.district
+                    ? getChoice(
+                        config.deliveryTypeChoices,
+                        record.delivery_mode
+                      )?.name
+                    : getChoice(
+                        config.deliveryTypeChoices,
+                        record.delivery_mode_outside_HP
+                      )?.name;
+                }
+              }}
+              disabled
+              variant="outlined"
+            />
+          </Tab>
+          <Tab label="Device Details">
+            <TextField label="Device Company" source="device_company" />
+            <FunctionField
+              label="Device Model"
+              render={(record) => {
+                if (record) {
+                  return record.device_model
+                    ? record.device_model
+                    : record.device_other_model;
+                }
+              }}
+            />
+            <TextField label="Device Size" source="device_size" />
+            <TextField label="Device Condition" source="device_condition" />
+            <TextField label="Device Age" source="device_age" />
+            <BooleanField source="wa_function" />
+            <BooleanField source="call_function" />
+            <BooleanField source="yt_function" />
+            <BooleanField source="charger_available" />
+          </Tab>
+          <Tab label="Update Status">
+            <TextField
+              source="delivery_status"
+              choices={config.statusChoices}
+              label="Delivery Status"
+            />
+          </Tab>
+          <Tab label="Recipient">
+            <TextField
+              label="School"
+              className={classes.textInput}
+              source="recipient_school_id"
+            />
+            <TextField
+              label="Name"
+              className={classes.textInput}
+              source="recipient_name"
+            />
+            <TextField
+              label="Grade"
+              choices={config.gradeChoices}
+              className={classes.selectInput}
+              source="recipient_grade"
+            />
+            <TextField
+              label="Student ID"
+              className={classes.textInput}
+              source="student_id"
+              validate={[required(), maxLength(8)]}
+            />
+          </Tab>
+          <Tab label="Verification">
+            <TextField
+              label="Verifier Name"
+              className={classes.textInput}
+              source="device_verification_record.verifier_name"
+            />
+            {/* <ImageInput
             label="Upload photo"
             className={classes.textInput}
             source="device_verification_record.photograph_url"
           >
             <ImageField source="photograph_url" />
           </ImageInput> */}
-          <TextField
-            label="Verifier's Phone Number"
-            className={classes.textInput}
-            source="device_verification_record.verifier_phone_number"
-          />
-          <BooleanField
-            source="device_verification_record.declaration"
-            label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
-            className={classes.fullWidth}
-          />
-        </Tab>
-      </TabbedShowLayout>
-    </Show></div>
+            <TextField
+              label="Verifier's Phone Number"
+              className={classes.textInput}
+              source="device_verification_record.verifier_phone_number"
+            />
+            <BooleanField
+              source="device_verification_record.declaration"
+              label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
+              className={classes.fullWidth}
+            />
+          </Tab>
+        </TabbedShowLayout>
+      </Show>
+    </div>
   );
 };

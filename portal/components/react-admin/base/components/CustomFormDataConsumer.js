@@ -17,10 +17,7 @@ import {
 } from "react-admin";
 import { useSession } from "next-auth/client";
 
-import {
-  makeStyles,
-  Button,
-} from "@material-ui/core";
+import { makeStyles, Button } from "@material-ui/core";
 import blueGrey from "@material-ui/core/colors/blueGrey";
 import config from "@/components/config";
 
@@ -34,10 +31,10 @@ const useStyles = makeStyles((theme) => ({
   grid: {
     display: "grid",
     width: "100%",
-    [theme.breakpoints.up('xs')]: {
+    [theme.breakpoints.up("xs")]: {
       gridTemplateColumns: "1fr",
     },
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up("sm")]: {
       gridTemplateColumns: "1fr 1fr 1fr",
     },
     gridRowGap: "1ch",
@@ -96,7 +93,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function CustomFormDataConsumer({otpGenerate,sendOtp}) {
+export default function CustomFormDataConsumer({ otpGenerated, sendOtp }) {
   const classes = useStyles();
   const [session] = useSession();
   return (
@@ -217,7 +214,7 @@ export default function CustomFormDataConsumer({otpGenerate,sendOtp}) {
                           label="Enter OTP"
                           className={classes.textInput}
                           source="device_verification_record.otp"
-                          disabled={!otpGenerate}
+                          disabled={!otpGenerated}
                         />
                         <BooleanInput
                           source="device_verification_record.declaration"
