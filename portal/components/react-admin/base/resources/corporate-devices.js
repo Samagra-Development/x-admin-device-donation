@@ -323,8 +323,13 @@ export const CorporateDevicesEdit = (props) => {
           verifier_phone_number: "Enter a valid 10 digit mobile number.",
         };
       }
+      if (!values.device_verification_record?.declaration) {
+        errors.device_verification_record = {
+          ...errors.device_verification_record,
+          declaration: "Declaration is required.",
+        };
+      }
     }
-
     return errors;
   };
 
@@ -513,96 +518,100 @@ export const CorporateDevicesShow = (props) => {
   return (
     <div>
       <Show title={<Title />} {...props} actions={false}>
-        <TabbedShowLayout syncWithLocation={false}>
-          <Tab label="Corporate Details">
-            <TextField
-              label="Company Name"
-              source="device_donation_corporate.company_name"
-              disabled
-              variant="outlined"
-            />
-            <TextField
-              label="Name"
-              source="device_donation_corporate.poc_name"
-              disabled
-              variant="outlined"
-            />
-            <TextField
-              label="Phone Number"
-              source="device_donation_corporate.poc_phone_number"
-              disabled
-              variant="outlined"
-            />
-            <TextField
-              label="Designation"
-              source="device_donation_corporate.poc_designation"
-              disabled
-              variant="outlined"
-            />
-            <TextField
-              label="Tracking ID"
-              source="device_tracking_key"
-              disabled
-              variant="outlined"
-            />
-            <DateField label="Date" locales="en-IN" source="created_at" />
-          </Tab>
-          <Tab label="Update Status">
-            <TextField
-              source="delivery_status"
-              choices={config.statusChoices}
-              label="Delivery Status"
-            />
-          </Tab>
-          <Tab label="Recipient">
-            <TextField
-              label="School"
-              className={classes.textInput}
-              source="recipient_school_id"
-            />
-            <TextField
-              label="Name"
-              className={classes.textInput}
-              source="recipient_name"
-            />
-            <TextField
-              label="Grade"
-              choices={config.gradeChoices}
-              className={classes.selectInput}
-              source="recipient_grade"
-            />
-            <TextField
-              label="Student ID"
-              className={classes.textInput}
-              source="student_id"
-              validate={[required(), maxLength(8)]}
-            />
-          </Tab>
-          <Tab label="Verification">
-            <TextField
-              label="Verifier Name"
-              className={classes.textInput}
-              source="device_verification_record.verifier_name"
-            />
-            {/* <ImageInput
+        <>
+          <BackButton history={props.history} />
+          <TabbedShowLayout syncWithLocation={false}>
+            <Tab label="Corporate Details">
+              <TextField
+                label="Company Name"
+                source="device_donation_corporate.company_name"
+                disabled
+                variant="outlined"
+              />
+              <TextField
+                label="Name"
+                source="device_donation_corporate.poc_name"
+                disabled
+                variant="outlined"
+              />
+              <TextField
+                label="Phone Number"
+                source="device_donation_corporate.poc_phone_number"
+                disabled
+                variant="outlined"
+              />
+              <TextField
+                label="Designation"
+                source="device_donation_corporate.poc_designation"
+                disabled
+                variant="outlined"
+              />
+              <TextField
+                label="Tracking ID"
+                source="device_tracking_key"
+                disabled
+                variant="outlined"
+              />
+              <DateField label="Date" locales="en-IN" source="created_at" />
+            </Tab>
+            <Tab label="Update Status">
+              <FunctionField
+                label="Delivery Staus"
+                render={(record) =>
+                  getChoice(config?.statusChoices, record.delivery_status)?.name
+                }
+              />
+            </Tab>
+            <Tab label="Recipient">
+              <TextField
+                label="School"
+                className={classes.textInput}
+                source="recipient_school_id"
+              />
+              <TextField
+                label="Name"
+                className={classes.textInput}
+                source="recipient_name"
+              />
+              <TextField
+                label="Grade"
+                choices={config.gradeChoices}
+                className={classes.selectInput}
+                source="recipient_grade"
+              />
+              <TextField
+                label="Student ID"
+                className={classes.textInput}
+                source="recipient_student_id"
+                validate={[required(), maxLength(8)]}
+              />
+            </Tab>
+            <Tab label="Verification">
+              <TextField
+                label="Verifier Name"
+                className={classes.textInput}
+                source="device_verification_record.verifier_name"
+              />
+              {/* <ImageInput
             label="Upload photo"
             className={classes.textInput}
             source="device_verification_record.photograph_url"
           >
             <ImageField source="photograph_url" />
           </ImageInput> */}
-            <TextField
-              label="Verifier's Phone Number"
-              className={classes.textInput}
-              source="device_verification_record.verifier_phone_number"
-            />
-            <BooleanField
-              source="device_verification_record.declaration"
-              label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
-              className={classes.fullWidth}
-            />
-          </Tab>
-        </TabbedShowLayout>
+              <TextField
+                label="Verifier's Phone Number"
+                className={classes.textInput}
+                source="device_verification_record.verifier_phone_number"
+              />
+              <BooleanField
+                source="device_verification_record.declaration"
+                label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
+                className={classes.fullWidth}
+              />
+            </Tab>
+          </TabbedShowLayout>
+        </>
       </Show>
     </div>
   );

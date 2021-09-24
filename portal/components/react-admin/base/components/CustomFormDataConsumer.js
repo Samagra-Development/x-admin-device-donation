@@ -162,7 +162,7 @@ export default function CustomFormDataConsumer({ otpGenerated, sendOtp }) {
                         <TextInput
                           label="Student ID"
                           className={classes.textInput}
-                          source="student_id"
+                          source="recipient_student_id"
                           validate={[required(), maxLength(8)]}
                           disabled={!verified}
                         />
@@ -171,68 +171,73 @@ export default function CustomFormDataConsumer({ otpGenerated, sendOtp }) {
                       <></>
                     )}
                   </div>
-                  <h2 className={classes.heading}>Verification</h2>
-                  <div
-                    className={session.role === "school" ? classes.grid : null}
-                  >
-                    <TextInput
-                      label="Verifier Name"
-                      className={classes.textInput}
-                      source="device_verification_record.verifier_name"
-                      disabled={!verified}
-                    />
-                    {/* <ImageInput
+                  {session.role === "school" ? (
+                    <>
+                      <h2 className={classes.heading}>Verification</h2>
+                      <div className={classes.grid}>
+                        <TextInput
+                          label="Verifier Name"
+                          className={classes.textInput}
+                          source="device_verification_record.verifier_name"
+                          disabled={!verified}
+                        />
+                        {/* <ImageInput
                   label="Upload photo"
                   className={classes.textInput}
                   source="device_verification_record.photograph_url"
                 >
                   <ImageField source="photograph_url" />
                 </ImageInput> */}
-                    {verified ? (
-                      <>
-                        <TextInput
-                          label="Verifier's Phone Number"
-                          className={classes.textInput}
-                          source="device_verification_record.verifier_phone_number"
-                          InputProps={{
-                            endAdornment: (
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={() =>
-                                  sendOtp(
-                                    device_verification_record?.verifier_phone_number
-                                  )
-                                }
-                              >
-                                Get OTP
-                              </Button>
-                            ),
-                          }}
-                        />
-                        <TextInput
-                          label="Enter OTP"
-                          className={classes.textInput}
-                          source="device_verification_record.otp"
-                          disabled={!otpGenerated}
-                        />
-                        <BooleanInput
-                          source="device_verification_record.declaration"
-                          label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
-                          className={classes.fullWidth}
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <TextInput
-                          label="Verifier's Phone Number"
-                          className={classes.textInput}
-                          source="device_verification_record.verifier_phone_number"
-                          disabled={!verified}
-                        />
-                      </>
-                    )}
-                  </div>
+                        {verified ? (
+                          <>
+                            <TextInput
+                              label="Verifier's Phone Number"
+                              className={classes.textInput}
+                              source="device_verification_record.verifier_phone_number"
+                              InputProps={{
+                                endAdornment: (
+                                  <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={() =>
+                                      sendOtp(
+                                        device_verification_record?.verifier_phone_number
+                                      )
+                                    }
+                                  >
+                                    Get OTP
+                                  </Button>
+                                ),
+                              }}
+                            />
+                            <TextInput
+                              label="Enter OTP"
+                              className={classes.textInput}
+                              source="device_verification_record.otp"
+                              disabled={!otpGenerated}
+                            />
+                            <BooleanInput
+                              defaultValue={false}
+                              source="device_verification_record.declaration"
+                              label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
+                              className={classes.fullWidth}
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <TextInput
+                              label="Verifier's Phone Number"
+                              className={classes.textInput}
+                              source="device_verification_record.verifier_phone_number"
+                              disabled={!verified}
+                            />
+                          </>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <></>
+                  )}
                   {verified ? (
                     <p className={classes.warning}>
                       Changing status will trigger an SMS notification to the

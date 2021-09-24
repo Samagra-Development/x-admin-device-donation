@@ -205,14 +205,16 @@ export const DeviceVerificationList = (props) => {
             label="Verifier Phone Number"
             source="verifier_phone_number"
           />
-          <TextField label="declaration" source="declaration" />
-          <TextField
-            label="Tracking ID individual"
-            source="device_tracking_key_individual"
-          />
-          <TextField
-            label="Tracking ID corporate"
-            source="device_tracking_key_corporate"
+          <BooleanField label="declaration" source="declaration" />
+          <FunctionField
+            label="Tracking ID"
+            render={(record) => {
+              if (record) {
+                return record.device_tracking_key_individual
+                  ? record.device_tracking_key_individual
+                  : record.device_tracking_key_corporate;
+              }
+            }}
           />
         </Datagrid>
       )}
