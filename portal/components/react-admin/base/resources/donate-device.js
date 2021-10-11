@@ -29,8 +29,10 @@ import {
   Toolbar,
   SaveButton,
   Labeled,
+  useRecordContext,
 } from "react-admin";
 
+import Image from "next/image";
 import { useSession } from "next-auth/client";
 import {
   Typography,
@@ -286,7 +288,7 @@ export const DonateDeviceRequestEdit = (props) => {
     const responseOtp = await axios({
       method: "post",
       url: `${process.env.NEXT_PUBLIC_API_URL}/fileUpload`,
-      data: { file: newfile },
+      data: { file: newfile, name: file.name },
     });
 
     return responseOtp.data;
@@ -418,9 +420,10 @@ export const DonateDeviceRequestEdit = (props) => {
         ) {
           let fileUrl = null;
           if (verificationData.photograph_url) {
-            fileUrl = await fileUpload(
+            const { etag } = await fileUpload(
               verificationData.photograph_url?.rawFile
             );
+            fileUrl = etag;
           }
           const record = {
             ...verificationData,
@@ -591,6 +594,43 @@ export const DonateDeviceRequestEdit = (props) => {
 export const DonateDeviceRequestShow = (props) => {
   const classes = useStyles();
   const [session] = useSession();
+  const [image, setImage] = useState(null);
+
+  const ImageField = (props) => {
+    const { source, label } = props;
+    const record = useRecordContext(props);
+    getImage(record.device_verification_record.photograph_url);
+    const myLoader = ({ src }) => image;
+    return (
+      <div>
+        {image ? (
+          <Labeled label={label}>
+            <a href={image ?? "/"} target="_blank" rel="noopener noreferrer">
+              <Image
+                loader={myLoader}
+                width="100"
+                height="100"
+                src={image}
+                alt={label}
+              />
+            </a>
+          </Labeled>
+        ) : (
+          <>
+            <Labeled label={label} />
+          </>
+        )}{" "}
+      </div>
+    );
+  };
+
+  const getImage = (name) => {
+    if (name && !image) {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/fileUpload?name=${name}`)
+        .then((re) => setImage(re.data?.url));
+    }
+  };
 
   const Title = ({ record }) => {
     return (
@@ -714,13 +754,10 @@ export const DonateDeviceRequestShow = (props) => {
                 className={classes.textInput}
                 source="device_verification_record.verifier_name"
               />
-              {/* <ImageInput
-            label="Upload photo"
-            className={classes.textInput}
-            source="device_verification_record.photograph_url"
-          >
-            <ImageField source="photograph_url" />
-          </ImageInput> */}
+              <ImageField
+                label="Upload photo"
+                source="device_verification_record.photograph_url"
+              />
               <TextField
                 label="Verifier's Phone Number"
                 className={classes.textInput}

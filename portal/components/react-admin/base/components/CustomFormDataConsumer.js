@@ -14,6 +14,7 @@ import {
   maxLength,
   Toolbar,
   SaveButton,
+  ImageInput,
 } from "react-admin";
 import { useSession } from "next-auth/client";
 
@@ -181,13 +182,6 @@ export default function CustomFormDataConsumer({ otpGenerated, sendOtp }) {
                           source="device_verification_record.verifier_name"
                           disabled={!verified}
                         />
-                        {/* <ImageInput
-                  label="Upload photo"
-                  className={classes.textInput}
-                  source="device_verification_record.photograph_url"
-                >
-                  <ImageField source="photograph_url" />
-                </ImageInput> */}
                         {verified ? (
                           <>
                             <TextInput
@@ -222,6 +216,14 @@ export default function CustomFormDataConsumer({ otpGenerated, sendOtp }) {
                               label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
                               className={classes.fullWidth}
                             />
+                            <ImageInput
+                              label="Upload photo"
+                              className={classes.textInput}
+                              source="device_verification_record.photograph_url"
+                              accept="image/*"
+                            >
+                              <ImageField source="photograph_url" />
+                            </ImageInput>
                           </>
                         ) : (
                           <>
