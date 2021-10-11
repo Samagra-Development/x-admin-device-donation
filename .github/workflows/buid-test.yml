@@ -38,4 +38,7 @@ jobs:
       export CERTIFICATE_URL=${{secrets.CERTIFICATE_URL}} &&
       export CAPTCHA_URL=${{secrets.CAPTCHA_URL}} &&
       export USER_SERVICE_URL=${{secrets.USER_SERVICE_URL}} &&
+      export UPLOAD_LOGIN_ID=${{secrets.UPLOAD_LOGIN_ID}} &&
+      export UPLOAD_PASSWORD=${{secrets.UPLOAD_PASSWORD}} &&
+      export UPLOAD_APPLICATION_ID=${{secrets.UPLOAD_APPLICATION_ID}} &&
       docker-compose up -d --build .
