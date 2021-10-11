@@ -520,13 +520,15 @@ export const CorporateDevicesShow = (props) => {
       <div>
         {image ? (
           <Labeled label={label}>
-            <Image
-              loader={myLoader}
-              width="100"
-              height="100"
-              src={image}
-              alt={label}
-            />
+            <a href={image} target="_blank" rel="noopener noreferrer">
+              <Image
+                loader={myLoader}
+                width="100"
+                height="100"
+                src={image}
+                alt={label}
+              />
+            </a>
           </Labeled>
         ) : (
           <>
