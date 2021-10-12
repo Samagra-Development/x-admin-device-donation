@@ -41,4 +41,6 @@ jobs:
       export UPLOAD_LOGIN_ID=${{secrets.UPLOAD_LOGIN_ID}} &&
       export UPLOAD_PASSWORD=${{secrets.UPLOAD_PASSWORD}} &&
       export UPLOAD_APPLICATION_ID=${{secrets.UPLOAD_APPLICATION_ID}} &&
+      export UPLOAD_MINIO_URL=${{secrets.UPLOAD_MINIO_URL}} &&
+      export UPLOAD_BUCKET_NAME=${{secrets.UPLOAD_BUCKET_NAME}} &&
       docker-compose up -d --build .

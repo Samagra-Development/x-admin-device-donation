@@ -35,7 +35,7 @@ export const verifyOTP = async (phoneNumber, otp) => {
     });
     if (response.data?.error) {
       sendLog(
-        `⚠️ *samarth-device*\n :round_pushpin: \`${process.env.NEXT_PUBLIC_URL}\` \n :pager: OTP successfully verified by *${phoneNumber}* failed`
+        `⚠️ *samarth-device*\n :round_pushpin: \`${process.env.NEXT_PUBLIC_URL}\` \n :pager: OTP verification by *${phoneNumber}* failed`
       );
       return { error: response.data?.error, success: null };
     } else if (response.data?.success) {
