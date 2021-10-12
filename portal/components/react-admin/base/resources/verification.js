@@ -19,7 +19,7 @@ import {
   AutocompleteInput,
   ReferenceInput,
   ReferenceField,
-  Labeled
+  Labeled,
 } from "react-admin";
 
 import { useSession } from "next-auth/client";
@@ -66,10 +66,10 @@ const useStyles = makeStyles((theme) => ({
   grid: {
     display: "grid",
     width: "100%",
-    [theme.breakpoints.up('xs')]: {
+    [theme.breakpoints.up("xs")]: {
       gridTemplateColumns: "1fr",
     },
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up("sm")]: {
       gridTemplateColumns: "1fr 1fr 1fr",
     },
     gridRowGap: "1ch",
@@ -157,7 +157,11 @@ const DevicesFilter = (props) => {
         className={isSmall ? classes.smSearchBar : classes.searchBar}
         alwaysOn
       />
-      <TextInput className={classes.textInput} label="Verifier Phone Number" source="verifier_phone_number" />
+      <TextInput
+        className={classes.textInput}
+        label="Verifier Phone Number"
+        source="verifier_phone_number"
+      />
       {/* <SelectInput
         label="Delivery Status"
         source="delivery_status"
@@ -187,17 +191,31 @@ export const DeviceVerificationList = (props) => {
       {isSmall ? (
         <SimpleList
           primaryText={(record) => record.name}
-          tertiaryText={(record) => record.device_tracking_key_individual ?? record.device_tracking_key_corporate}
+          tertiaryText={(record) =>
+            record.device_tracking_key_individual ??
+            record.device_tracking_key_corporate
+          }
           linkType="edit"
         />
       ) : (
         <Datagrid rowClick="edit">
           <DateField label="Date" locales="en-IN" source="created_at" />
           <TextField label="Verifier name" source="verifier_name" />
-          <TextField label="Verifier Phone Number" source="verifier_phone_number" />
-          <TextField label="declaration" source="declaration" />
-          <TextField label="Tracking ID individual" source="device_tracking_key_individual" />
-          <TextField label="Tracking ID corporate" source="device_tracking_key_corporate" />
+          <TextField
+            label="Verifier Phone Number"
+            source="verifier_phone_number"
+          />
+          <BooleanField label="declaration" source="declaration" />
+          <FunctionField
+            label="Tracking ID"
+            render={(record) => {
+              if (record) {
+                return record.device_tracking_key_individual
+                  ? record.device_tracking_key_individual
+                  : record.device_tracking_key_corporate;
+              }
+            }}
+          />
         </Datagrid>
       )}
     </List>
@@ -211,35 +229,46 @@ export const DeviceVerificationEdit = (props) => {
     return (
       <span>
         Edit device verification{" "}
-        <span className={classes.grey}>#{record.device_tracking_key_individual ?? record.device_tracking_key_corporate}</span>
+        <span className={classes.grey}>
+          #
+          {record.device_tracking_key_individual ??
+            record.device_tracking_key_corporate}
+        </span>
       </span>
     );
   };
   return (
     <div>
-      <Edit
-        mutationMode={"pessimistic"}
-        title={<Title />}
-        {...props}
-      >
+      <Edit mutationMode={"pessimistic"} title={<Title />} {...props}>
         <SimpleForm toolbar={<EditNoDeleteToolbar />}>
           <BackButton history={props.history} />
           <span className={classes.heading}>Details</span>
           <div className={classes.grid}>
-            <Labeled label="Verifier name"><TextField source="verifier_name" /></Labeled>
-            <Labeled label="Verifier Phone Number"><TextField source="verifier_phone_number" /></Labeled>
-            <Labeled label="Declaration"><TextField source="declaration" /></Labeled>
+            <Labeled label="Verifier name">
+              <TextField source="verifier_name" />
+            </Labeled>
+            <Labeled label="Verifier Phone Number">
+              <TextField source="verifier_phone_number" />
+            </Labeled>
+            <Labeled label="Declaration">
+              <TextField source="declaration" />
+            </Labeled>
           </div>
           <div className={`${classes.grid}`}>
             <Labeled label="Tracking ID">
               <FormDataConsumer>
-                {({ formData, ...rest }) => formData?.device_tracking_key_individual ? 
-                  <TextField source="device_tracking_key_individual" />
-                  : <TextField source="device_tracking_key_corporate" />
+                {({ formData, ...rest }) =>
+                  formData?.device_tracking_key_individual ? (
+                    <TextField source="device_tracking_key_individual" />
+                  ) : (
+                    <TextField source="device_tracking_key_corporate" />
+                  )
                 }
               </FormDataConsumer>
             </Labeled>
-            <Labeled label="Date"><DateField locales="en-IN" source="created_at" /></Labeled>
+            <Labeled label="Date">
+              <DateField locales="en-IN" source="created_at" />
+            </Labeled>
           </div>
         </SimpleForm>
       </Edit>

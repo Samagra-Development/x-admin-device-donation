@@ -14,12 +14,12 @@ const sendSMS = async (msg, templateId, contactNumber) => {
     });
     if (response.data?.error) {
       sendLog(
-        `*⚠️samarth-device*: SMS status update notification sending to *${contactNumber}* failed`
+        `⚠️ *samarth-device*\n :round_pushpin: \`${process.env.NEXT_PUBLIC_URL}\` \n :pager: SMS status update notification sending to *${contactNumber}* failed`
       );
       return { error: response.data?.error, success: null };
     } else if (response.data?.success) {
       sendLog(
-        `*✅samarth-device*: SMS status update notification successfully sent to *${contactNumber}*`
+        `:white_check_mark: *samarth-device*\n :round_pushpin: \`${process.env.NEXT_PUBLIC_URL}\` \n :pager: SMS status update notification successfully sent to *${contactNumber}*`
       );
       return { success: response.data?.success, error: null };
     }

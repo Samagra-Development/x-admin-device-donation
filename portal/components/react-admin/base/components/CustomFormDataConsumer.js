@@ -14,13 +14,11 @@ import {
   maxLength,
   Toolbar,
   SaveButton,
+  ImageInput,
 } from "react-admin";
 import { useSession } from "next-auth/client";
 
-import {
-  makeStyles,
-  Button,
-} from "@material-ui/core";
+import { makeStyles, Button } from "@material-ui/core";
 import blueGrey from "@material-ui/core/colors/blueGrey";
 import config from "@/components/config";
 
@@ -34,10 +32,10 @@ const useStyles = makeStyles((theme) => ({
   grid: {
     display: "grid",
     width: "100%",
-    [theme.breakpoints.up('xs')]: {
+    [theme.breakpoints.up("xs")]: {
       gridTemplateColumns: "1fr",
     },
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up("sm")]: {
       gridTemplateColumns: "1fr 1fr 1fr",
     },
     gridRowGap: "1ch",
@@ -96,7 +94,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function CustomFormDataConsumer({otpGenerate,sendOtp}) {
+export default function CustomFormDataConsumer({ otpGenerated, sendOtp }) {
   const classes = useStyles();
   const [session] = useSession();
   return (
@@ -165,7 +163,7 @@ export default function CustomFormDataConsumer({otpGenerate,sendOtp}) {
                         <TextInput
                           label="Student ID"
                           className={classes.textInput}
-                          source="student_id"
+                          source="recipient_student_id"
                           validate={[required(), maxLength(8)]}
                           disabled={!verified}
                         />
@@ -174,68 +172,74 @@ export default function CustomFormDataConsumer({otpGenerate,sendOtp}) {
                       <></>
                     )}
                   </div>
-                  <h2 className={classes.heading}>Verification</h2>
-                  <div
-                    className={session.role === "school" ? classes.grid : null}
-                  >
-                    <TextInput
-                      label="Verifier Name"
-                      className={classes.textInput}
-                      source="device_verification_record.verifier_name"
-                      disabled={!verified}
-                    />
-                    {/* <ImageInput
-                  label="Upload photo"
-                  className={classes.textInput}
-                  source="device_verification_record.photograph_url"
-                >
-                  <ImageField source="photograph_url" />
-                </ImageInput> */}
-                    {verified ? (
-                      <>
+                  {session.role === "school" ? (
+                    <>
+                      <h2 className={classes.heading}>Verification</h2>
+                      <div className={classes.grid}>
                         <TextInput
-                          label="Verifier's Phone Number"
+                          label="Verifier Name"
                           className={classes.textInput}
-                          source="device_verification_record.verifier_phone_number"
-                          InputProps={{
-                            endAdornment: (
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={() =>
-                                  sendOtp(
-                                    device_verification_record?.verifier_phone_number
-                                  )
-                                }
-                              >
-                                Get OTP
-                              </Button>
-                            ),
-                          }}
-                        />
-                        <TextInput
-                          label="Enter OTP"
-                          className={classes.textInput}
-                          source="device_verification_record.otp"
-                          disabled={!otpGenerate}
-                        />
-                        <BooleanInput
-                          source="device_verification_record.declaration"
-                          label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
-                          className={classes.fullWidth}
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <TextInput
-                          label="Verifier's Phone Number"
-                          className={classes.textInput}
-                          source="device_verification_record.verifier_phone_number"
+                          source="device_verification_record.verifier_name"
                           disabled={!verified}
                         />
-                      </>
-                    )}
-                  </div>
+                        {verified ? (
+                          <>
+                            <TextInput
+                              label="Verifier's Phone Number"
+                              className={classes.textInput}
+                              source="device_verification_record.verifier_phone_number"
+                              InputProps={{
+                                endAdornment: (
+                                  <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={() =>
+                                      sendOtp(
+                                        device_verification_record?.verifier_phone_number
+                                      )
+                                    }
+                                  >
+                                    Get OTP
+                                  </Button>
+                                ),
+                              }}
+                            />
+                            <TextInput
+                              label="Enter OTP"
+                              className={classes.textInput}
+                              source="device_verification_record.otp"
+                              disabled={!otpGenerated}
+                            />
+                            <BooleanInput
+                              defaultValue={false}
+                              source="device_verification_record.declaration"
+                              label="Yes, I agree with the above declaration हां, मैं उपरोक्त घोषणा से सहमत हूं"
+                              className={classes.fullWidth}
+                            />
+                            <ImageInput
+                              label="Upload photo"
+                              className={classes.textInput}
+                              source="device_verification_record.photograph_url"
+                              accept="image/*"
+                            >
+                              <ImageField source="photograph_url" />
+                            </ImageInput>
+                          </>
+                        ) : (
+                          <>
+                            <TextInput
+                              label="Verifier's Phone Number"
+                              className={classes.textInput}
+                              source="device_verification_record.verifier_phone_number"
+                              disabled={!verified}
+                            />
+                          </>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <></>
+                  )}
                   {verified ? (
                     <p className={classes.warning}>
                       Changing status will trigger an SMS notification to the

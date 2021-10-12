@@ -6,12 +6,12 @@ const handler = async (req, res) => {
   if (session) {
     if (req.method === "GET") {
       const { phone_number } = req.query;
-      
+
       const response = await axios({
         method: "get",
-        url: `http://139.59.46.189:3005/user/sendOTP?phone=${phone_number}`,
+        url: `${process.env.USER_SERVICE_URL}/user/sendOTP?phone=${phone_number}`,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${session.jwt}`,
         },
       });
@@ -24,18 +24,19 @@ const handler = async (req, res) => {
         });
       } else {
         res.status(200).json({
-          error: `Error sending SMS - Provider error code ${responseObject.id}`,
+          error: `Error sending SMS - Provider error code ${responseObject.status}`,
           success: null,
         });
       }
-    } if (req.method === "POST") {
+    }
+    if (req.method === "POST") {
       const { phone_number, otp } = req.body;
-      
+
       const response = await axios({
         method: "get",
-        url: `http://139.59.46.189:3005/user/verifyOTP?phone=${phone_number}&&otp=${otp}`,
+        url: `${process.env.USER_SERVICE_URL}/user/verifyOTP?phone=${phone_number}&&otp=${otp}`,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${session.jwt}`,
         },
       });
