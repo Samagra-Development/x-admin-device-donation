@@ -1,0 +1,46 @@
+name: build-test-docker
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    environment: production
+    runs-on: ubuntu-20.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build container image
+        run: |
+          export POSTGRES_USER=${{secrets.POSTGRES_USER}} &&
+          export POSTGRES_PASSWORD=${{secrets.POSTGRES_PASSWORD}} &&
+          export DATABASE_USERNAME=${{secrets.DATABASE_USERNAME}} &&
+          export DATABASE_PASSWORD=${{secrets.DATABASE_PASSWORD}} &&
+          export ES_JAVA_OPTS=${{secrets.ES_JAVA_OPTS}} &&
+          export FUSIONAUTH_MEMORY=${{secrets.FUSIONAUTH_MEMORY}} &&
+          export FUSIONAUTH_APP_MEMORY=${{secrets.FUSIONAUTH_APP_MEMORY}} &&
+          export MONGO_CONTAINER=${{secrets.MONGO_CONTAINER}} &&
+          export MONGO_USER=${{secrets.MONGO_USER}} &&
+          export MONGO_PASSWORD=${{secrets.MONGO_PASSWORD}} &&
+          export HASURA_URL=${{secrets.HASURA_URL}} &&
+          export HASURA_ADMIN_SECRET=${{secrets.HASURA_ADMIN_SECRET}} &&
+          export NEXTAUTH_URL=${{secrets.NEXTAUTH_URL}} &&
+          export FUSIONAUTH_DOMAIN=${{secrets.FUSIONAUTH_DOMAIN}} &&
+          export FUSIONAUTH_API_KEY=${{secrets.FUSIONAUTH_API_KEY}} &&
+          export GUPSHUP_USERNAME=${{secrets.GUPSHUP_USERNAME}} &&
+          export GUPSHUP_PASSWORD=${{secrets.GUPSHUP_PASSWORD}} &&
+          export GUPSHUP_PRINCIPAL_ENTITY_ID=${{secrets.GUPSHUP_PRINCIPAL_ENTITY_ID}} &&
+          export DONATE_DEVICES_CORPORATE_TEMPLATE_ID=${{secrets.DONATE_DEVICES_CORPORATE_TEMPLATE_ID}} &&
+          export DONATE_DEVICES_TEMPLATE_ID=${{secrets.DONATE_DEVICES_TEMPLATE_ID}} &&
+          export SLACK_ADMIN_LOGGER_AUTH_TOKEN=${{secrets.SLACK_ADMIN_LOGGER_AUTH_TOKEN}} &&
+          export SLACK_ADMIN_LOGS_CHANNEL_ID=${{secrets.SLACK_ADMIN_LOGS_CHANNEL_ID}} &&
+          export CERTIFICATE_URL=${{secrets.CERTIFICATE_URL}} &&
+          export CAPTCHA_URL=${{secrets.CAPTCHA_URL}} &&
+          export USER_SERVICE_URL=${{secrets.USER_SERVICE_URL}} &&
+          export UPLOAD_LOGIN_ID=${{secrets.UPLOAD_LOGIN_ID}} &&
+          export UPLOAD_PASSWORD=${{secrets.UPLOAD_PASSWORD}} &&
+          export UPLOAD_APPLICATION_ID=${{secrets.UPLOAD_APPLICATION_ID}} &&
+          export UPLOAD_MINIO_URL=${{secrets.UPLOAD_MINIO_URL}} &&
+          export UPLOAD_BUCKET_NAME=${{secrets.UPLOAD_BUCKET_NAME}} &&
+          docker-compose up -d --build .
