@@ -34,7 +34,6 @@ jobs:
             export POSTGRES_PASSWORD=${{secrets.POSTGRES_PASSWORD}} &&
             export DATABASE_USERNAME=${{secrets.DATABASE_USERNAME}} &&
             export DATABASE_PASSWORD=${{secrets.DATABASE_PASSWORD}} &&
-            export ES_JAVA_OPTS=${{secrets.ES_JAVA_OPTS}} &&
             export FUSIONAUTH_MEMORY=${{secrets.FUSIONAUTH_MEMORY}} &&
             export FUSIONAUTH_APP_MEMORY=${{secrets.FUSIONAUTH_APP_MEMORY}} &&
             export MONGO_CONTAINER=${{secrets.MONGO_CONTAINER}} &&
