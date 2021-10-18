@@ -43,8 +43,3 @@ const School = (props) => {
 };
 
 export default School;
-
-export async function getStaticProps({ params: { slug } }) {
-  // ↓add
-  console.log(`Building slug: ${slug}`);
-}
