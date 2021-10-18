@@ -10,7 +10,7 @@ const Home = (props) => {
       <div className={styles.grid}>
         {config.homepageCards.map((card, index) => {
           return (
-            <Link key={index} href={card.target} passHref>
+            <Link key={index} href={card.target ?? "#"} passHref>
               <div className="card logo-card card-center">
                 <span
                   className={`material-icons ${styles.icon} ${
