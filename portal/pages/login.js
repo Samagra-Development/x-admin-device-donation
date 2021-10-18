@@ -45,3 +45,8 @@ const LoginWrapper = (props) => {
 };
 
 export default LoginWrapper;
+
+export async function getStaticProps({ params: { slug } }) {
+  // ↓add
+  console.log(`Building slug: ${slug}`);
+}
