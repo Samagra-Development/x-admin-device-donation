@@ -42,4 +42,4 @@ jobs:
           export UPLOAD_APPLICATION_ID=${{secrets.UPLOAD_APPLICATION_ID}} &&
           export UPLOAD_MINIO_URL=${{secrets.UPLOAD_MINIO_URL}} &&
           export UPLOAD_BUCKET_NAME=${{secrets.UPLOAD_BUCKET_NAME}} &&
-          docker-compose up -d --build .
+          docker-compose up -d --build
