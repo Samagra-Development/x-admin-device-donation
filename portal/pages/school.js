@@ -5,7 +5,7 @@ import Login from "./login";
 import styles from "../styles/Home.module.css";
 import config from "@/components/config";
 
-const School = () => {
+const School = (props) => {
   const [session, loading] = useSession();
 
   if (loading) return null;

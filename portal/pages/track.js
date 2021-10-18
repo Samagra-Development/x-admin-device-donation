@@ -29,17 +29,17 @@ const TrackWrapper = (props) => {
               className={`card`}
             >
               <span
-                  className={`material-icons ${styles.icon} ${
-                    styles[card.colour]
-                  }`}
-                >
-                  {card.icon}
-                </span>
-                <h2>
-                  {" "}
-                  {card.title.en} &#47;
-                  <br /> {card.title.hi} &#10230;
-                </h2>
+                className={`material-icons ${styles.icon} ${
+                  styles[card.colour]
+                }`}
+              >
+                {card.icon}
+              </span>
+              <h2>
+                {" "}
+                {card.title.en} &#47;
+                <br /> {card.title.hi} &#10230;
+              </h2>
             </div>
           ))}
         </div>

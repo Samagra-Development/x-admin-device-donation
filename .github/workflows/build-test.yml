@@ -13,7 +13,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build container image
         run: |
-          cd /home/device-donation/ &&
           export POSTGRES_USER=${{secrets.POSTGRES_USER}} &&
           export POSTGRES_PASSWORD=${{secrets.POSTGRES_PASSWORD}} &&
           export DATABASE_USERNAME=${{secrets.DATABASE_USERNAME}} &&
@@ -43,4 +42,4 @@ jobs:
           export UPLOAD_APPLICATION_ID=${{secrets.UPLOAD_APPLICATION_ID}} &&
           export UPLOAD_MINIO_URL=${{secrets.UPLOAD_MINIO_URL}} &&
           export UPLOAD_BUCKET_NAME=${{secrets.UPLOAD_BUCKET_NAME}} &&
-          docker-compose up -d --build .
+          docker-compose up -d --build

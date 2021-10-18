@@ -6,7 +6,7 @@ const ReactAdmin = dynamic(() => import("../components/react-admin/app"), {
   ssr: false,
 });
 
-const Admin = () => {
+const Admin = (props) => {
   const [session, loading] = useSession();
 
   if (loading) return null;

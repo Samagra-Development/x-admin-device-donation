@@ -50,7 +50,9 @@ export default function Login(props) {
       }`,
     });
     if (url) {
-      router.push(url);
+      if (!router.isFallback) {
+        router.push(url);
+      }
     }
     if (error) {
       addToast(error, { appearance: "error" });

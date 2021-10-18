@@ -5,7 +5,7 @@ import Login from "../components/login/login";
 import styles from "../styles/Login.module.css";
 import config from "@/components/config";
 
-const LoginWrapper = () => {
+const LoginWrapper = (props) => {
   const [selectedPersona, setSelectedPersona] = useState(null);
   if (selectedPersona) {
     return (

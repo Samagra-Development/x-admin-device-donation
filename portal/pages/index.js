@@ -4,13 +4,13 @@ import Layout from "../components/layout";
 import styles from "../styles/Home.module.css";
 import config from "@/components/config";
 
-const Home = () => {
+const Home = (props) => {
   return (
     <Layout>
       <div className={styles.grid}>
         {config.homepageCards.map((card, index) => {
           return (
-            <Link key={index} href={card.target} passHref>
+            <Link key={index} href={card.target ?? "#"} passHref>
               <div className="card logo-card card-center">
                 <span
                   className={`material-icons ${styles.icon} ${
