@@ -26,3 +26,8 @@ const Admin = (props) => {
 };
 
 export default Admin;
+
+export async function getStaticProps({ params: { slug } }) {
+  // ↓add
+  console.log(`Building slug: ${slug}`);
+}
