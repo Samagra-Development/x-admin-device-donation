@@ -4,7 +4,7 @@ import Layout from "../components/layout";
 import styles from "../styles/Home.module.css";
 import config from "@/components/config";
 
-const Home = () => {
+const Home = (props) => {
   return (
     <Layout>
       <div className={styles.grid}>
