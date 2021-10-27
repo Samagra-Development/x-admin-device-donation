@@ -331,7 +331,11 @@ export const DonateDeviceRequestEdit = (props) => {
   const validateForm = async (values) => {
     const errors = {};
 
-    if (values.delivery_status && values.delivery_status == "delivered-child") {
+    if (
+      values.delivery_status &&
+      values.delivery_status == "delivered-child" &&
+      session.role === "school"
+    ) {
       if (!values.device_verification_record?.otp) {
         errors.device_verification_record = { otp: "The Otp is required" };
       }
@@ -386,63 +390,78 @@ export const DonateDeviceRequestEdit = (props) => {
   const save = useCallback(
     async (values) => {
       try {
-        const recordData = filtered(
-          values,
-          ["device_verification_record"],
-          "except"
-        );
-        const verificationData = values?.device_verification_record;
-        if (verificationData.otp) {
-          const responseOtpObject = await verifyOTP(
-            verificationData.verifier_phone_number,
-            verificationData.otp
-          );
-          if (responseOtpObject.error) {
-            return {
-              device_verification_record: { otp: "invalid otp" },
-            };
-          }
-        }
-
-        const response = await mutate(
-          {
-            type: "update",
-            resource: "device_donation_donor",
-            payload: { id: values.id, data: recordData },
-          },
-          { returnPromise: true }
-        );
-        const responseObject = response.data;
-        if (
-          verificationData.otp &&
-          responseObject &&
-          responseObject.delivery_status == "delivered-child"
-        ) {
-          let fileUrl = null;
-          if (verificationData.photograph_url) {
-            const { etag } = await fileUpload(
-              verificationData.photograph_url?.rawFile
-            );
-            fileUrl = etag;
-          }
-          const record = {
-            ...verificationData,
-            udise: session.username,
-            transaction_id: uuidv4(),
-            device_tracking_key_individual: responseObject.device_tracking_key,
-            photograph_url: fileUrl,
-          };
+        if (session.role !== "school") {
           const response = await mutate(
             {
-              type: "create",
-              resource: "device_verification_records",
-              payload: { data: record },
+              type: "update",
+              resource: "device_donation_donor",
+              payload: { id: values.id, data: values },
             },
             { returnPromise: true }
           );
-          setOtpGenerated(false);
+          const responseObject = response.data;
+          console.log("responseObject:", responseObject);
+          onSuccess(responseObject);
+        } else {
+          const recordData = filtered(
+            values,
+            ["device_verification_record"],
+            "except"
+          );
+          const verificationData = values?.device_verification_record;
+          if (verificationData.otp) {
+            const responseOtpObject = await verifyOTP(
+              verificationData.verifier_phone_number,
+              verificationData.otp
+            );
+            if (responseOtpObject.error) {
+              return {
+                device_verification_record: { otp: "invalid otp" },
+              };
+            }
+          }
+
+          const response = await mutate(
+            {
+              type: "update",
+              resource: "device_donation_donor",
+              payload: { id: values.id, data: recordData },
+            },
+            { returnPromise: true }
+          );
+          const responseObject = response.data;
+          if (
+            verificationData.otp &&
+            responseObject &&
+            responseObject.delivery_status == "delivered-child"
+          ) {
+            let fileUrl = null;
+            if (verificationData.photograph_url) {
+              const { etag } = await fileUpload(
+                verificationData.photograph_url?.rawFile
+              );
+              fileUrl = etag;
+            }
+            const record = {
+              ...verificationData,
+              udise: session.username,
+              transaction_id: uuidv4(),
+              device_tracking_key_individual:
+                responseObject.device_tracking_key,
+              photograph_url: fileUrl,
+            };
+            const response = await mutate(
+              {
+                type: "create",
+                resource: "device_verification_records",
+                payload: { data: record },
+              },
+              { returnPromise: true }
+            );
+            setOtpGenerated(false);
+          }
+          onSuccess(responseObject);
         }
-        onSuccess(responseObject);
       } catch (error) {
         if (error.body?.errors) {
           return error.body.errors;
