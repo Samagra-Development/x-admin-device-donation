@@ -247,7 +247,7 @@ export const CorporateDevicesEdit = (props) => {
   const notify = useNotify();
   const redirect = useRedirect();
   const [session] = useSession();
-  const [mutate] = useMutation();
+  const [coreMutate] = useMutation();
   const [otpGenerated, setOtpGenerated] = useState(false);
 
   const fileUpload = async (file) => {
@@ -361,26 +361,28 @@ export const CorporateDevicesEdit = (props) => {
       }, {});
   };
 
+  const mutate = async (type, resource, record) => {
+    return coreMutate(
+      {
+        type: type,
+        resource: resource,
+        payload: record,
+      },
+      { returnPromise: true }
+    );
+  };
+
   const save = useCallback(
     async (values) => {
       try {
         if (session.role !== "school") {
-          const response = await mutate(
-            {
-              type: "update",
-              resource: "corporate_donor_devices",
-              payload: { id: values.id, data: values },
-            },
-            { returnPromise: true }
-          );
+          const response = await mutate("update", "corporate_donor_devices", {
+            id: values.id,
+            data: values,
+          });
           const responseObject = response.data;
           onSuccess(responseObject);
         } else {
-          const recordData = filtered(
-            values,
-            ["device_verification_record"],
-            "except"
-          );
           const verificationData = values?.device_verification_record;
           if (verificationData.otp) {
             const responseOtpObject = await verifyOTP(
@@ -393,15 +395,15 @@ export const CorporateDevicesEdit = (props) => {
               };
             }
           }
-
-          const response = await mutate(
-            {
-              type: "update",
-              resource: "corporate_donor_devices",
-              payload: { id: values.id, data: recordData },
-            },
-            { returnPromise: true }
+          const recordData = filtered(
+            values,
+            ["device_verification_record"],
+            "except"
           );
+          const response = await mutate("update", "corporate_donor_devices", {
+            id: values.id,
+            data: recordData,
+          });
           const responseObject = response.data;
           if (
             verificationData.otp &&
@@ -415,6 +417,7 @@ export const CorporateDevicesEdit = (props) => {
               );
               fileUrl = etag;
             }
+
             const record = {
               ...verificationData,
               udise: session.username,
@@ -423,12 +426,9 @@ export const CorporateDevicesEdit = (props) => {
               photograph_url: fileUrl,
             };
             const response = await mutate(
-              {
-                type: "create",
-                resource: "device_verification_records",
-                payload: { data: record },
-              },
-              { returnPromise: true }
+              "create",
+              "device_verification_records",
+              { data: record }
             );
             setOtpGenerated(false);
           }
