@@ -59,4 +59,5 @@ jobs:
             export UPLOAD_APPLICATION_ID=${{secrets.UPLOAD_APPLICATION_ID}} &&
             export UPLOAD_MINIO_URL=${{secrets.UPLOAD_MINIO_URL}} &&
             export UPLOAD_BUCKET_NAME=${{secrets.UPLOAD_BUCKET_NAME}} &&
+            export NODE_OPTIONS=--openssl-legacy-provider &&
             docker-compose up -d --build

@@ -222,7 +222,7 @@ export const DeviceVerificationEdit = (props) => {
   const ImageField = (props) => {
     const { source, label } = props;
     const record = useRecordContext(props);
-    new getImage(record.photograph_url);
+    getImage(record.photograph_url);
     const myLoader = ({ src }) => image;
     return (
       <div>

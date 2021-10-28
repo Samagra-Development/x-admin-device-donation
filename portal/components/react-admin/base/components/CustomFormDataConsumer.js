@@ -366,7 +366,6 @@ export const customSave = async ({
         verificationData.otp
       );
       if (responseOtpObject.error) {
-        console.log("verificationData : ", verificationData);
         return {
           device_verification_record: { otp: "invalid otp" },
         };
