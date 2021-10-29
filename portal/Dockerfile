@@ -14,11 +14,10 @@ COPY --from=deps /app/node_modules ./node_modules
 RUN npm run build
 
 # Production image, copy all the files and run next
-FROM node:alpine AS runner
+FROM node:16-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
-RUN export NODE_OPTIONS=--openssl-legacy-provider
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
