@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   List,
   SimpleList,
@@ -10,26 +10,19 @@ import {
   Edit,
   SimpleForm,
   TextInput,
-  SelectInput,
   Filter,
   SearchInput,
-  useRedirect,
-  useNotify,
   FormDataConsumer,
-  AutocompleteInput,
-  ReferenceInput,
-  ReferenceField,
   Labeled,
+  useRecordContext,
 } from "react-admin";
 
-import { useSession } from "next-auth/client";
-import { Typography, makeStyles, useMediaQuery } from "@material-ui/core";
+import { makeStyles, useMediaQuery } from "@material-ui/core";
 import EditNoDeleteToolbar from "../components/EditNoDeleteToolbar";
 import BackButton from "../components/BackButton";
 import blueGrey from "@material-ui/core/colors/blueGrey";
-import config from "@/components/config";
-import sendSMS from "@/utils/sendSMS";
-import buildGupshup from "@/utils/buildGupshup";
+import axios from "axios";
+import Image from "next/image";
 
 const useStyles = makeStyles((theme) => ({
   searchBar: {
@@ -224,6 +217,43 @@ export const DeviceVerificationList = (props) => {
 
 export const DeviceVerificationEdit = (props) => {
   const classes = useStyles();
+  const [image, setImage] = useState(null);
+
+  const ImageField = (props) => {
+    const { source, label } = props;
+    const record = useRecordContext(props);
+    getImage(record.photograph_url);
+    const myLoader = ({ src }) => image;
+    return (
+      <div>
+        {image ? (
+          <Labeled label={label}>
+            <a href={image ?? "/"} target="_blank" rel="noopener noreferrer">
+              <Image
+                loader={myLoader}
+                width="100"
+                height="100"
+                src={image}
+                alt={label}
+              />
+            </a>
+          </Labeled>
+        ) : (
+          <>
+            <Labeled label={label} />
+          </>
+        )}{" "}
+      </div>
+    );
+  };
+
+  function getImage(name) {
+    if (name && !image) {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/fileUpload?name=${name}`)
+        .then((re) => setImage(re.data?.url));
+    }
+  }
 
   const Title = ({ record }) => {
     return (
@@ -247,6 +277,7 @@ export const DeviceVerificationEdit = (props) => {
             <Labeled label="Verifier name">
               <TextField source="verifier_name" />
             </Labeled>
+            <ImageField label="Upload photo" source="photograph_url" />
             <Labeled label="Verifier Phone Number">
               <TextField source="verifier_phone_number" />
             </Labeled>

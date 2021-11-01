@@ -21,6 +21,8 @@ import { useSession } from "next-auth/client";
 import { makeStyles, Button } from "@material-ui/core";
 import blueGrey from "@material-ui/core/colors/blueGrey";
 import config from "@/components/config";
+import { sendOTP, verifyOTP } from "@/utils/sendOTP";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
   list: {
@@ -94,9 +96,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function CustomFormDataConsumer({ otpGenerated, sendOtp }) {
+export default function CustomFormDataConsumer({
+  otpGenerated,
+  setOtpGenerated,
+}) {
   const classes = useStyles();
   const [session] = useSession();
+
+  const generateOtp = async (phone_number) => {
+    if (phone_number && phone_number.length >= 10) {
+      const responseObject = await sendOTP(phone_number);
+      if (!responseObject.error) {
+        setOtpGenerated(true);
+      }
+    }
+  };
+
   return (
     <FormDataConsumer>
       {({ formData, ...rest }) => {
@@ -194,7 +209,7 @@ export default function CustomFormDataConsumer({ otpGenerated, sendOtp }) {
                                     variant="contained"
                                     color="primary"
                                     onClick={() =>
-                                      sendOtp(
+                                      generateOtp(
                                         device_verification_record?.verifier_phone_number
                                       )
                                     }
@@ -259,3 +274,142 @@ export default function CustomFormDataConsumer({ otpGenerated, sendOtp }) {
     </FormDataConsumer>
   );
 }
+
+export const validateForm = async (values) => {
+  const errors = {};
+  if (values.delivery_status && values.delivery_status == "delivered-child") {
+    if (!values.device_verification_record?.otp) {
+      errors.device_verification_record = { otp: "The Otp is required" };
+    }
+    if (!values.device_verification_record?.verifier_phone_number) {
+      errors.device_verification_record = {
+        ...errors.device_verification_record,
+        verifier_phone_number: "Verifier's phone number is required",
+      };
+    } else if (
+      !values.device_verification_record.verifier_phone_number.match(
+        "[0-9]{10}"
+      )
+    ) {
+      errors.device_verification_record = {
+        ...errors.device_verification_record,
+        verifier_phone_number: "Enter a valid 10 digit mobile number.",
+      };
+    }
+    if (!values.device_verification_record?.declaration) {
+      errors.device_verification_record = {
+        ...errors.device_verification_record,
+        declaration: "Declaration is required.",
+      };
+    }
+  }
+
+  return errors;
+};
+
+const fileUpload = async (file) => {
+  const newfile = await new Promise(function (resolve, reject) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (e) => reject(e);
+  });
+
+  const responseOtp = await axios({
+    method: "post",
+    url: `${process.env.NEXT_PUBLIC_API_URL}/fileUpload`,
+    data: { file: newfile, name: file.name },
+  });
+
+  return responseOtp.data;
+};
+
+const uuidv4 = () => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
+const filtered = (raw, allowed, except = "only") => {
+  return Object.keys(raw)
+    .filter((key) =>
+      except == "except" ? !allowed.includes(key) : allowed.includes(key)
+    )
+    .reduce((obj, key) => {
+      obj[key] = raw[key];
+      return obj;
+    }, {});
+};
+
+export const customSave = async ({
+  values,
+  resource,
+  setOtpGenerated,
+  session,
+  mutate,
+  onSuccess,
+}) => {
+  if (session.role !== "school") {
+    const response = await mutate("update", resource, {
+      id: values.id,
+      data: values,
+    });
+    const responseObject = response.data;
+    onSuccess(responseObject);
+  } else {
+    const verificationData = values?.device_verification_record;
+    if (verificationData.otp) {
+      const responseOtpObject = await verifyOTP(
+        verificationData.verifier_phone_number,
+        verificationData.otp
+      );
+      if (responseOtpObject.error) {
+        return {
+          device_verification_record: { otp: "invalid otp" },
+        };
+      }
+    }
+
+    const recordData = filtered(
+      values,
+      ["device_verification_record"],
+      "except"
+    );
+    const response = await mutate("update", resource, {
+      id: values.id,
+      data: recordData,
+    });
+    const responseObject = response.data;
+    if (
+      verificationData.otp &&
+      responseObject &&
+      responseObject.delivery_status == "delivered-child"
+    ) {
+      let fileUrl = null;
+      if (verificationData.photograph_url) {
+        const { etag } = await fileUpload(
+          verificationData.photograph_url?.rawFile
+        );
+        fileUrl = etag;
+      }
+
+      const record = {
+        ...verificationData,
+        udise: session.username,
+        transaction_id: uuidv4(),
+        [resource == "device_donation_donor"
+          ? "device_tracking_key_individual"
+          : "device_tracking_key_corporate"]:
+          responseObject.device_tracking_key,
+        photograph_url: fileUrl,
+      };
+      const response = await mutate("create", "device_verification_records", {
+        data: record,
+      });
+      setOtpGenerated(false);
+    }
+    onSuccess(responseObject);
+  }
+};

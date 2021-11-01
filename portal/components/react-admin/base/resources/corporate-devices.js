@@ -49,9 +49,11 @@ import config from "@/components/config";
 import sendSMS from "@/utils/sendSMS";
 import buildGupshup from "@/utils/buildGupshup";
 import axios from "axios";
-import CustomFormDataConsumer from "../components/CustomFormDataConsumer";
+import CustomFormDataConsumer, {
+  customSave,
+  validateForm,
+} from "../components/CustomFormDataConsumer";
 import purple from "@material-ui/core/colors/purple";
-import { sendOTP, verifyOTP } from "@/utils/sendOTP";
 
 const useStyles = makeStyles((theme) => ({
   searchBar: {
@@ -247,25 +249,8 @@ export const CorporateDevicesEdit = (props) => {
   const notify = useNotify();
   const redirect = useRedirect();
   const [session] = useSession();
-  const [mutate] = useMutation();
+  const [coreMutate] = useMutation();
   const [otpGenerated, setOtpGenerated] = useState(false);
-
-  const fileUpload = async (file) => {
-    const newfile = await new Promise(function (resolve, reject) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (e) => reject(e);
-    });
-
-    const responseOtp = await axios({
-      method: "post",
-      url: `${process.env.NEXT_PUBLIC_API_URL}/fileUpload`,
-      data: { file: newfile, name: file.name },
-    });
-
-    return responseOtp.data;
-  };
 
   const getTemplateFromDeliveryStatus = (status) => {
     const obj = config.statusChoices.find((elem) => elem.id === status);
@@ -304,119 +289,28 @@ export const CorporateDevicesEdit = (props) => {
     }
   };
 
-  const validateForm = async (values) => {
-    const errors = {};
-    if (values.delivery_status && values.delivery_status == "delivered-child") {
-      if (!values.device_verification_record?.otp) {
-        errors.device_verification_record = { otp: "The Otp is required" };
-      }
-      if (!values.device_verification_record?.verifier_phone_number) {
-        errors.device_verification_record = {
-          ...errors.device_verification_record,
-          verifier_phone_number: "Verifier's phone number is required",
-        };
-      } else if (
-        !values.device_verification_record.verifier_phone_number.match(
-          "[0-9]{10}"
-        )
-      ) {
-        errors.device_verification_record = {
-          ...errors.device_verification_record,
-          verifier_phone_number: "Enter a valid 10 digit mobile number.",
-        };
-      }
-      if (!values.device_verification_record?.declaration) {
-        errors.device_verification_record = {
-          ...errors.device_verification_record,
-          declaration: "Declaration is required.",
-        };
-      }
-    }
-    return errors;
-  };
-
-  const uuidv4 = () => {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-      /[xy]/g,
-      function (c) {
-        var r = (Math.random() * 16) | 0,
-          v = c == "x" ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-      }
+  const mutate = async (type, resource, record) => {
+    return coreMutate(
+      {
+        type: type,
+        resource: resource,
+        payload: record,
+      },
+      { returnPromise: true }
     );
-  };
-
-  const filtered = (raw, allowed, except = "only") => {
-    return Object.keys(raw)
-      .filter((key) =>
-        except == "except" ? !allowed.includes(key) : allowed.includes(key)
-      )
-      .reduce((obj, key) => {
-        obj[key] = raw[key];
-        return obj;
-      }, {});
   };
 
   const save = useCallback(
     async (values) => {
       try {
-        const recordData = filtered(
-          values,
-          ["device_verification_record"],
-          "except"
-        );
-        const verificationData = values?.device_verification_record;
-        if (verificationData.otp) {
-          const responseOtpObject = await verifyOTP(
-            verificationData.verifier_phone_number,
-            verificationData.otp
-          );
-          if (responseOtpObject.error) {
-            return {
-              device_verification_record: { otp: "invalid otp" },
-            };
-          }
-        }
-
-        const response = await mutate(
-          {
-            type: "update",
-            resource: "corporate_donor_devices",
-            payload: { id: values.id, data: recordData },
-          },
-          { returnPromise: true }
-        );
-        const responseObject = response.data;
-        if (
-          verificationData.otp &&
-          responseObject &&
-          responseObject.delivery_status == "delivered-child"
-        ) {
-          let fileUrl = null;
-          if (verificationData.photograph_url) {
-            const { etag } = await fileUpload(
-              verificationData.photograph_url?.rawFile
-            );
-            fileUrl = etag;
-          }
-          const record = {
-            ...verificationData,
-            udise: session.username,
-            transaction_id: uuidv4(),
-            device_tracking_key_corporate: responseObject.device_tracking_key,
-            photograph_url: fileUrl,
-          };
-          const response = await mutate(
-            {
-              type: "create",
-              resource: "device_verification_records",
-              payload: { data: record },
-            },
-            { returnPromise: true }
-          );
-          setOtpGenerated(false);
-        }
-        onSuccess(responseObject);
+        return customSave({
+          values: values,
+          resource: "corporate_donor_devices",
+          setOtpGenerated: setOtpGenerated,
+          session: session,
+          mutate: mutate,
+          onSuccess: onSuccess,
+        });
       } catch (error) {
         if (error.body?.errors) {
           return error.body.errors;
@@ -425,17 +319,8 @@ export const CorporateDevicesEdit = (props) => {
         }
       }
     },
-    [mutate]
+    [coreMutate]
   );
-
-  const generateOtp = async (phone_number) => {
-    if (phone_number && phone_number.length >= 10) {
-      const responseObject = await sendOTP(phone_number);
-      if (!responseObject.error) {
-        setOtpGenerated(true);
-      }
-    }
-  };
 
   const EditNoDeleteToolbar = (props) => {
     let { record } = props;
@@ -469,7 +354,7 @@ export const CorporateDevicesEdit = (props) => {
       >
         <SimpleForm
           toolbar={<EditNoDeleteToolbar />}
-          validate={validateForm}
+          validate={session.role === "school" ? validateForm : null}
           save={save}
         >
           <BackButton history={props.history} />
@@ -498,7 +383,7 @@ export const CorporateDevicesEdit = (props) => {
           </div>
           <CustomFormDataConsumer
             otpGenerated={otpGenerated}
-            sendOtp={generateOtp}
+            setOtpGenerated={setOtpGenerated}
           />
         </SimpleForm>
       </Edit>
