@@ -19,34 +19,34 @@ const resourceConfig = {
   ],
   trackCards: [
     {
-        title: {
-          en: "Track a Smartphone as an Individual Donor",
-          hi: "व्यक्तिगत दाता",
-        },
-        type: "Individual",
-        icon: "volunteer_activism",
-        colour: "primary",
+      title: {
+        en: "Track a Smartphone as an Individual Donor",
+        hi: "व्यक्तिगत दाता",
       },
-      {
-        title: {
-          en: "Track a smartphone as a Corporate Donor",
-          hi: "कॉर्पोरेट दाता",
-        },
-        type: "Corporate",
-        icon: "corporate_fare",
-        colour: "primary",
+      type: "Individual",
+      icon: "volunteer_activism",
+      colour: "primary",
+    },
+    {
+      title: {
+        en: "Track a smartphone as a Corporate Donor",
+        hi: "कॉर्पोरेट दाता",
       },
+      type: "Corporate",
+      icon: "corporate_fare",
+      colour: "primary",
+    },
   ],
   homepageCards: [
     {
-    //   title: {
-    //     en: "Donate your smartphone",
-    //     hi: "अपना स्मार्टफ़ोन दान करें",
-    //   },
-    //   target: "/donate",
-    //   icon: "volunteer_activism",
-    //   colour: "primary",
-    // },{
+      //   title: {
+      //     en: "Donate your smartphone",
+      //     hi: "अपना स्मार्टफ़ोन दान करें",
+      //   },
+      //   target: "/donate",
+      //   icon: "volunteer_activism",
+      //   colour: "primary",
+      // },{
       title: {
         en: "Donate a Smartphone as an Individual Donor",
         hi: "व्यक्तिगत दाता",
@@ -135,7 +135,7 @@ const resourceConfig = {
   statusChoices: [
     {
       id: "no-action-taken",
-      name: "Donation in Progress",//No Action Taken
+      name: "Donation in Progress", //No Action Taken
       icon: "warning",
       style: "error",
     },

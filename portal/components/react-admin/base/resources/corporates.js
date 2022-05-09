@@ -212,11 +212,7 @@ export const CorporatesEdit = (props) => {
   };
   return (
     <div>
-      <Edit
-        mutationMode={"pessimistic"}
-        title={<Title />}
-        {...props}
-      >
+      <Edit mutationMode={"pessimistic"} title={<Title />} {...props}>
         <SimpleForm toolbar={<EditNoDeleteToolbar />}>
           <BackButton history={props.history} />
           <span className={classes.heading}>Corporate Details</span>
@@ -224,8 +220,18 @@ export const CorporatesEdit = (props) => {
             <td>Company Name</td>
             <td>Name</td>
             <td>Phone Number</td>
-            <TextField label="Company Name" source="company_name" disabled variant="outlined" />
-            <TextField label="Name" source="poc_name" disabled variant="outlined" />
+            <TextField
+              label="Company Name"
+              source="company_name"
+              disabled
+              variant="outlined"
+            />
+            <TextField
+              label="Name"
+              source="poc_name"
+              disabled
+              variant="outlined"
+            />
             <TextField
               label="Phone Number"
               source="poc_phone_number"
@@ -234,7 +240,7 @@ export const CorporatesEdit = (props) => {
             />
             <td>Quantity</td>
             <td>Designation</td>
-            <td/>
+            <td />
             <TextField
               label="Quantity"
               source="quantity_of_devices"

@@ -1,3 +1,2 @@
-
-export * from './donation';
-export * from './corporate-devices';
+export * from "./donation";
+export * from "./corporate-devices";

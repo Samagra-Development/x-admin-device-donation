@@ -6,7 +6,7 @@ import axios from "axios";
 import { useToasts } from "react-toast-notifications";
 import config from "@/components/config";
 
-const Track = ({type}) => {
+const Track = ({ type }) => {
   const [trackingKey, setTrackingKey] = useState(null);
   const [captcha, setCaptcha] = useState(null);
   const [captchaToken, setCaptchaToken] = useState(null);
@@ -19,16 +19,16 @@ const Track = ({type}) => {
   const captchaRef = useRef(null);
 
   useEffect(() => {
-    let {allStatus} = trackingResponse ?? false;
-    if(allStatus) {
-      const obj = config.statusChoices.filter(
-        (elem) => allStatus.includes(elem.id)
+    let { allStatus } = trackingResponse ?? false;
+    if (allStatus) {
+      const obj = config.statusChoices.filter((elem) =>
+        allStatus.includes(elem.id)
       );
       if (obj) {
         setDeliveryStatus(obj);
         let BooleanV = true;
-        obj.forEach(e => {
-          if (!(["received-state", "delivered-child"].includes(e.id))) {
+        obj.forEach((e) => {
+          if (!["received-state", "delivered-child"].includes(e.id)) {
             BooleanV = false;
           }
         });
@@ -74,7 +74,7 @@ const Track = ({type}) => {
         `${process.env.NEXT_PUBLIC_API_URL}/track`,
         {
           id: trackingKey,
-          type:type,
+          type: type,
           captcha: captcha,
           captchaToken: captchaToken,
         }
@@ -194,22 +194,33 @@ const Track = ({type}) => {
                     </td>
                     <td className={`${styles.tableCell}`}>
                       <table className={styles.table}>
-                        {deliveryStatus.map((status,index) => { 
-                          return <tr key={index}>
-                            <td><span
-                              className={`material-icons ${
-                                styles[status.style]
-                              } ${styles.icon}`}
-                            >
-                              {status.icon}
-                            </span></td>
-                            <td className={"text-left"}>{status.name}</td>
-                            {type == "Corporate" ? <td>
-                              {(trackingResponse && trackingResponse.allStatus) ?
-                                trackingResponse.allStatus.filter((e) => e == status.id).length
-                              : ""}
-                            </td>: ""}
-                          </tr>
+                        {deliveryStatus.map((status, index) => {
+                          return (
+                            <tr key={index}>
+                              <td>
+                                <span
+                                  className={`material-icons ${
+                                    styles[status.style]
+                                  } ${styles.icon}`}
+                                >
+                                  {status.icon}
+                                </span>
+                              </td>
+                              <td className={"text-left"}>{status.name}</td>
+                              {type == "Corporate" ? (
+                                <td>
+                                  {trackingResponse &&
+                                  trackingResponse.allStatus
+                                    ? trackingResponse.allStatus.filter(
+                                        (e) => e == status.id
+                                      ).length
+                                    : ""}
+                                </td>
+                              ) : (
+                                ""
+                              )}
+                            </tr>
+                          );
                         })}
                       </table>
                     </td>

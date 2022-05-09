@@ -1,16 +1,13 @@
 import {
   DonateDeviceRequestEdit,
   DonateDeviceRequestList,
-  DonateDeviceRequestShow
+  DonateDeviceRequestShow,
 } from "@/resources/donate-device";
 import {
   RequestDeviceEdit,
   RequestDeviceList,
 } from "@/resources/request-device";
-import {
-  CorporatesEdit,
-  CorporatesList,
-} from "@/resources/corporates";
+import { CorporatesEdit, CorporatesList } from "@/resources/corporates";
 import {
   CorporateDevicesEdit,
   CorporateDevicesList,

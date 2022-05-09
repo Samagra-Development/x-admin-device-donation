@@ -9,7 +9,7 @@ export const EXTENDED_DONATION_RECORD = gql`
       location {
         district
       }
-    } 
+    }
     device_verification_record {
       udise
       verifier_name

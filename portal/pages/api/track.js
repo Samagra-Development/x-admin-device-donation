@@ -6,7 +6,7 @@ const handler = async (req, res) => {
       const { captcha, captchaToken } = req.body;
       const responseObjectCaptcha = await captchaVerify(captcha, captchaToken);
       const { id, type } = req.body;
-      const responseObject = await startFetchTrackDevice(id,type);
+      const responseObject = await startFetchTrackDevice(id, type);
       if (responseObject?.errors) {
         res
           .status(500)
@@ -16,18 +16,14 @@ const handler = async (req, res) => {
           res.status(200).json({
             error: null,
             success: {
-              data: modifyData(
-                responseObject.data["device_donation_donor"]
-              ),
+              data: modifyData(responseObject.data["device_donation_donor"]),
             },
           });
         } else if (responseObject?.data?.["corporate_donor_devices"]?.length) {
           res.status(200).json({
             error: null,
             success: {
-              data: modifyData(
-                responseObject.data["corporate_donor_devices"]
-              ),
+              data: modifyData(responseObject.data["corporate_donor_devices"]),
             },
           });
         } else
@@ -46,14 +42,16 @@ const handler = async (req, res) => {
 };
 
 function modifyData(array) {
-  let modifyData = array.map(element => element.delivery_status);
-  let obj = {allStatus:modifyData};
+  let modifyData = array.map((element) => element.delivery_status);
+  let obj = { allStatus: modifyData };
   let { phone_number, device_donation_corporate, name } = array[0];
-  if(phone_number) {
+  if (phone_number) {
     obj.phone_number = maskPhoneNumber(phone_number);
     obj.name = name;
-  } else if(device_donation_corporate.poc_phone_number) {
-    obj.phone_number = maskPhoneNumber(device_donation_corporate.poc_phone_number);
+  } else if (device_donation_corporate.poc_phone_number) {
+    obj.phone_number = maskPhoneNumber(
+      device_donation_corporate.poc_phone_number
+    );
     obj.name = device_donation_corporate.company_name;
   }
   return obj;
@@ -119,20 +117,20 @@ const operationsCorporateDoc = `
   }
 `;
 
-function fetchTrackDevice(trackingKey,type) {
-  if(type == "Individual") {
+function fetchTrackDevice(trackingKey, type) {
+  if (type == "Individual") {
     return fetchGraphQL(operationsIndividualDoc, "trackDevice", {
       trackingKey: trackingKey,
     });
-  } else if(type == "Corporate") {
+  } else if (type == "Corporate") {
     return fetchGraphQL(operationsCorporateDoc, "trackDevice", {
       trackingKey: trackingKey,
     });
   }
 }
 
-async function startFetchTrackDevice(trackingKey,type) {
-  const response = await fetchTrackDevice(trackingKey,type);
+async function startFetchTrackDevice(trackingKey, type) {
+  const response = await fetchTrackDevice(trackingKey, type);
 
   return response.data;
 }
